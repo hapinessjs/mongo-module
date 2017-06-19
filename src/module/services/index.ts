@@ -1,1 +1,1 @@
-export * from './hello-world.service';
+export * from './mongo-manager.service';

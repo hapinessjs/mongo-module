@@ -11,12 +11,12 @@ import * as unit from 'unit.js';
 import { Observable } from 'rxjs/Observable';
 
 // element to test
-import { HelloWorldService } from '../../src';
+import { MongoManagerService } from '../../src';
 
-@suite('- Unit HelloWorldServiceTest file')
-class HelloWorldServiceTest {
+@suite('- Unit MongoManagerServiceTest file')
+class MongoManagerServiceTest {
     // private property to store service instance
-    private _helloWorldService: HelloWorldService;
+    private _mongoManagerService: MongoManagerService;
 
     /**
      * Function executed before the suite
@@ -38,14 +38,14 @@ class HelloWorldServiceTest {
      * Function executed before each test
      */
     before() {
-        this._helloWorldService = new HelloWorldService();
+        this._mongoManagerService = new MongoManagerService();
     }
 
     /**
      * Function executed after each test
      */
     after() {
-        this._helloWorldService = undefined;
+        this._mongoManagerService = undefined;
     }
 
     /**
@@ -53,7 +53,7 @@ class HelloWorldServiceTest {
      */
     @test('- `HelloWorldService` must have `sayHello` function')
     testHelloWorldServiceSayHello() {
-        unit.function(this._helloWorldService.sayHello);
+        unit.function(this._mongoManagerService.sayHello);
     }
 
     /**
@@ -61,13 +61,13 @@ class HelloWorldServiceTest {
      */
     @test('- `HelloWorldService.sayHello()` function must return an Observable')
     testHelloWorldServiceSayHelloObservable() {
-        unit.object(this._helloWorldService.sayHello()).isInstanceOf(Observable);
+        unit.object(this._mongoManagerService.sayHello()).isInstanceOf(Observable);
     }
     /**
      * Test if `HelloWorldService.sayHello()` Observable returns 'Hello World'
      */
     @test('- `HelloWorldService.sayHello()` Observable function must return a string with `Hello World` value')
     testHelloWorldServiceSayHelloObservableReturnString(done) {
-        this._helloWorldService.sayHello().subscribe(m => unit.string(m).is('Hello World').when(_ => done()));
+        this._mongoManagerService.sayHello().subscribe(m => unit.string(m).is('Hello World').when(_ => done()));
     }
 }

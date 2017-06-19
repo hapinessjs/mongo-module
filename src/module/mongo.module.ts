@@ -1,17 +1,16 @@
 import { HapinessModule } from '@hapiness/core';
-import { GetHelloWorldRoute } from './routes';
-import { HelloWorldService } from './services';
+import { MongoManagerService } from './services';
 
 @HapinessModule({
     version: '1.0.0-beta.2',
     declarations: [
-        GetHelloWorldRoute
+
     ],
     providers: [
-        HelloWorldService
+        MongoManagerService
     ],
     exports: [
-        HelloWorldService
+
     ]
 })
 export class HelloWorldModule {}
