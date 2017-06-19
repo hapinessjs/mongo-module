@@ -1,0 +1,1 @@
+export * from './stringmap.interface';
