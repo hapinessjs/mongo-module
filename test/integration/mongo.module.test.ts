@@ -1,7 +1,7 @@
 /**
  * @see https://github.com/pana-cc/mocha-typescript
  */
-import { test, suite } from 'mocha-typescript';
+import { test, suite, only } from 'mocha-typescript';
 
 /**
  * @see http://unitjs.com/
@@ -45,6 +45,7 @@ class MongoModuleTest {
     /**
      * Test if sayHello GET route returns `Hello World`
      */
+    @only
     @test('- check if `sayHello` GET route returns `Hello World`')
     testSayHelloGetRoute(done) {
         @HapinessModule({
@@ -61,10 +62,16 @@ class MongoModuleTest {
             ]
         })
         class MongoModuleTest implements OnStart {
-            constructor() {}
+            constructor(private _mongoManager: MongoManagerService) {}
 
             onStart(): void {
-                // this._mongoManager.getAdapter('mongoose');
+                const uri = this
+                    ._mongoManager
+                    .getAdapter('mongoose')
+                    .getUri();
+                console.log('URI => ', uri);
+                console.log('THIS.MANAGER => ', this._mongoManager);
+                done();
             }
         }
 

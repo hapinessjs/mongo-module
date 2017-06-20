@@ -1,10 +1,8 @@
-import { HapinessModule,  InjectionToken, CoreModuleWithProviders, OnRegister, Inject, Optional } from '@hapiness/core';
-
-import { IHapinessMongoAdapterConstructorArgs } from './adapters';
+import { HapinessModule, CoreModuleWithProviders, Inject, Optional } from '@hapiness/core';
 
 import { MongoManagerService } from './services/index';
-
-export const MONGO_MODULE_CONFIG = new InjectionToken('mongo_module_config');
+import { IHapinessMongoAdapterConstructorArgs } from './adapters/index';
+import { MONGO_CONFIG } from './utils/index';
 
 @HapinessModule({
     version: '1.0.0-beta.2',
@@ -18,26 +16,20 @@ export const MONGO_MODULE_CONFIG = new InjectionToken('mongo_module_config');
         MongoManagerService
     ]
 })
-export class MongoModule implements OnRegister {
+export class MongoModule  {
     static setConfig(config: IHapinessMongoAdapterConstructorArgs): CoreModuleWithProviders {
         return {
             module: MongoModule,
             providers: [
                 {
-                    provide: MONGO_MODULE_CONFIG,
+                    provide: MONGO_CONFIG,
                     useValue: config
                 }
             ]
         };
     }
 
-    constructor(
-        @Optional() @Inject(MONGO_MODULE_CONFIG) private config?: IHapinessMongoAdapterConstructorArgs
-    ) {
-        console.log('---- module#constructor => ', this.config);
-    }
-
-    onRegister() {
-        console.log('---- onRegister => ');
+    constructor(@Optional() @Inject(MONGO_CONFIG) config: IHapinessMongoAdapterConstructorArgs) {
+        console.log('ploplop =>', config);
     }
 }

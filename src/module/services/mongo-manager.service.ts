@@ -1,7 +1,6 @@
 import { Injectable, Inject, Optional } from '@hapiness/core';
 import { AbstractHapinessMongoAdapter, IHapinessMongoAdapterConstructorArgs, MongooseAdapter } from '../adapters/index';
-import { MONGO_MODULE_CONFIG } from '../index';
-import { StringMap } from '../utils/index';
+import { StringMap, MONGO_CONFIG } from '../utils/index';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -12,14 +11,17 @@ export class MongoManagerService {
     private _adaptersInstances: StringMap<AbstractHapinessMongoAdapter>;
 
     constructor(
-        @Optional() @Inject(MONGO_MODULE_CONFIG) private config?: IHapinessMongoAdapterConstructorArgs
+        // @Optional()
+        @Inject(MONGO_CONFIG) config: IHapinessMongoAdapterConstructorArgs
     ) {
-        console.log('ENCULETTE 1');
-        this._config = this._fixConfig(this.config);
+        console.log('TOKEN => ', MONGO_CONFIG);
+        console.log('OPTIONS #contruct before -- ', config);
+        this._config = this._fixConfig(config);
+        console.log('OPTIONS #contruct before -- ', this._config);
         this._adaptersInstances = {};
-        this._adapters = {
-            [MongooseAdapter.getInterfaceName()]: MongooseAdapter
-        };
+        this._adapters = {};
+
+        this.registerAdapter(MongooseAdapter);
     }
 
     private _fixConfig(configValues?: IHapinessMongoAdapterConstructorArgs): IHapinessMongoAdapterConstructorArgs {
@@ -53,7 +55,7 @@ export class MongoManagerService {
 
         const _options: IHapinessMongoAdapterConstructorArgs =
             <IHapinessMongoAdapterConstructorArgs>Object.assign({}, this._config, options)
-
+        console.log('OPTIONS #getAdapter -- ', _options);
         const key = this._keyForAdapter(adapterName, _options);
         if (!this._adaptersInstances[key]) {
             this._adaptersInstances[key] = new (this._adapters[adapterName])(_options);
