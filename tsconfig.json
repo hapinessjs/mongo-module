@@ -18,7 +18,9 @@
             "hapi",
             "hoek",
             "joi",
-            "fs-extra"
+            "fs-extra",
+            "mongoose",
+            "gridfs-stream"
         ],
         "lib": [
             "dom",

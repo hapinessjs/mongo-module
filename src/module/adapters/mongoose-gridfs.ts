@@ -1,35 +1,18 @@
 import * as mongoose from 'mongoose';
-import { Mockgoose } from 'mockgoose';
+import * as GridFsStream from 'gridfs-stream';
 import { Observable } from 'rxjs';
 import { AbstractHapinessMongoAdapter } from './mongo-adapter.abstract';
 
-export class MongooseAdapter extends AbstractHapinessMongoAdapter {
+export class MongooseGridFsAdapter extends AbstractHapinessMongoAdapter {
+
+    private _gridfs: GridFsStream.Grid;
 
     public static getInterfaceName(): string {
-        return 'mongoose';
+        return 'mongoose-gridfs';
     }
 
     constructor(options) {
         super(options);
-    }
-
-    protected _mock(): Observable<void> {
-        return Observable
-            .create(observer => {
-                const mockgoose: Mockgoose = new Mockgoose(mongoose);
-
-                mockgoose
-                    .prepareStorage()
-                    .then(() => {
-                        mongoose.connect(this._uri);
-
-                        this._connection = mongoose.connection;
-
-                        observer.next();
-                        observer.complete();
-                    });
-            })
-            .map(_ => this._afterConnect());
     }
 
     protected _tryConnect(): Observable<void> {
@@ -48,8 +31,6 @@ export class MongooseAdapter extends AbstractHapinessMongoAdapter {
                     },
                 };
 
-                this._connection = mongoose.createConnection(this._uri, connectOptions);
-
                 this._connection.once('connected', () => {
                     observer.next();
                     observer.complete();
@@ -67,6 +48,8 @@ export class MongooseAdapter extends AbstractHapinessMongoAdapter {
         return Observable
             .create(observer => {
                 this._db = this._connection.db;
+
+                this._gridfs = GridFsStream(this._db, mongoose.mongo);
 
                 this.onConnected().subscribe(_ => {}, (e) => {});
 
