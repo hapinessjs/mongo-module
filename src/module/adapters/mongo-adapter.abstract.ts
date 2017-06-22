@@ -26,7 +26,7 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
         this._config = options;
 
         // It means we're not on test environment but we dont get any config!
-        if (!this._config) {
+        if (!this._config || !Object.keys(this._config).length) {
             throw new Error('Missing mongodb configuration');
         }
 
@@ -41,7 +41,7 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
             });
     }
 
-    private connect(): Observable<void> {
+    public connect(): Observable<void> {
         this._connection = null;
 
         const db = this._config.db || this._config.database;
@@ -57,7 +57,7 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
         return this.tryConnect();
     }
 
-    private tryConnect(): Observable<void> {
+    public tryConnect(): Observable<void> {
         return this
             ._tryConnect()
             .switchMap(_ => this._afterConnect());
@@ -69,7 +69,7 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
      *
      */
     protected _tryConnect(): Observable<void> {
-        return Observable.throw(new Error('Not implemented'));
+        return Observable.throw(new Error('`_tryConnect` is not implemented'));
     }
 
     /*
@@ -78,7 +78,7 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
      *
      */
     protected _afterConnect(): Observable<void> {
-        return Observable.throw(new Error('Not implemented'));
+        return Observable.throw(new Error('`_afterConnect` is not implemented'));
     }
 
     /*
@@ -87,7 +87,7 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
      *
      */
     public getLibrary(): any {
-        throw new Error('Not implemented');
+        throw new Error('`getLibrary` is not implemented');
     }
 
     protected onConnected(): Observable<void> {
@@ -113,7 +113,7 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
             .delay(5000);
     }
 
-    protected onError(err): Observable<void> {
+    protected onError(err?: any): Observable<void> {
         __debugger.debug('onError', `got error :: ${JSON.stringify(err, null, 2)}`);
 
         return this

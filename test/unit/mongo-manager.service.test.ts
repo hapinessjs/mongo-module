@@ -82,7 +82,7 @@ class MongoManagerServiceTest {
      */
     @test('- `MongoManagerService.getAdapter(...).subscribe(...)` function must return an instance of MongooseAdapter')
     testMongoManagerServiceGetAdapterMongooseAdapterClass(done) {
-        this._mockConnection.emitAfter('connected');
+        this._mockConnection.emitAfter('connected', 400);
         this
             ._mongoManagerService
             .getAdapter('mongoose')
@@ -192,6 +192,75 @@ class MongoManagerServiceTest {
     /**
      * Test if we register a custom adapter and we get it twice, we got two different instances'
      */
+    @test('- Test if registering, then getting a custom adapter with db name will create the correct URI')
+    testMongoManagerServiceRegisterAndGetItForDb(done) {
+        class CustomAdapter extends AbstractHapinessMongoAdapter {
+            public static getInterfaceName(): string {
+                return 'custom';
+            }
+
+            constructor(options) { super(options); }
+
+            protected _tryConnect(): Observable<void> {
+                return Observable.create(observer => { observer.next(); observer.complete(); })
+            }
+
+            protected _afterConnect(): Observable<void> {
+                return this.onConnected();
+            }
+        }
+
+        // Register custom adapter
+        this._mongoManagerService.registerAdapter(CustomAdapter);
+
+        this
+            ._mongoManagerService
+            .getAdapter('custom', { db: 'toto1' })
+            .subscribe(adapter => {
+                unit
+                    .string(adapter.getUri())
+                    .is('mongodb://test.in.tdw:27017/toto1');
+
+                done();
+            }, (err) => done(err));
+    }
+
+    @test('- Test if registering, then getting a custom adapter with database name will create the correct URI')
+    testMongoManagerServiceRegisterAndGetItForDatabase(done) {
+        class CustomAdapter extends AbstractHapinessMongoAdapter {
+            public static getInterfaceName(): string {
+                return 'custom';
+            }
+
+            constructor(options) { super(options); }
+
+            protected _tryConnect(): Observable<void> {
+                return Observable.create(observer => { observer.next(); observer.complete(); })
+            }
+
+            protected _afterConnect(): Observable<void> {
+                return this.onConnected();
+            }
+        }
+
+        // Register custom adapter
+        this._mongoManagerService.registerAdapter(CustomAdapter);
+
+        this
+            ._mongoManagerService
+            .getAdapter('custom', { database: 'toto1' })
+            .subscribe(adapter => {
+                unit
+                    .string(adapter.getUri())
+                    .is('mongodb://test.in.tdw:27017/toto1');
+
+                done();
+            }, (err) => done(err));
+    }
+
+    /**
+     * Test if we register a custom adapter and we get it twice, we got two different instances'
+     */
     @test('- Test if we register a custom adapter and we get it twice, we got two different instances')
     testMongoManagerServiceRegisterAndGetTwiceWithDifferentKey(done) {
         class CustomAdapter extends AbstractHapinessMongoAdapter {
@@ -211,7 +280,7 @@ class MongoManagerServiceTest {
         }
 
         // Register custom adapter
-        this._mongoManagerService.registerAdapter(CustomAdapter)
+        this._mongoManagerService.registerAdapter(CustomAdapter);
 
         let adapter1;
         let adapter2;

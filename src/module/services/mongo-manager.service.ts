@@ -33,7 +33,7 @@ export class MongoManagerService {
     }
 
     private _keyForAdapter(adapterName: string, options: IHapinessMongoAdapterConstructorArgs): string {
-        return `${adapterName}_${options.db || options.database || 'default'}_${options.instance || 0}`;
+        return `${adapterName}_${options.db || options.database}_${options.instance || 0}`;
     }
 
     public registerAdapter(adapterClass: typeof AbstractHapinessMongoAdapter): boolean {
@@ -53,7 +53,7 @@ export class MongoManagerService {
         }
 
         const _options: IHapinessMongoAdapterConstructorArgs =
-            <IHapinessMongoAdapterConstructorArgs>Object.assign({}, this._config, options)
+            <IHapinessMongoAdapterConstructorArgs> Object.assign({}, this._config, options)
 
         const key = this._keyForAdapter(adapterName, _options);
         if (!this._adaptersInstances[key]) {
