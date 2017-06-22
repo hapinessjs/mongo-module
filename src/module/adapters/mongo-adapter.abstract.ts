@@ -1,19 +1,9 @@
-import { UtilFunctions } from '../utils/index';
 import { EventEmitter } from 'events';
 import { Observable } from 'rxjs';
+import { IHapinessMongoAdapterConstructorArgs } from './interfaces';
+import { UtilFunctions, Debugger } from '../shared/index';
 
-
-export interface IHapinessMongoAdapterConstructorArgs {
-    db?: string;
-    database?: string;
-    host?: string;
-    port?: number;
-    instance?: number;
-    url?: string;
-    is_ready?: boolean;
-    is_mocking?: boolean;
-    multi?: boolean;
-}
+const __debugger = new Debugger('AbstractHapinessMongoAdapter');
 
 /*
  * Not really abstract but we'll simulate it
@@ -33,13 +23,7 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
     constructor(options: IHapinessMongoAdapterConstructorArgs) {
         super();
 
-        this._config = !!options ?
-            options :
-            (
-                process.env.NODE_ENV === 'test' ?
-                    { is_mocking: true } :
-                    undefined
-            );
+        this._config = options;
 
         // It means we're not on test environment but we dont get any config!
         if (!this._config) {
@@ -48,35 +32,35 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
 
         this._isReady = false;
 
-        this.connect().subscribe(_ => { }, (err) => { });
+        this
+            .connect()
+            .subscribe(_ => {
+                __debugger.debug('constructor', 'OK');
+            }, (err) => {
+                __debugger.debug('constructor', `Err catched :: ${JSON.stringify(err, null, 2)}`);
+            });
     }
 
     private connect(): Observable<void> {
         this._connection = null;
 
-        if (this._config.is_mocking) {
-            this._uri = `mongodb://localhost/unit_test_${new Date().getTime()}_${process.pid}`;
-            return this._mock();
-        }
-
         const db = this._config.db || this._config.database;
 
         if (this._config.url) {
             this._uri = UtilFunctions.getMongoUri(this._config.url, db);
-        } else {
+        } else if (!!db) {
             this._uri = `mongodb://${this._config.host}:${this._config.port || 27017}/${db}`;
+        } else {
+            return Observable.throw(new Error('No db name provided'));
         }
 
-        return this._tryConnect();
+        return this.tryConnect();
     }
 
-    /*
-     *
-     *  This function can be overriden by all inherited classes.
-     *
-     */
-    protected _mock(): Observable<void> {
-        throw new Error('Not implemented');
+    private tryConnect(): Observable<void> {
+        return this
+            ._tryConnect()
+            .switchMap(_ => this._afterConnect());
     }
 
     /*
@@ -85,7 +69,7 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
      *
      */
     protected _tryConnect(): Observable<void> {
-        throw new Error('Not implemented');
+        return Observable.throw(new Error('Not implemented'));
     }
 
     /*
@@ -94,10 +78,21 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
      *
      */
     protected _afterConnect(): Observable<void> {
+        return Observable.throw(new Error('Not implemented'));
+    }
+
+    /*
+     *
+     *  This function should be overriden by all inherited classes.
+     *
+     */
+    public getLibrary(): any {
         throw new Error('Not implemented');
     }
 
     protected onConnected(): Observable<void> {
+        __debugger.debug('onConnected', '');
+
         return Observable
             .create(observer => {
                 this._isReady = true;
@@ -109,32 +104,43 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
     }
 
     protected onDisconnected(): Observable<void> {
+        __debugger.debug('onDisconnected', '');
+
         this.emit('disconnected');
+
         return this
-            ._tryConnect()
+            .tryConnect()
             .delay(5000);
     }
 
     protected onError(err): Observable<void> {
+        __debugger.debug('onError', `got error :: ${JSON.stringify(err, null, 2)}`);
+
         return this
-            ._tryConnect()
+            .tryConnect()
             .delay(5000);
     }
 
-    public whenReady(options: { timeout: number }): Observable<void> {
-         return Observable
+    public whenReady(options: { timeout: number } = { timeout: 60000 }): Observable<void> {
+        return Observable
             .create(observer => {
                 if (this._isReady) {
+                    __debugger.debug('whenReady', 'already ready');
+
                     observer.next();
                     observer.complete();
                 }
 
                 this.on('ready', () => {
+                    __debugger.debug('whenReady', 'now ready');
+
+                    this._isReady = true;
+
                     observer.next();
                     observer.complete();
                 });
             })
-            .timeout(options.timeout || 60000);
+            .timeout(options.timeout);
     }
 
     public isConnected(): boolean {

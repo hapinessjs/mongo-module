@@ -1,7 +1,7 @@
 /**
  * @see https://github.com/pana-cc/mocha-typescript
  */
-import { test, suite } from 'mocha-typescript';
+import { test, suite, only } from 'mocha-typescript';
 
 /**
  * @see http://unitjs.com/
@@ -9,15 +9,17 @@ import { test, suite } from 'mocha-typescript';
 import * as unit from 'unit.js';
 
 import { Observable } from 'rxjs/Observable';
+import { MongooseMockInstance, ConnectionMock } from '../mocks/index';
 
-// element to test
-import { AbstractHapinessMongoAdapter, MongoManagerService, MongooseAdapter } from '../../src';
+import { AbstractHapinessMongoAdapter, MongoManagerService, MongooseAdapter } from '../../src/index';
 
 
 @suite('- Unit MongoManagerServiceTest file')
 class MongoManagerServiceTest {
+
     // private property to store service instance
     private _mongoManagerService: MongoManagerService;
+    private _mockConnection: ConnectionMock;
 
     /**
      * Function executed before the suite
@@ -40,13 +42,17 @@ class MongoManagerServiceTest {
      */
     before() {
         this._mongoManagerService = new MongoManagerService({ host: 'test.in.tdw' });
+        this._mockConnection = MongooseMockInstance.mockCreateConnection();
     }
 
     /**
      * Function executed after each test
      */
     after() {
+        MongooseMockInstance.restore();
+
         this._mongoManagerService = undefined;
+        this._mockConnection = undefined;
     }
 
     /**
@@ -61,38 +67,54 @@ class MongoManagerServiceTest {
     /**
      * Test if `MongoManagerService.getAdapter()` function returns an Observable
      */
-    @test('- `MongoManagerService.getAdapter(...)` function must return an instance of MongooseAdapter with db toto')
-    testMongoManagerServiceGetAdapterMongooseAdapterClassDbToto() {
+    @test('- `MongoManagerService.getAdapter(...)` function must returns an Observable')
+    testMongoManagerServiceGetAdapterMongooseAdapterIsObservable() {
         unit
-            .object(
-                this._mongoManagerService.getAdapter('mongoose', { db: 'toto' })
+            .object(this
+                ._mongoManagerService
+                .getAdapter('mongoose')
             )
-            .isInstanceOf(MongooseAdapter);
+            .isInstanceOf(Observable);
     }
 
     /**
-     * Test if `MongoManagerService.getAdapter()` function returns an Observable
+     * Test if `MongoManagerService.getAdapter(...).subscribe(...)` function must return an instance of MongooseAdapter
      */
-    @test('- `MongoManagerService.getAdapter(...)` function must return an instance of MongooseAdapter with db default')
-    testMongoManagerServiceGetAdapterMongooseAdapterClassDbDefault() {
-        unit
-            .object(
-                this._mongoManagerService.getAdapter('mongoose', {})
-            )
-            .isInstanceOf(MongooseAdapter);
+    @test('- `MongoManagerService.getAdapter(...).subscribe(...)` function must return an instance of MongooseAdapter')
+    testMongoManagerServiceGetAdapterMongooseAdapterClass(done) {
+        this._mockConnection.emitAfter('connected');
+        this
+            ._mongoManagerService
+            .getAdapter('mongoose')
+            .subscribe(adapter => {
+                unit
+                    .object(
+                        adapter
+                    )
+                    .isInstanceOf(MongooseAdapter);
+
+                done();
+            }, (err) => done(err));
     }
 
     /**
      * Test if `MongoManagerService.getAdapter()` function returns an Observable
      */
     @test('- `MongoManagerService.getAdapter(...)` function should throw an error')
-    testMongoManagerServiceGetAdapterUnknowAdapter() {
-            unit
-                .assert
-                .throws(
-                    () => this._mongoManagerService.getAdapter('test', { db: 'toto' }),
-                    'Unknown adapter, please register it before using it.'
-                );
+    testMongoManagerServiceGetAdapterUnknowAdapter(done) {
+        this._mockConnection.emitAfter('connected');
+        this
+            ._mongoManagerService
+            .getAdapter('test', { db: 'toto' })
+            .subscribe(_ => {
+                done(new Error('Should not go there !'));
+            }, (err) => {
+                unit
+                    .string(err.message)
+                    .is('Unknown adapter test, please register it before using it.');
+
+                done();
+            });
     }
 
     /**
@@ -100,6 +122,8 @@ class MongoManagerServiceTest {
      */
     @test('- `MongoManagerService.registerAdapter(...)` throw an error because the child class dont override getInterfaceName')
     testMongoManagerServiceRegisterAdapterThrowErrorMissingFunctionGetInterfaceName() {
+        this._mockConnection.emitAfter('connected');
+
         class CustomAdapter extends AbstractHapinessMongoAdapter {
             constructor(options) { super(options) }
         }
@@ -108,7 +132,13 @@ class MongoManagerServiceTest {
                 .assert
                 .throws(
                     () => this._mongoManagerService.registerAdapter(CustomAdapter),
-                    'Your adapter should implements `getInterfaceName()`'
+                    (err) => {
+                        if ((err instanceof Error) && err.message === 'Your adapter should implements `getInterfaceName()`') {
+                            return true;
+                        }
+
+                        return false;
+                    }
                 );
     }
 
@@ -129,7 +159,13 @@ class MongoManagerServiceTest {
                 .assert
                 .throws(
                     () => this._mongoManagerService.registerAdapter(CustomMongooseAdapter),
-                    'Provider mongoose already exists.'
+                    (err) => {
+                        if ((err instanceof Error) && err.message === 'Provider mongoose already exists.') {
+                            return true;
+                        }
+
+                        return false;
+                    }
                 );
     }
 
@@ -144,18 +180,6 @@ class MongoManagerServiceTest {
             }
 
             constructor(options) { super(options) }
-
-            protected _mock(): Observable<void> {
-                return Observable.create(observer => { observer.next(); observer.complete(); })
-            }
-
-            protected _tryConnect(): Observable<void> {
-                return Observable.create(observer => { observer.next(); observer.complete(); })
-            }
-
-            protected _afterConnect(): Observable<void> {
-                return Observable.create(observer => { observer.next(); observer.complete(); })
-            }
         }
 
         unit
@@ -166,69 +190,93 @@ class MongoManagerServiceTest {
     }
 
     /**
-     * Test if we register a custom adapter and we get it twice, we got two different instance'
+     * Test if we register a custom adapter and we get it twice, we got two different instances'
      */
-    @test('- Test if we register a custom adapter and we get it twice, we got two different instance')
-    testMongoManagerServiceRegisterAndGetTwiceWithDifferentKey() {
+    @test('- Test if we register a custom adapter and we get it twice, we got two different instances')
+    testMongoManagerServiceRegisterAndGetTwiceWithDifferentKey(done) {
         class CustomAdapter extends AbstractHapinessMongoAdapter {
             public static getInterfaceName(): string {
                 return 'custom';
             }
 
-            constructor(options) { super(options) }
-
-            protected _mock(): Observable<void> {
-                return Observable.create(observer => { observer.next(); observer.complete(); })
-            }
+            constructor(options) { super(options); this._uri = options.db; }
 
             protected _tryConnect(): Observable<void> {
                 return Observable.create(observer => { observer.next(); observer.complete(); })
             }
 
             protected _afterConnect(): Observable<void> {
-                return Observable.create(observer => { observer.next(); observer.complete(); })
+                return this.onConnected();
             }
         }
 
         // Register custom adapter
         this._mongoManagerService.registerAdapter(CustomAdapter)
 
+        let adapter1;
+        let adapter2;
+
+        this._mockConnection.emitAfter('connected');
+
         // Get first instance
-        const adapter1 = this._mongoManagerService.getAdapter('custom', { db: 'toto1' });
+        this
+            ._mongoManagerService
+            .getAdapter('custom', { db: 'toto1' })
+            .switchMap(adap1 => {
+                adapter1 = adap1;
+                return this._mongoManagerService.getAdapter('custom', { db: 'toto2' });
+            })
+            .subscribe(adap2 => {
+                adapter2 = adap2;
+                unit
+                    .bool(
+                        adapter1.getUri() === adapter2.getUri(),
+                    )
+                    .isFalse();
 
-        // Get second instance
-        const adapter2 = this._mongoManagerService.getAdapter('custom', { db: 'toto2' });
-
-        unit
-            .bool(
-                adapter1.getUri() === adapter2.getUri(),
-            )
-            .isFalse();
+                done();
+            }, (err) => done(err));
     }
 
     /**
      * Test if we get twice a registered adapter for the same key, we get the exact same instance'
      */
     @test('- Test if we get twice a registered adapter for the same key, we get the exact same instance')
-    testMongoManagerServiceRegisterAndGetTwiceWithSameKey() {
+    testMongoManagerServiceRegisterAndGetTwiceWithSameKey(done) {
         const mongoManagerService = new MongoManagerService({ db: 'toto', host: 'test.in.tdw' });
 
+         this._mockConnection.emitAfter('connected');
+
+        let adapter1;
+        let adapter2;
+
         // Get first instance
-        const adapter1 = mongoManagerService.getAdapter('mongoose');
+        mongoManagerService
+            .getAdapter('mongoose')
+            .switchMap(adap1 => {
+                adapter1 = adap1;
+                return mongoManagerService.getAdapter('mongoose');
+            })
+            .subscribe(adap2 => {
+                try {
+                    adapter2 = adap2;
 
-        // Get second instance
-        const adapter2 = mongoManagerService.getAdapter('mongoose');
+                    unit
+                        .string(
+                            adapter1.getUri()
+                        )
+                        .is('mongodb://test.in.tdw:27017/toto');
 
-        unit
-            .string(
-                adapter1.getUri()
-            )
-            .is('mongodb://test.in.tdw:27017/toto');
+                    unit
+                        .bool(
+                            adapter1.getUri() === adapter2.getUri(),
+                        )
+                        .isTrue();
 
-        unit
-            .bool(
-                adapter1.getUri() === adapter2.getUri(),
-            )
-            .isTrue();
+                    done();
+                } catch (err) {
+                    done(err);
+                }
+            }, (err) => done(err));
     }
 }

@@ -1,7 +1,9 @@
 import { Injectable, Inject, Optional } from '@hapiness/core';
 import { AbstractHapinessMongoAdapter, IHapinessMongoAdapterConstructorArgs, MongooseAdapter } from '../adapters/index';
-import { StringMap, MONGO_CONFIG } from '../utils/index';
+import { StringMap, defaultMongoConfig, Debugger, MONGO_CONFIG } from '../shared/index';
 import { Observable } from 'rxjs';
+
+const __debugger = new Debugger('MongooseAdapter');
 
 @Injectable()
 export class MongoManagerService {
@@ -11,13 +13,9 @@ export class MongoManagerService {
     private _adaptersInstances: StringMap<AbstractHapinessMongoAdapter>;
 
     constructor(
-        // @Optional()
-        @Inject(MONGO_CONFIG) config: IHapinessMongoAdapterConstructorArgs
+        @Optional() @Inject(MONGO_CONFIG) config: IHapinessMongoAdapterConstructorArgs
     ) {
-        console.log('TOKEN => ', MONGO_CONFIG);
-        console.log('OPTIONS #contruct before -- ', config);
         this._config = this._fixConfig(config);
-        console.log('OPTIONS #contruct before -- ', this._config);
         this._adaptersInstances = {};
         this._adapters = {};
 
@@ -28,6 +26,7 @@ export class MongoManagerService {
         return <IHapinessMongoAdapterConstructorArgs> (
             Object.assign(
                 {},
+                defaultMongoConfig,
                 configValues
             )
         );
@@ -48,19 +47,27 @@ export class MongoManagerService {
         return true;
     }
 
-    public getAdapter(adapterName: string, options?: any): AbstractHapinessMongoAdapter {
+    public getAdapter(adapterName: string, options?: any): Observable<AbstractHapinessMongoAdapter> {
         if (!this._adapters[adapterName]) {
-            throw new Error('Unknown adapter, please register it before using it.');
+            return Observable.throw(new Error(`Unknown adapter ${adapterName}, please register it before using it.`));
         }
 
         const _options: IHapinessMongoAdapterConstructorArgs =
             <IHapinessMongoAdapterConstructorArgs>Object.assign({}, this._config, options)
-        console.log('OPTIONS #getAdapter -- ', _options);
+
         const key = this._keyForAdapter(adapterName, _options);
         if (!this._adaptersInstances[key]) {
             this._adaptersInstances[key] = new (this._adapters[adapterName])(_options);
         }
 
-        return this._adaptersInstances[key];
+        return this
+            ._adaptersInstances[key]
+            .whenReady()
+            .switchMap(_ => Observable
+                .create(observer => {
+                    observer.next(this._adaptersInstances[key]);
+                    observer.complete();
+                })
+            );
     }
 }

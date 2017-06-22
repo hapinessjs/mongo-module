@@ -11,11 +11,17 @@ import * as unit from 'unit.js';
 import { Hapiness, HapinessModule, HttpServer, Lib, OnStart } from '@hapiness/core';
 import { Observable } from 'rxjs/Observable';
 
+// Mongoose mocking
+import { MongooseMockInstance, ConnectionMock } from '../mocks/index';
+
 // element to test
-import { MongoModule, MongoManagerService } from '../../src';
+import { AbstractHapinessMongoAdapter, MongoModule, MongoManagerService, MONGO_CONFIG } from '../../src/index';
+import { unitTestMongoConfig } from '../config/index';
 
 @suite('- Integration MongoModule test file')
 class MongoModuleTest {
+    private _mockConnection: ConnectionMock;
+
     /**
      * Function executed before the suite
      */
@@ -35,43 +41,138 @@ class MongoModuleTest {
     /**
      * Function executed before each test
      */
-    before() {}
+    before() {
+        this._mockConnection = MongooseMockInstance.mockCreateConnection();
+    }
 
     /**
      * Function executed after each test
      */
-    after() {}
+    after() {
+        MongooseMockInstance.restore();
+
+        this._mockConnection = undefined;
+    }
 
     /**
-     * Test if sayHello GET route returns `Hello World`
+     * Test if `MongoModule` has a Mongoose adapter and if we can get the connection URI
      */
-    @only
-    @test('- check if `sayHello` GET route returns `Hello World`')
-    testSayHelloGetRoute(done) {
+    @test('- Test if `MongoModule` has a Mongoose adapter and if we can get the connection URI')
+    testMongoModuleMongooseAdapter(done) {
+        this._mockConnection.emitAfter('connected', 400);
+
         @HapinessModule({
             version: '1.0.0',
             options: {
                 host: '0.0.0.0',
                 port: 4443
             },
+            providers: [
+                {
+                    provide: MONGO_CONFIG,
+                    useValue: unitTestMongoConfig
+                }
+            ],
             imports: [
-                MongoModule.setConfig({
-                    host: 'toto.in.tdw',
-                    db: 'test'
-                })
+                MongoModule.setConfig(Object.assign({}, unitTestMongoConfig))
             ]
         })
         class MongoModuleTest implements OnStart {
             constructor(private _mongoManager: MongoManagerService) {}
 
             onStart(): void {
-                const uri = this
+                this
                     ._mongoManager
                     .getAdapter('mongoose')
-                    .getUri();
-                console.log('URI => ', uri);
-                console.log('THIS.MANAGER => ', this._mongoManager);
-                done();
+                    .subscribe(adapter => {
+                        try {
+                            unit
+                                .string(adapter.getUri())
+                                .is('mongodb://my.hostname.com:27017/unit_test');
+
+                            Hapiness
+                                .kill()
+                                .subscribe(__ => done());
+                        } catch (err) {
+                            Hapiness
+                                .kill()
+                                .subscribe(__ => done(err));
+                        }
+                    }, (err) => Hapiness
+                        .kill()
+                        .subscribe(__ => done(err))
+                    );
+            }
+        }
+
+        Hapiness.bootstrap(MongoModuleTest);
+    }
+
+    /**
+     * Test if `MongoModule` can register a custom provider and if we can get it with its connection uri
+     */
+    @test('- Test if `MongoModule` can register a custom provider and if we can get it with its connection uri')
+    testMongoModuleCustomAdapter(done) {
+        class CustomAdapter extends AbstractHapinessMongoAdapter {
+            public static getInterfaceName(): string {
+                return 'custom';
+            }
+
+            constructor(options) { super(options); }
+
+            protected _tryConnect(): Observable<void> {
+                return Observable.create(observer => { observer.next(); observer.complete(); })
+            }
+
+            protected _afterConnect(): Observable<void> {
+                return this.onConnected();
+            }
+        }
+
+
+        @HapinessModule({
+            version: '1.0.0',
+            options: {
+                host: '0.0.0.0',
+                port: 4443
+            },
+            providers: [
+                {
+                    provide: MONGO_CONFIG,
+                    useValue: unitTestMongoConfig
+                }
+            ],
+            imports: [
+                MongoModule.setConfig(Object.assign({}, unitTestMongoConfig))
+            ]
+        })
+        class MongoModuleTest implements OnStart {
+            constructor(private _mongoManager: MongoManagerService) {}
+
+            onStart(): void {
+                const res = this._mongoManager.registerAdapter(CustomAdapter);
+
+                this
+                    ._mongoManager
+                    .getAdapter('custom')
+                    .subscribe(adapter => {
+                        try {
+                            unit
+                                .string(adapter.getUri())
+                                .is('mongodb://my.hostname.com:27017/unit_test');
+
+                            Hapiness
+                                .kill()
+                                .subscribe(__ => done());
+                        } catch (err) {
+                            Hapiness
+                                .kill()
+                                .subscribe(__ => done(err));
+                        }
+                    }, (err) => Hapiness
+                        .kill()
+                        .subscribe(__ => done(err))
+                    );
             }
         }
 

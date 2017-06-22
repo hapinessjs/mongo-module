@@ -41,7 +41,7 @@ export class MongooseGridFsAdapter extends AbstractHapinessMongoAdapter {
                     observer.complete();
                 });
             })
-            .map(_ => this._afterConnect());
+            .switchMap(_ => this._afterConnect());
     }
 
     protected _afterConnect(): Observable<void> {

@@ -2,7 +2,7 @@ import { HapinessModule, CoreModuleWithProviders, Inject, Optional } from '@hapi
 
 import { MongoManagerService } from './services/index';
 import { IHapinessMongoAdapterConstructorArgs } from './adapters/index';
-import { MONGO_CONFIG } from './utils/index';
+import { MONGO_CONFIG } from './shared/index';
 
 @HapinessModule({
     version: '1.0.0-beta.2',
@@ -30,6 +30,6 @@ export class MongoModule  {
     }
 
     constructor(@Optional() @Inject(MONGO_CONFIG) config: IHapinessMongoAdapterConstructorArgs) {
-        console.log('ploplop =>', config);
+
     }
 }
