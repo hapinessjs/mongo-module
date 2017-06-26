@@ -1,14 +1,18 @@
-import * as mongoose from 'mongoose';
 import * as unit from 'unit.js';
+import * as mongoose from 'mongoose';
 
 import { EventEmitter } from 'events';
 
 export class ConnectionMock extends EventEmitter {
     private _db: string;
 
-    emitAfter(evt: string, delay?: number) {
+    emitAfter(evt: string, delay?: number, objectToSend?: any) {
         setTimeout(() => {
-            this.emit(evt);
+            if (!!objectToSend) {
+                this.emit(evt, objectToSend);
+            } else {
+                this.emit(evt);
+            }
         }, delay || 200);
     }
 

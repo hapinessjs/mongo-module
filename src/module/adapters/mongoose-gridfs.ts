@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose';
-import * as GridFsStream from 'gridfs-stream';
 import { Observable } from 'rxjs';
+
+import { CreateGridFsStream, GridFsStream } from '../shared/gridfs-stream';
 import { AbstractHapinessMongoAdapter } from './mongo-adapter.abstract';
 
 export class MongooseGridFsAdapter extends AbstractHapinessMongoAdapter {
@@ -31,6 +32,8 @@ export class MongooseGridFsAdapter extends AbstractHapinessMongoAdapter {
                     },
                 };
 
+                this._connection = mongoose.createConnection(this._uri, connectOptions);
+
                 this._connection.once('connected', () => {
                     observer.next();
                     observer.complete();
@@ -40,8 +43,7 @@ export class MongooseGridFsAdapter extends AbstractHapinessMongoAdapter {
                     observer.error(err);
                     observer.complete();
                 });
-            })
-            .switchMap(_ => this._afterConnect());
+            });
     }
 
     protected _afterConnect(): Observable<void> {
@@ -49,11 +51,11 @@ export class MongooseGridFsAdapter extends AbstractHapinessMongoAdapter {
             .create(observer => {
                 this._db = this._connection.db;
 
-                this._gridfs = GridFsStream(this._db, mongoose.mongo);
+                this._gridfs = CreateGridFsStream(this._db, mongoose.mongo);
 
                 this.onConnected().subscribe(_ => {}, (e) => {});
 
-                this._connection.on('error', err =>
+                this._connection.once('error', err =>
                     this.onError(err).subscribe(_ => {}, (e) => {})
                 );
 

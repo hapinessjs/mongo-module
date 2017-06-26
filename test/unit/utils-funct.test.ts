@@ -13,8 +13,8 @@ import { Observable } from 'rxjs/Observable';
 // element to test
 import { UtilFunctions } from '../../src';
 
-@suite('- Unit Utils#Funct file')
-class MongoManagerServiceTest {
+@suite('- Unit Shared#funct file')
+class SharedFunctionsTest {
     /**
      * Function executed before the suite
      */

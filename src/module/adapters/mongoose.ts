@@ -62,7 +62,7 @@ export class MongooseAdapter extends AbstractHapinessMongoAdapter {
                     __debugger.debug('_afterConnect', `(subscribe) On connected failed ${JSON.stringify(e, null, 2)}`);
                 });
 
-                this._connection.on('error', err =>
+                this._connection.once('error', err =>
                     this.onError(err).subscribe(_ => {
                         __debugger.debug('_afterConnect', '(subscribe) On connection error #success');
                     }, (e) => {

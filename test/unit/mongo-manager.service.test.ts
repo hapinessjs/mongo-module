@@ -1,7 +1,7 @@
 /**
  * @see https://github.com/pana-cc/mocha-typescript
  */
-import { test, suite, only } from 'mocha-typescript';
+import { test, suite } from 'mocha-typescript';
 
 /**
  * @see http://unitjs.com/

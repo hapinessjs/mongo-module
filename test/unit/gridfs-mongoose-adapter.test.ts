@@ -7,18 +7,17 @@ import { test, suite } from 'mocha-typescript';
  * @see http://unitjs.com/
  */
 import * as unit from 'unit.js';
-
 import { Observable } from 'rxjs/Observable';
+// import  * as gfs from '../../src/index';
 
-import { MongooseMockInstance, ConnectionMock } from '../mocks/index';
+import { MongooseMockInstance, GridFsMockInstance, ConnectionMock } from '../mocks/index';
 
-import { MongooseAdapter } from '../../src/index';
+import { MongooseGridFsAdapter } from '../../src/index';
 
-@suite('- Unit MongooseAdapterTest file')
-class MongooseAdapterTest {
-
-    private _mongooseAdapter: MongooseAdapter;
+@suite('- Unit MongooseGridFsAdapterTest file')
+class MongooseGridFsAdapterTest {
     private _mockConnection: ConnectionMock;
+    private _gridfsMock: any;
 
     /**
      * Function executed before the suite
@@ -40,8 +39,8 @@ class MongooseAdapterTest {
      * Function executed before each test
      */
     before() {
-        this._mongooseAdapter = new MongooseAdapter({ host: 'test.in.tdw', db: 'test', skip_connect: true });
         this._mockConnection = MongooseMockInstance.mockCreateConnection();
+        this._gridfsMock = GridFsMockInstance.mockGridFsStream();
     }
 
     /**
@@ -49,9 +48,10 @@ class MongooseAdapterTest {
      */
     after() {
         MongooseMockInstance.restore();
+        GridFsMockInstance.restore();
 
-        this._mongooseAdapter = undefined;
         this._mockConnection = undefined;
+        this._gridfsMock = undefined;
     }
 
     /**
@@ -60,19 +60,8 @@ class MongooseAdapterTest {
     @test('- Static method getInterfaceName should return correct key')
     testGetInterfaceNameReturnValue() {
         unit
-            .string(MongooseAdapter.getInterfaceName())
-            .is('mongoose');
-    }
-
-    /**
-     * Get librairy should return mongoose instance
-     */
-    @test('- Get librairy should return mongoose instance')
-    testGetLibrairyShouldReturnInstance() {
-        const _mongoose = this._mongooseAdapter.getLibrary();
-        const test = _mongoose.createConnection();
-
-        unit.assert(test instanceof ConnectionMock);
+            .string(MongooseGridFsAdapter.getInterfaceName())
+            .is('mongoose-gridfs');
     }
 
     /**
@@ -82,7 +71,7 @@ class MongooseAdapterTest {
     testIfDbAlreadyExistsItShouldCloseIt(done) {
         const spy = unit.spy();
 
-        class ExtendMongooseAdapter extends MongooseAdapter {
+        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
             constructor(opts) {
                 super(opts);
                 this._db = { close: spy };
@@ -93,7 +82,7 @@ class MongooseAdapterTest {
             }
         }
 
-        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
         this._mockConnection.emitAfter('connected', 400);
 
         _tmpObject
@@ -112,7 +101,7 @@ class MongooseAdapterTest {
      */
     @test('- If connection got an error the observer should failed and return the error')
     testConnectionGotErrorObserverShouldFail(done) {
-        class ExtendMongooseAdapter extends MongooseAdapter {
+        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
             constructor(opts) {
                 super(opts);
             }
@@ -122,7 +111,7 @@ class MongooseAdapterTest {
             }
         }
 
-        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
         this._mockConnection.emitAfter('error', 400, new Error('Custom error, connection failed'));
 
         _tmpObject
@@ -141,7 +130,7 @@ class MongooseAdapterTest {
      */
     @test('- If the connection emit the event connected, the _tryConnect function should resolve observable')
     testConnectionSucceedObserverShouldResolve(done) {
-        class ExtendMongooseAdapter extends MongooseAdapter {
+        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
             constructor(opts) {
                 super(opts);
             }
@@ -151,7 +140,7 @@ class MongooseAdapterTest {
             }
         }
 
-        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
         this._mockConnection.emitAfter('connected', 400);
 
         _tmpObject
@@ -165,14 +154,60 @@ class MongooseAdapterTest {
     }
 
     /**
+     *  If the connection emit the event connected, the afterConnect function should go though success block
+     */
+    @test('- If the connection emit the event connected, the onConnected function inside afterConnect should resolve observable')
+    testConnectionSucceedOnConnectedInsideAfterConnect(done) {
+        const gridfsMock = this._gridfsMock;
+
+        this._mockConnection.db = 'toto';
+        const mockConnection = this._mockConnection;
+
+        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
+            constructor(opts) {
+                super(opts);
+            }
+
+            publicAfterConnect() {
+                this._connection = mockConnection;
+                return this._afterConnect();
+            }
+
+            onConnected() {
+                return Observable.create(
+                    observer => {
+                        observer.next();
+                        observer.complete();
+
+                        done();
+                    }
+                );
+            }
+        }
+
+        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+
+        _tmpObject
+            .publicAfterConnect()
+            .subscribe(_ => {
+                this._mockConnection.emitAfter('connected', 400);
+            }, (err) => {
+                unit.assert(false);
+                done(err);
+            });
+    }
+
+    /**
      *  When afterConnect got an error after calling the onConnected function, it should pass in the error block
      */
     @test('- When afterConnect got an error after calling the onConnected function, it should pass in the error block')
     testAfterConnectOnConnectedFailShouldGoInErrorBlock(done) {
+        const gridfsMock = this._gridfsMock;
+
         this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
 
-        class ExtendMongooseAdapter extends MongooseAdapter {
+        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
             constructor(opts) {
                 super(opts);
             }
@@ -187,14 +222,14 @@ class MongooseAdapterTest {
                     observer => {
                         observer.error(new Error('test error'));
                         observer.complete();
-
+                        unit.assert(gridfsMock.callCount === 1, `Incorrect call count, expected 1 but it was ${gridfsMock.callCount}`)
                         done();
                     }
                 );
             }
         }
 
-        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
 
         _tmpObject
             .publicAfterConnect()
@@ -211,10 +246,12 @@ class MongooseAdapterTest {
      */
     @test('- When afterConnect got error, the onError function should be called')
     testAfterConnectGotConnectionError(done) {
+        const gridfsMock = this._gridfsMock;
+
         this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
 
-        class ExtendMongooseAdapter extends MongooseAdapter {
+        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
             constructor(opts) {
                 super(opts);
             }
@@ -236,7 +273,7 @@ class MongooseAdapterTest {
             }
         }
 
-        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
 
         _tmpObject
             .publicAfterConnect()
@@ -253,10 +290,12 @@ class MongooseAdapterTest {
      */
     @test('- When afterConnect got error, the onError function should be called and go to the error block of observer if there is an error')
     testAfterConnectGotConnectionErrorGoToObservableErrBlock(done) {
+        const gridfsMock = this._gridfsMock;
+
         this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
 
-        class ExtendMongooseAdapter extends MongooseAdapter {
+        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
             constructor(opts) {
                 super(opts);
             }
@@ -278,7 +317,7 @@ class MongooseAdapterTest {
             }
         }
 
-        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
 
         _tmpObject
             .publicAfterConnect()
@@ -295,10 +334,12 @@ class MongooseAdapterTest {
      */
     @test('- When afterConnect got disconnected, the onDisconnected function should be called')
     testAfterConnectGotConnectionDisconnected(done) {
+        const gridfsMock = this._gridfsMock;
+
         this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
 
-        class ExtendMongooseAdapter extends MongooseAdapter {
+        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
             constructor(opts) {
                 super(opts);
             }
@@ -320,7 +361,7 @@ class MongooseAdapterTest {
             }
         }
 
-        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
 
         _tmpObject
             .publicAfterConnect()
@@ -333,14 +374,17 @@ class MongooseAdapterTest {
     }
 
     /**
-     * If afterConnect got disconnected, onDisconnected function should be called and go to the error block of observer if there is an err
+     * If afterConnect got disconnected, onDisconnected
+    function should be called and go to the error block of observer if there is an err
      */
     @test('- If afterConnect got disconnected, onDisconnected func should be called and go to the err block of observer if there is an err')
     testAfterConnectGotConnectionDisconnectedGoToObservableErrBlock(done) {
+        const gridfsMock = this._gridfsMock;
+
         this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
 
-        class ExtendMongooseAdapter extends MongooseAdapter {
+        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
             constructor(opts) {
                 super(opts);
             }
@@ -362,7 +406,7 @@ class MongooseAdapterTest {
             }
         }
 
-        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
 
         _tmpObject
             .publicAfterConnect()

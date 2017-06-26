@@ -32,6 +32,10 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
 
         this._isReady = false;
 
+        if (options.skip_connect) {
+            return;
+        }
+
         this
             .connect()
             .subscribe(_ => {
@@ -131,7 +135,7 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
                     observer.complete();
                 }
 
-                this.on('ready', () => {
+                this.once('ready', () => {
                     __debugger.debug('whenReady', 'now ready');
 
                     this._isReady = true;
