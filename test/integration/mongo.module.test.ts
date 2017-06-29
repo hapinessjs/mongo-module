@@ -1,21 +1,24 @@
 /**
  * @see https://github.com/pana-cc/mocha-typescript
  */
-import { test, suite } from 'mocha-typescript';
+import { test, suite, only } from 'mocha-typescript';
 
 /**
  * @see http://unitjs.com/
  */
 import * as unit from 'unit.js';
 
-import { Hapiness, HapinessModule, HttpServer, Lib, OnStart } from '@hapiness/core';
+import { Hapiness, HapinessModule, Lib, OnStart, Inject } from '@hapiness/core';
+import { HttpServerExt, Server } from '@hapiness/core/extensions/http-server';
+
 import { Observable } from 'rxjs/Observable';
 
 // Mongoose mocking
 import { MongooseMockInstance, ConnectionMock } from '../mocks/index';
 
 // element to test
-import { AbstractHapinessMongoAdapter, MongoModule, MongoManagerService, MONGO_CONFIG } from '../../src/index';
+import { AbstractHapinessMongoAdapter, MongoClientExt, MongoManagerService, Debugger } from '../../src/index';
+
 import { unitTestMongoConfig } from '../config/index';
 
 @suite('- Integration MongoModule test file')
@@ -63,54 +66,50 @@ class MongoModuleTest {
 
         @HapinessModule({
             version: '1.0.0',
-            options: {
-                host: '0.0.0.0',
-                port: 4443
-            },
-            providers: [
-                {
-                    provide: MONGO_CONFIG,
-                    useValue: unitTestMongoConfig
-                }
-            ],
-            imports: [
-                MongoModule.setConfig(Object.assign({}, unitTestMongoConfig))
-            ]
+            providers: [],
+            imports: []
         })
         class MongoModuleTest implements OnStart {
-            constructor(private _mongoManager: MongoManagerService) {}
+            constructor(
+                @Inject(HttpServerExt) private _httpServer: Server,
+                @Inject(MongoClientExt) private _mongoManager: MongoManagerService
+            ) { }
 
             onStart(): void {
-                this
-                    ._mongoManager
-                    .getAdapter('mongoose')
-                    .subscribe(adapter => {
-                        try {
-                            unit
-                                .string(adapter.getUri())
-                                .is('mongodb://my.hostname.com:27017/unit_test');
+                const mongooseAdapter = this._mongoManager.getAdapter('mongoose');
+                try {
+                    unit
+                        .string(mongooseAdapter.getUri())
+                        .is('mongodb://my.hostname.com:27017/unit_test');
 
-                            Hapiness
-                                .kill()
-                                .subscribe(__ => done());
-                        } catch (err) {
-                            Hapiness
-                                .kill()
-                                .subscribe(__ => done(err));
-                        }
-                    }, (err) => Hapiness
-                        .kill()
-                        .subscribe(__ => done(err))
-                    );
+                    this._httpServer.stop().then(__ => done()).catch(err => done(err));
+                } catch (err) {
+                    this._httpServer.stop().then(__ => done(err)).catch(err => done(err));
+                }
             }
         }
 
-        Hapiness.bootstrap(MongoModuleTest);
+        Hapiness.bootstrap(MongoModuleTest, [
+            HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
+            MongoClientExt.setConfig({
+                common: {
+                    host: 'my.hostname.com',
+                    port: 27017,
+                    db: 'unit_test'
+                },
+                register: [],
+                load: [{
+                    name: 'mongoose',
+                    config: {}
+                }],
+            }),
+        ]);
     }
 
     /**
      * Test if `MongoModule` can register a custom provider and if we can get it with its connection uri
      */
+    @only
     @test('- Test if `MongoModule` can register a custom provider and if we can get it with its connection uri')
     testMongoModuleCustomAdapter(done) {
         class CustomAdapter extends AbstractHapinessMongoAdapter {
@@ -132,174 +131,43 @@ class MongoModuleTest {
 
         @HapinessModule({
             version: '1.0.0',
-            options: {
-                host: '0.0.0.0',
-                port: 4443
-            },
-            providers: [
-                {
-                    provide: MONGO_CONFIG,
-                    useValue: unitTestMongoConfig
-                }
-            ],
-            imports: [
-                MongoModule.setConfig(Object.assign({}, unitTestMongoConfig))
-            ]
+            providers: [],
+            imports: []
         })
         class MongoModuleTest implements OnStart {
-            constructor(private _mongoManager: MongoManagerService) {}
+            constructor(
+                @Inject(HttpServerExt) private _httpServer: Server,
+                @Inject(MongoClientExt) private _mongoManager: MongoManagerService
+            ) { }
 
             onStart(): void {
-                const res = this._mongoManager.registerAdapter(CustomAdapter);
+                const customAdapter = this._mongoManager.getAdapter('custom');
+                try {
+                    unit
+                        .string(customAdapter.getUri())
+                        .is('mongodb://my.hostname.com:27017/unit_test');
 
-                this
-                    ._mongoManager
-                    .getAdapter('custom')
-                    .subscribe(adapter => {
-                        try {
-                            unit
-                                .string(adapter.getUri())
-                                .is('mongodb://my.hostname.com:27017/unit_test');
-
-                            Hapiness
-                                .kill()
-                                .subscribe(__ => done());
-                        } catch (err) {
-                            Hapiness
-                                .kill()
-                                .subscribe(__ => done(err));
-                        }
-                    }, (err) => Hapiness
-                        .kill()
-                        .subscribe(__ => done(err))
-                    );
+                    this._httpServer.stop().then(__ => done()).catch(err => done(err));
+                } catch (err) {
+                    this._httpServer.stop().then(__ => done(err)).catch(err => done(err));
+                }
             }
         }
 
-        Hapiness.bootstrap(MongoModuleTest);
+        Hapiness.bootstrap(MongoModuleTest, [
+            HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
+            MongoClientExt.setConfig({
+                common: {
+                    host: 'my.hostname.com',
+                    port: 27017,
+                    db: 'unit_test'
+                },
+                register: [CustomAdapter],
+                load: [{
+                    name: 'custom',
+                    config: {}
+                }],
+            }),
+        ]);
     }
-
-    // /**
-    //  * Test if injected service is an instance of HelloWorldService
-    //  */
-    // @test('- Injected service must be an instance of `HelloWorldService`')
-    // testInjectableHelloWorldService(done) {
-    //     @Lib()
-    //     class HelloWorldLib {
-    //         constructor(private _helloWorldService: HelloWorldService) {
-    //             unit.object(this._helloWorldService).isInstanceOf(HelloWorldService)
-    //                 .when(_ => Hapiness.kill().subscribe(__ => done()));
-    //         }
-    //     }
-
-    //     @HapinessModule({
-    //         version: '1.0.0',
-    //         options: {
-    //             host: '0.0.0.0',
-    //             port: 4443
-    //         },
-    //         imports: [
-    //             HelloWorldModule
-    //         ],
-    //         declarations: [
-    //             HelloWorldLib
-    //         ]
-    //     })
-    //     class HelloWorldModuleTest {}
-
-    //     Hapiness.bootstrap(HelloWorldModuleTest);
-    // }
-
-    // /**
-    //  * Test if injected `HelloWorldService` as a `sayHello` function
-    //  */
-    // @test('- Injected `HelloWorldService` must have `sayHello` function')
-    // testInjectableHelloWorldServiceSayHello(done) {
-    //     @Lib()
-    //     class HelloWorldLib {
-    //         constructor(private _helloWorldService: HelloWorldService) {
-    //             unit.function(this._helloWorldService.sayHello)
-    //                 .when(_ => Hapiness.kill().subscribe(__ => done()));
-    //         }
-    //     }
-
-    //     @HapinessModule({
-    //         version: '1.0.0',
-    //         options: {
-    //             host: '0.0.0.0',
-    //             port: 4443
-    //         },
-    //         imports: [
-    //             HelloWorldModule
-    //         ],
-    //         declarations: [
-    //             HelloWorldLib
-    //         ]
-    //     })
-    //     class HelloWorldModuleTest {}
-
-    //     Hapiness.bootstrap(HelloWorldModuleTest);
-    // }
-
-    // /**
-    //  * Test if injected `HelloWorldService.sayHello()` function returns an Observable
-    //  */
-    // @test('- Injected `HelloWorldService.sayHello()` function must return an Observable')
-    // testInjectableHelloWorldServiceSayHelloObservable(done) {
-    //     @Lib()
-    //     class HelloWorldLib {
-    //         constructor(private _helloWorldService: HelloWorldService) {
-    //             unit.object(this._helloWorldService.sayHello()).isInstanceOf(Observable)
-    //                 .when(_ => Hapiness.kill().subscribe(__ => done()));
-    //         }
-    //     }
-
-    //     @HapinessModule({
-    //         version: '1.0.0',
-    //         options: {
-    //             host: '0.0.0.0',
-    //             port: 4443
-    //         },
-    //         imports: [
-    //             HelloWorldModule
-    //         ],
-    //         declarations: [
-    //             HelloWorldLib
-    //         ]
-    //     })
-    //     class HelloWorldModuleTest {}
-
-    //     Hapiness.bootstrap(HelloWorldModuleTest);
-    // }
-
-    // /**
-    //  * Test if injected `HelloWorldService.sayHello()` Observable returns 'Hello World'
-    //  */
-    // @test('- Injected `HelloWorldService.sayHello()` Observable function must return a string with `Hello World` value')
-    // testInjectableHelloWorldServiceSayHelloObservableReturnString(done) {
-    //     @Lib()
-    //     class HelloWorldLib {
-    //         constructor(private _helloWorldService: HelloWorldService) {
-    //             this._helloWorldService.sayHello().subscribe(m => unit.string(m).is('Hello World')
-    //                     .when(_ => Hapiness.kill().subscribe(__ => done())));
-    //         }
-    //     }
-
-    //     @HapinessModule({
-    //         version: '1.0.0',
-    //         options: {
-    //             host: '0.0.0.0',
-    //             port: 4443
-    //         },
-    //         imports: [
-    //             HelloWorldModule
-    //         ],
-    //         declarations: [
-    //             HelloWorldLib
-    //         ]
-    //     })
-    //     class HelloWorldModuleTest {}
-
-    //     Hapiness.bootstrap(HelloWorldModuleTest);
-    // }
 }

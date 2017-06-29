@@ -1,35 +1,14 @@
 import { HapinessModule, CoreModuleWithProviders, Inject, Optional } from '@hapiness/core';
 
+import { MongoClientExt } from './mongo.extension';
 import { MongoManagerService } from './services/index';
 import { IHapinessMongoAdapterConstructorArgs } from './adapters/index';
-import { MONGO_CONFIG } from './shared/index';
 
 @HapinessModule({
     version: '1.0.0-beta.2',
-    declarations: [
-
-    ],
-    providers: [
-        MongoManagerService
-    ],
-    exports: [
-        MongoManagerService
-    ]
+    declarations: [ ],
+    providers: [ ],
+    exports: [ ]
 })
 export class MongoModule  {
-    static setConfig(config: IHapinessMongoAdapterConstructorArgs): CoreModuleWithProviders {
-        return {
-            module: MongoModule,
-            providers: [
-                {
-                    provide: MONGO_CONFIG,
-                    useValue: config
-                }
-            ]
-        };
-    }
-
-    constructor(@Optional() @Inject(MONGO_CONFIG) config: IHapinessMongoAdapterConstructorArgs) {
-
-    }
 }

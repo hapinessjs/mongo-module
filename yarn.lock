@@ -2,25 +2,25 @@
 # yarn lockfile v1
 
 
-"@hapiness/core@^1.0.0-beta.6":
-  version "1.0.0-beta.6"
-  resolved "https://registry.yarnpkg.com/@hapiness/core/-/core-1.0.0-beta.6.tgz#f151384d9901af5600c28884d7df23233d0abbd2"
+"@hapiness/core@^1.0.0-rc.1-0":
+  version "1.0.0-rc.1-0"
+  resolved "https://registry.yarnpkg.com/@hapiness/core/-/core-1.0.0-rc.1-0.tgz#05828a1203522c24ac4cf4a61384965d5293e439"
   dependencies:
-    "@types/boom" "^4.3.2"
-    "@types/hapi" "^16.1.2"
+    "@types/boom" "^4.3.5"
+    "@types/hapi" "^16.1.6"
     "@types/hoek" "^4.1.3"
-    "@types/joi" "^10.3.2"
-    "@types/node" "^7.0.22"
+    "@types/joi" "^10.4.0"
+    "@types/node" "^8.0.4"
     "@types/websocket" "^0.0.33"
     debug "^2.6.8"
-    hapi "^16.1.1"
+    hapi "^16.4.3"
     reflect-metadata "^0.1.10"
-    rxjs "^5.4.0"
+    rxjs "^5.4.1"
     websocket "^1.0.24"
 
-"@types/boom@*", "@types/boom@^4.3.2":
+"@types/boom@*", "@types/boom@^4.3.5":
   version "4.3.5"
-  resolved "https://registry.yarnpkg.com/@types/boom/-/boom-4.3.5.tgz#9ccca31e08c989bce483bd76b2de798526c608f5"
+  resolved "http://nexus.in.tdw/repository/npm/@types/boom/-/boom-4.3.5.tgz#9ccca31e08c989bce483bd76b2de798526c608f5"
 
 "@types/bson@*":
   version "1.0.3"
@@ -47,9 +47,9 @@
     "@types/mongodb" "*"
     "@types/node" "*"
 
-"@types/hapi@^16.1.2":
-  version "16.1.5"
-  resolved "https://registry.yarnpkg.com/@types/hapi/-/hapi-16.1.5.tgz#f74aee6207d4efdc37f9c694424a254e639f03be"
+"@types/hapi@^16.1.6":
+  version "16.1.6"
+  resolved "http://nexus.in.tdw/repository/npm/@types/hapi/-/hapi-16.1.6.tgz#a55e0b201e69ca74a147776b3e1a464aa7b14c76"
   dependencies:
     "@types/boom" "*"
     "@types/catbox" "*"
@@ -63,7 +63,7 @@
   version "4.1.3"
   resolved "https://registry.yarnpkg.com/@types/hoek/-/hoek-4.1.3.tgz#d1982d48fb0d2a0e5d7e9d91838264d8e428d337"
 
-"@types/joi@*", "@types/joi@^10.3.2":
+"@types/joi@*", "@types/joi@^10.4.0":
   version "10.4.0"
   resolved "https://registry.yarnpkg.com/@types/joi/-/joi-10.4.0.tgz#a4de40cdf2462c7e1c83eb47ca3e19177bcc2ae8"
 
@@ -91,9 +91,13 @@
     "@types/mongodb" "*"
     "@types/node" "*"
 
-"@types/node@*", "@types/node@^7.0.22":
+"@types/node@*":
   version "7.0.32"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.32.tgz#6afe6c66520a4c316623a14aef123908d01b4bba"
+
+"@types/node@^8.0.4":
+  version "8.0.5"
+  resolved "http://nexus.in.tdw/repository/npm/@types/node/-/node-8.0.5.tgz#71ac2a2c33a4231dd2427f1b5a5b66ad2b185b5f"
 
 "@types/podium@*":
   version "1.0.0"
@@ -836,9 +840,9 @@ handlebars@^4.0.3:
   optionalDependencies:
     uglify-js "^2.6"
 
-hapi@^16.1.1:
+hapi@^16.4.3:
   version "16.4.3"
-  resolved "https://registry.yarnpkg.com/hapi/-/hapi-16.4.3.tgz#be4daaf2dcdbee97957ce503061b09765078aa05"
+  resolved "http://nexus.in.tdw/repository/npm/hapi/-/hapi-16.4.3.tgz#be4daaf2dcdbee97957ce503061b09765078aa05"
   dependencies:
     accept "2.x.x"
     ammo "2.x.x"
@@ -1791,7 +1795,7 @@ rimraf@^2.6.1:
   dependencies:
     glob "^7.0.5"
 
-rxjs@^5.4.0:
+rxjs@^5.4.0, rxjs@^5.4.1:
   version "5.4.1"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.4.1.tgz#b62f757f279445d265a18a58fb0a70dc90e91626"
   dependencies:

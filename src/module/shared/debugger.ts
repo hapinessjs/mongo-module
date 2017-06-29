@@ -1,4 +1,4 @@
-const debug = require('debug')('hapiness:mongo-mondule');
+const debug = require('debug')('hapiness:mongo-module');
 
 export class Debugger {
     private _className: string;

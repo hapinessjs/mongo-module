@@ -1,28 +1,34 @@
 import { Injectable, Inject, Optional } from '@hapiness/core';
-import { AbstractHapinessMongoAdapter, IHapinessMongoAdapterConstructorArgs, MongooseAdapter } from '../adapters/index';
-import { StringMap, defaultMongoConfig, Debugger, MONGO_CONFIG } from '../shared/index';
+
+import {
+    AbstractHapinessMongoAdapter,
+    IHapinessMongoAdapterConstructorArgs,
+    MongooseAdapter,
+    MongooseGridFsAdapter
+} from '../adapters/index';
+
+import { StringMap, defaultMongoConfig, Debugger } from '../shared/index';
 import { Observable } from 'rxjs';
 
-const __debugger = new Debugger('MongooseAdapter');
+const __debugger = new Debugger('MongoManagerService');
 
-@Injectable()
 export class MongoManagerService {
 
     private _config: IHapinessMongoAdapterConstructorArgs;
     private _adapters: StringMap<typeof AbstractHapinessMongoAdapter>;
     private _adaptersInstances: StringMap<AbstractHapinessMongoAdapter>;
 
-    constructor(
-        @Optional() @Inject(MONGO_CONFIG) config: IHapinessMongoAdapterConstructorArgs
-    ) {
+    constructor(config?: IHapinessMongoAdapterConstructorArgs) {
         this._config = this._fixConfig(config);
         this._adaptersInstances = {};
-        this._adapters = {};
-
-        this.registerAdapter(MongooseAdapter);
+        this._adapters = {
+            [MongooseAdapter.getInterfaceName()]: MongooseAdapter,
+            [MongooseGridFsAdapter.getInterfaceName()]: MongooseGridFsAdapter
+        };
     }
 
     private _fixConfig(configValues?: IHapinessMongoAdapterConstructorArgs): IHapinessMongoAdapterConstructorArgs {
+        __debugger.debug('_fixConfig', '');
         return <IHapinessMongoAdapterConstructorArgs> (
             Object.assign(
                 {},
@@ -33,11 +39,14 @@ export class MongoManagerService {
     }
 
     private _keyForAdapter(adapterName: string, options: IHapinessMongoAdapterConstructorArgs): string {
+        __debugger.debug('_keyForAdapter', '');
         return `${adapterName}_${options.db || options.database}_${options.instance || 0}`;
     }
 
     public registerAdapter(adapterClass: typeof AbstractHapinessMongoAdapter): boolean {
+        __debugger.debug('registerAdapter', '');
         const adapterName: string = adapterClass.getInterfaceName();
+        __debugger.debug('registerAdapter', `---->  ${adapterName}`);
         if (!this._adapters[adapterName]) {
             this._adapters[adapterName] = adapterClass;
         } else {
@@ -47,13 +56,14 @@ export class MongoManagerService {
         return true;
     }
 
-    public getAdapter(adapterName: string, options?: any): Observable<AbstractHapinessMongoAdapter> {
+    public loadAdapter(adapterName: string, options?: any): Observable<AbstractHapinessMongoAdapter> {
+        __debugger.debug('loadAdapter', `Adapter name ---> ${adapterName}`);
         if (!this._adapters[adapterName]) {
             return Observable.throw(new Error(`Unknown adapter ${adapterName}, please register it before using it.`));
         }
 
-        const _options: IHapinessMongoAdapterConstructorArgs =
-            <IHapinessMongoAdapterConstructorArgs> Object.assign({}, this._config, options)
+        const _options: IHapinessMongoAdapterConstructorArgs = <IHapinessMongoAdapterConstructorArgs>
+            Object.assign({}, this._config, options);
 
         const key = this._keyForAdapter(adapterName, _options);
         if (!this._adaptersInstances[key]) {
@@ -69,5 +79,16 @@ export class MongoManagerService {
                     observer.complete();
                 })
             );
+    }
+
+    public getAdapter(adapterName: string, options?: any): AbstractHapinessMongoAdapter {
+        __debugger.debug('getAdapter', `Adapter name ---> ${adapterName}`);
+
+        const _options: IHapinessMongoAdapterConstructorArgs = <IHapinessMongoAdapterConstructorArgs>
+            Object.assign({}, this._config, options);
+
+        const key = this._keyForAdapter(adapterName, _options);
+
+        return this._adaptersInstances[key];
     }
 }
