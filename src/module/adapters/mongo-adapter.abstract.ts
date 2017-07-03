@@ -73,7 +73,8 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
      *
      */
     protected _tryConnect(): Observable<void> {
-        return Observable.throw(new Error('`_tryConnect` is not implemented'));
+        return Observable
+            .throw(new Error('`_tryConnect` is not implemented'));
     }
 
     /*
@@ -82,7 +83,8 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
      *
      */
     protected _afterConnect(): Observable<void> {
-        return Observable.throw(new Error('`_afterConnect` is not implemented'));
+        return Observable
+            .throw(new Error('`_afterConnect` is not implemented'));
     }
 
     /*

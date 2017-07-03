@@ -1,5 +1,5 @@
 {
-    "name": "@hapiness/mongo-module",
+    "name": "@hapiness/mongo",
     "version": "1.0.0-beta.6",
     "description": "Hapiness Module for MongoDB usage",
     "main": "index.js",

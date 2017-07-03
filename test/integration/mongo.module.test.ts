@@ -171,7 +171,6 @@ class MongoModuleTest {
                 register: [CustomAdapter],
                 load: [{
                     name: 'custom',
-                    config: {}
                 }],
             }),
         ]);
