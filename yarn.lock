@@ -2,16 +2,16 @@
 # yarn lockfile v1
 
 
-"@hapiness/core@^1.0.0-rc.2":
-  version "1.0.0-rc.2"
-  resolved "https://registry.yarnpkg.com/@hapiness/core/-/core-1.0.0-rc.2.tgz#d42a0765cfc5b550f78a216199bdd8756238f31b"
+"@hapiness/core@1.0.0-rc.3":
+  version "1.0.0-rc.3"
+  resolved "https://registry.yarnpkg.com/@hapiness/core/-/core-1.0.0-rc.3.tgz#19813d0849c867cd654ea81aeec77a6ee9ae6f38"
   dependencies:
     "@types/boom" "^4.3.5"
     "@types/hapi" "^16.1.6"
     "@types/hoek" "^4.1.3"
     "@types/joi" "^10.4.0"
-    "@types/node" "^8.0.4"
-    "@types/websocket" "^0.0.33"
+    "@types/node" "^8.0.7"
+    "@types/websocket" "^0.0.34"
     debug "^2.6.8"
     hapi "^16.4.3"
     reflect-metadata "^0.1.10"
@@ -91,9 +91,13 @@
     "@types/mongodb" "*"
     "@types/node" "*"
 
-"@types/node@*", "@types/node@^8.0.4":
+"@types/node@*":
   version "8.0.5"
   resolved "http://nexus.in.tdw/repository/npm/@types/node/-/node-8.0.5.tgz#71ac2a2c33a4231dd2427f1b5a5b66ad2b185b5f"
+
+"@types/node@^8.0.7":
+  version "8.0.7"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.7.tgz#fb0ad04b5b6f6eabe0372a32a8f1fbba5c130cae"
 
 "@types/podium@*":
   version "1.0.0"
@@ -105,9 +109,9 @@
   dependencies:
     "@types/node" "*"
 
-"@types/websocket@^0.0.33":
-  version "0.0.33"
-  resolved "https://registry.yarnpkg.com/@types/websocket/-/websocket-0.0.33.tgz#e0f54460969b89f4429f2e1e60bebd970ca9ff01"
+"@types/websocket@^0.0.34":
+  version "0.0.34"
+  resolved "https://registry.yarnpkg.com/@types/websocket/-/websocket-0.0.34.tgz#25596764cec885eda070fdb6d19cd76fe582747c"
   dependencies:
     "@types/node" "*"
 
