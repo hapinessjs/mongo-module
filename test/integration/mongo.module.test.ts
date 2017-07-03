@@ -1,7 +1,7 @@
 /**
  * @see https://github.com/pana-cc/mocha-typescript
  */
-import { test, suite, only } from 'mocha-typescript';
+import { test, suite } from 'mocha-typescript';
 
 /**
  * @see http://unitjs.com/
@@ -17,7 +17,14 @@ import { Observable } from 'rxjs/Observable';
 import { MongooseMockInstance, ConnectionMock } from '../mocks/index';
 
 // element to test
-import { AbstractHapinessMongoAdapter, MongoClientExt, MongoManager, Debugger } from '../../src/index';
+import {
+    AbstractHapinessMongoAdapter,
+    MongoClientExt,
+    MongoManager,
+    Debugger,
+    MongoModule,
+    MongoClientService
+} from '../../src/index';
 
 import { unitTestMongoConfig } from '../config/index';
 
@@ -170,74 +177,72 @@ class MongoModuleTest {
         ]);
     }
 
-    // /**
-    //  * Trying to register an existing Adapter should lead to an error
-    //  */
-    // @only
-    // @test('- Trying to register an existing Adapter should lead to an error')
-    // testMongoModuleRegisterExistingAdapter(done) {
-    //     class MongooseAdapter extends AbstractHapinessMongoAdapter {
-    //         public static getInterfaceName(): string {
-    //             return 'mongoose';
-    //         }
+    /**
+     * Trying to register an existing Adapter should lead to an error
+     */
+    @test('- Trying to register an existing Adapter should lead to an error')
+    testMongoModuleRegisterExistingAdapter(done) {
+        class MongooseAdapter extends AbstractHapinessMongoAdapter {
+            public static getInterfaceName(): string {
+                return 'mongoose';
+            }
 
-    //         constructor(options) { super(options); }
+            constructor(options) { super(options); }
 
-    //         protected _tryConnect(): Observable<void> {
-    //             return Observable.create(observer => { observer.next(); observer.complete(); })
-    //         }
+            protected _tryConnect(): Observable<void> {
+                return Observable.create(observer => { observer.next(); observer.complete(); })
+            }
 
-    //         protected _afterConnect(): Observable<void> {
-    //             return this.onConnected();
-    //         }
-    //     }
+            protected _afterConnect(): Observable<void> {
+                return this.onConnected();
+            }
+        }
 
 
-    //     @HapinessModule({
-    //         version: '1.0.0',
-    //         providers: [],
-    //         imports: []
-    //     })
-    //     class MongoModuleTest implements OnStart {
-    //         constructor(
-    //             @Inject(HttpServerExt) private _httpServer: Server,
-    //             @Inject(MongoClientExt) private _mongoManager: MongoManager
-    //         ) { }
+        @HapinessModule({
+            version: '1.0.0',
+            providers: [],
+            imports: []
+        })
+        class MongoModuleTest implements OnStart {
+            constructor(
+                @Inject(HttpServerExt) private _httpServer: Server,
+                @Inject(MongoClientExt) private _mongoManager: MongoManager
+            ) { }
 
-    //         onStart(): void {
-    //             this
-    //                 ._httpServer
-    //                 .stop()
-    //                 .then(__ => done(new Error('Should not go there')))
-    //                 .catch(err => done(err));
-    //         }
-    //     }
+            onStart(): void {
+                this
+                    ._httpServer
+                    .stop()
+                    .then(__ => done(new Error('Should not go there')))
+                    .catch(err => done(err));
+            }
+        }
 
-    //     Hapiness.bootstrap(MongoModuleTest, [
-    //         HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
-    //         MongoClientExt.setConfig({
-    //             common: {
-    //                 host: 'my.hostname.com',
-    //                 port: 27017,
-    //                 db: 'unit_test'
-    //             },
-    //             register: [MongooseAdapter],
-    //             load: [{
-    //                 name: 'custom',
-    //                 config: {}
-    //             }],
-    //         }),
-    //     ])
-    //     .catch(err => {
-    //         console.log('LALALAL => ', Hapiness['extensions']);
-    //         Hapiness['extensions']
-    //             .find(ext => ext.token === HttpServerExt)
-    //             .value
-    //             .stop()
-    //             .then(__ => done())
-    //             .catch(e => done(e));
-    //     });
-    // }
+        Hapiness.bootstrap(MongoModuleTest, [
+            HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
+            MongoClientExt.setConfig({
+                common: {
+                    host: 'my.hostname.com',
+                    port: 27017,
+                    db: 'unit_test'
+                },
+                register: [ MongooseAdapter ],
+                load: [{
+                    name: 'custom',
+                    config: {}
+                }],
+            }),
+        ])
+        .catch(err => {
+            Hapiness['extensions']
+                .find(ext => ext.token === HttpServerExt)
+                .value
+                .stop()
+                .then(__ => done())
+                .catch(e => done(e));
+        });
+    }
 
     /**
      * We can add MongoModule without loading any adapters
@@ -339,6 +344,95 @@ class MongoModuleTest {
         ])
         .catch(err => {
             done(err);
+        });
+    }
+
+    /**
+     * Loading MongoExt with an unregistered adapter should throw an error
+     */
+    @test('- Loading MongoExt with an unregistered adapter should throw an error')
+    testMongoModuleLoadUnregisterAdapter(done) {
+        @HapinessModule({
+            version: '1.0.0',
+            providers: [],
+            imports: []
+        })
+        class MongoModuleTest implements OnStart {
+            constructor(
+                @Inject(HttpServerExt) private _httpServer: Server,
+                @Inject(MongoClientExt) private _mongoManager: MongoManager
+            ) { }
+
+            onStart(): void {
+                this._httpServer.stop()
+                    .then(__ => done(new Error('Should not go there')))
+                    .catch(err => done(err));
+            }
+        }
+
+        Hapiness.bootstrap(MongoModuleTest, [
+            HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
+            MongoClientExt.setConfig({
+                load: [{
+                    name: 'custom',
+                    config: {}
+                }],
+            }),
+        ])
+        .catch(err => {
+            unit
+                .string(err.message)
+                .is('Unknown adapter custom, please register it before using it.')
+
+            Hapiness['extensions']
+                .find(ext => ext.token === HttpServerExt)
+                .value
+                .stop()
+                .then(__ => done())
+                .catch(e => done(e));
+        });
+    }
+
+    /**
+     * We should be able to use the MongoClientService to get the MongoManager
+     */
+    @test('- We should be able to use the MongoClientService to get the MongoManager')
+    testMongoModuleViaMongoClientService(done) {
+        @HapinessModule({
+            version: '1.0.0',
+            providers: [],
+            imports: [ MongoModule ]
+        })
+        class MongoModuleTest implements OnStart {
+
+            private _mongoManager: MongoManager;
+
+            constructor(
+                @Inject(HttpServerExt) private _httpServer: Server,
+                private _mongoClientService: MongoClientService
+            ) {
+                this._mongoManager = _mongoClientService.get();
+            }
+
+            onStart(): void {
+                unit
+                    .bool(this._mongoManager instanceof MongoManager)
+                    .isTrue();
+
+                this
+                    ._httpServer
+                    .stop()
+                    .then(__ => done())
+                    .catch(err => done(err));
+            }
+        }
+
+        Hapiness.bootstrap(MongoModuleTest, [
+            HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
+            MongoClientExt,
+        ])
+        .catch(err => {
+           done(err);
         });
     }
 }

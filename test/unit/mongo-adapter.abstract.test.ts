@@ -254,6 +254,27 @@ class AbstractMongoAdapterTest {
     }
 
     /**
+     * Calling getConnection should return the value of the connection
+     */
+    @test('- Calling getConnection should return the value of the connection')
+    testCallGetConnection() {
+        let hasBeenCalled = false;
+
+        class TestAdapter extends AbstractHapinessMongoAdapter {
+            constructor(options) {
+                super(options);
+                this._connection = 'the_connection';
+            }
+        }
+
+        const adapter = new TestAdapter({ host: 'test.in.tdw', db: 'test', skip_connect: true });
+
+        unit
+            .string(adapter.getConnection())
+            .is('the_connection');
+    }
+
+    /**
      * Calling onError should call try connect
      */
     @test('- Calling onError should call try connect')

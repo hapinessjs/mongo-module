@@ -2,8 +2,6 @@ import { Injectable, Inject, Optional } from '@hapiness/core';
 import { MongoClientExt } from '../mongo.extension';
 import { MongoManager } from '../managers/index';
 
-console.log(MongoClientExt);
-
 @Injectable()
 export class MongoClientService {
     constructor(
