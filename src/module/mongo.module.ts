@@ -1,14 +1,11 @@
-import { HapinessModule, CoreModuleWithProviders, Inject, Optional } from '@hapiness/core';
-
-import { MongoClientExt } from './mongo.extension';
-import { MongoManagerService } from './services/index';
-import { IHapinessMongoAdapterConstructorArgs } from './adapters/index';
+import { HapinessModule } from '@hapiness/core';
+import { MongoClientService } from './services/index';
 
 @HapinessModule({
     version: '1.0.0-beta.2',
     declarations: [ ],
     providers: [ ],
-    exports: [ ]
+    exports: [ MongoClientService ]
 })
 export class MongoModule  {
 }

@@ -293,4 +293,45 @@ class AbstractMongoAdapterTest {
                 done(err);
             });
     }
+
+    /**
+     * Calling connect with an uri should use UtilFunctions.getMongoUri to format it
+     */
+    @test('- Calling connect with an uri should use UtilFunctions.getMongoUri to format it')
+    testCallingConnectWithAnUri(done) {
+        let hasBeenCalled = false;
+
+        class TestAdapter extends AbstractHapinessMongoAdapter {
+            constructor(options) {
+                super(options);
+            }
+
+            tryConnect() {
+                return Observable.create(observer => {
+                    hasBeenCalled = true;
+
+                    observer.next();
+                    observer.complete();
+                });
+            }
+        }
+
+        const adapter = new TestAdapter({ skip_connect: true, url: 'this.is.a.fake.uri' });
+
+        adapter
+            .connect()
+            .subscribe(_ => {
+                unit
+                    .bool(hasBeenCalled)
+                    .isTrue();
+
+                unit
+                    .string(adapter.getUri())
+                    .is('this.is.a.fake.uri')
+
+                done();
+            }, (err) => {
+                done(err);
+            });
+    }
 }

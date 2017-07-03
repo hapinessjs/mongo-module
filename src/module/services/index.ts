@@ -1,1 +1,1 @@
-export * from './mongo-manager.service';
+export * from './mongo-client.service';

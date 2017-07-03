@@ -159,4 +159,8 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
         return this._uri;
     }
 
+    public getConnection(): any {
+        return this._connection;
+    }
+
 }

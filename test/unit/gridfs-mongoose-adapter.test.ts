@@ -8,7 +8,6 @@ import { test, suite } from 'mocha-typescript';
  */
 import * as unit from 'unit.js';
 import { Observable } from 'rxjs/Observable';
-// import  * as gfs from '../../src/index';
 
 import { MongooseMockInstance, GridFsMockInstance, ConnectionMock } from '../mocks/index';
 

@@ -3,7 +3,7 @@ import { IHapinessMongoAdapterConstructorArgs } from './ihapiness-mongo-adapter'
 
 export interface IHapinessLoadAdapterConfig {
     name: string,
-    config: IHapinessMongoAdapterConstructorArgs
+    config?: IHapinessMongoAdapterConstructorArgs
 }
 
 export interface IHapinessMongoConfig {

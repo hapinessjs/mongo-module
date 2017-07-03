@@ -1,7 +1,7 @@
 import { CoreModule, Extension, ExtensionWithConfig, OnExtensionLoad } from '@hapiness/core/core';
 import { Observable } from 'rxjs';
 
-import { MongoManagerService } from './services/index';
+import { MongoManager } from './managers/index';
 import { AbstractHapinessMongoAdapter, IHapinessMongoConfig, IHapinessLoadAdapterConfig } from './adapters/index';
 
 import { Debugger } from './shared/index';
@@ -18,7 +18,7 @@ export class MongoClientExt implements OnExtensionLoad {
         };
     }
 
-    registerAdapters(mongoManager: MongoManagerService, adaptersToRegister: Array<typeof AbstractHapinessMongoAdapter>): Observable<void> {
+    registerAdapters(mongoManager: MongoManager, adaptersToRegister: Array<typeof AbstractHapinessMongoAdapter>): Observable<void> {
         __debugger.debug('registerAdapters', '');
         return Observable
             .create(
@@ -32,11 +32,7 @@ export class MongoClientExt implements OnExtensionLoad {
                                 try {
                                     const res = mongoManager.registerAdapter(_adapter);
                                     __debugger.debug('registerAdapters', `Correctly register ${JSON.stringify(res, null, 2)}`);
-                                    if (!!res) {
-                                        return null;
-                                    }
-
-                                    throw new Error('Failed to register');
+                                    return null;
                                 } catch (err) {
                                     return err;
                                 }
@@ -56,7 +52,7 @@ export class MongoClientExt implements OnExtensionLoad {
             );
     }
 
-    loadAdapters(mongoManager: MongoManagerService, adaptersToLoad: IHapinessLoadAdapterConfig[]): Observable<void> {
+    loadAdapters(mongoManager: MongoManager, adaptersToLoad: IHapinessLoadAdapterConfig[]): Observable<void> {
         __debugger.debug('loadAdapters', `Params => ${JSON.stringify(adaptersToLoad, null, 2)}`);
         return Observable
             .create(
@@ -101,10 +97,10 @@ export class MongoClientExt implements OnExtensionLoad {
     onExtensionLoad(module: CoreModule, config: IHapinessMongoConfig): Observable<Extension> {
         return Observable
             .create(observer => {
-                const instance = new MongoManagerService(!!config ? config.common : null);
+                const instance = new MongoManager(config.common);
                 this
-                    .registerAdapters(instance, !!config ? config.register : null)
-                    .switchMap(_ => this.loadAdapters(instance, !!config ? config.load : null))
+                    .registerAdapters(instance, config.register)
+                    .switchMap(_ => this.loadAdapters(instance, config.load))
                     .subscribe(_ => {
                         observer.next({
                             instance: this,

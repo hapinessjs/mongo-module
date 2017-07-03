@@ -17,7 +17,7 @@ import { Observable } from 'rxjs/Observable';
 import { MongooseMockInstance, ConnectionMock } from '../mocks/index';
 
 // element to test
-import { AbstractHapinessMongoAdapter, MongoClientExt, MongoManagerService, Debugger } from '../../src/index';
+import { AbstractHapinessMongoAdapter, MongoClientExt, MongoManager, Debugger } from '../../src/index';
 
 import { unitTestMongoConfig } from '../config/index';
 
@@ -72,7 +72,7 @@ class MongoModuleTest {
         class MongoModuleTest implements OnStart {
             constructor(
                 @Inject(HttpServerExt) private _httpServer: Server,
-                @Inject(MongoClientExt) private _mongoManager: MongoManagerService
+                @Inject(MongoClientExt) private _mongoManager: MongoManager
             ) { }
 
             onStart(): void {
@@ -84,7 +84,7 @@ class MongoModuleTest {
 
                     this._httpServer.stop().then(__ => done()).catch(err => done(err));
                 } catch (err) {
-                    this._httpServer.stop().then(__ => done(err)).catch(err => done(err));
+                    this._httpServer.stop().then(__ => done(err)).catch(e => done(e));
                 }
             }
         }
@@ -109,7 +109,6 @@ class MongoModuleTest {
     /**
      * Test if `MongoModule` can register a custom provider and if we can get it with its connection uri
      */
-    @only
     @test('- Test if `MongoModule` can register a custom provider and if we can get it with its connection uri')
     testMongoModuleCustomAdapter(done) {
         class CustomAdapter extends AbstractHapinessMongoAdapter {
@@ -137,7 +136,7 @@ class MongoModuleTest {
         class MongoModuleTest implements OnStart {
             constructor(
                 @Inject(HttpServerExt) private _httpServer: Server,
-                @Inject(MongoClientExt) private _mongoManager: MongoManagerService
+                @Inject(MongoClientExt) private _mongoManager: MongoManager
             ) { }
 
             onStart(): void {
@@ -149,7 +148,7 @@ class MongoModuleTest {
 
                     this._httpServer.stop().then(__ => done()).catch(err => done(err));
                 } catch (err) {
-                    this._httpServer.stop().then(__ => done(err)).catch(err => done(err));
+                    this._httpServer.stop().then(__ => done(err)).catch(e => done(e));
                 }
             }
         }
@@ -169,5 +168,177 @@ class MongoModuleTest {
                 }],
             }),
         ]);
+    }
+
+    // /**
+    //  * Trying to register an existing Adapter should lead to an error
+    //  */
+    // @only
+    // @test('- Trying to register an existing Adapter should lead to an error')
+    // testMongoModuleRegisterExistingAdapter(done) {
+    //     class MongooseAdapter extends AbstractHapinessMongoAdapter {
+    //         public static getInterfaceName(): string {
+    //             return 'mongoose';
+    //         }
+
+    //         constructor(options) { super(options); }
+
+    //         protected _tryConnect(): Observable<void> {
+    //             return Observable.create(observer => { observer.next(); observer.complete(); })
+    //         }
+
+    //         protected _afterConnect(): Observable<void> {
+    //             return this.onConnected();
+    //         }
+    //     }
+
+
+    //     @HapinessModule({
+    //         version: '1.0.0',
+    //         providers: [],
+    //         imports: []
+    //     })
+    //     class MongoModuleTest implements OnStart {
+    //         constructor(
+    //             @Inject(HttpServerExt) private _httpServer: Server,
+    //             @Inject(MongoClientExt) private _mongoManager: MongoManager
+    //         ) { }
+
+    //         onStart(): void {
+    //             this
+    //                 ._httpServer
+    //                 .stop()
+    //                 .then(__ => done(new Error('Should not go there')))
+    //                 .catch(err => done(err));
+    //         }
+    //     }
+
+    //     Hapiness.bootstrap(MongoModuleTest, [
+    //         HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
+    //         MongoClientExt.setConfig({
+    //             common: {
+    //                 host: 'my.hostname.com',
+    //                 port: 27017,
+    //                 db: 'unit_test'
+    //             },
+    //             register: [MongooseAdapter],
+    //             load: [{
+    //                 name: 'custom',
+    //                 config: {}
+    //             }],
+    //         }),
+    //     ])
+    //     .catch(err => {
+    //         console.log('LALALAL => ', Hapiness['extensions']);
+    //         Hapiness['extensions']
+    //             .find(ext => ext.token === HttpServerExt)
+    //             .value
+    //             .stop()
+    //             .then(__ => done())
+    //             .catch(e => done(e));
+    //     });
+    // }
+
+    /**
+     * We can add MongoModule without loading any adapters
+     */
+    @test('- We can add MongoModule without loading any adapters')
+    testMongoModuleWithoutLoadingAdapters(done) {
+        @HapinessModule({
+            version: '1.0.0',
+            providers: [],
+            imports: []
+        })
+        class MongoModuleTest implements OnStart {
+            constructor(
+                @Inject(HttpServerExt) private _httpServer: Server,
+                @Inject(MongoClientExt) private _mongoManager: MongoManager
+            ) { }
+
+            onStart(): void {
+                this._httpServer.stop().then(__ => done()).catch(err => done(err));
+            }
+        }
+
+        Hapiness.bootstrap(MongoModuleTest, [
+            HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
+            MongoClientExt.setConfig({
+                common: {
+                    host: 'my.hostname.com',
+                    port: 27017,
+                    db: 'unit_test'
+                },
+            }),
+        ])
+        .catch(err => {
+            done(err);
+        });
+    }
+
+    /**
+     * We can add MongoModule with empty adapters array to load
+     */
+    @test('- We can add MongoModule with empty adapters array to load')
+    testMongoModuleWithEmptyAdaptersArrayToLoad(done) {
+        @HapinessModule({
+            version: '1.0.0',
+            providers: [],
+            imports: []
+        })
+        class MongoModuleTest implements OnStart {
+            constructor(
+                @Inject(HttpServerExt) private _httpServer: Server,
+                @Inject(MongoClientExt) private _mongoManager: MongoManager
+            ) { }
+
+            onStart(): void {
+                this._httpServer.stop().then(__ => done()).catch(err => done(err));
+            }
+        }
+
+        Hapiness.bootstrap(MongoModuleTest, [
+            HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
+            MongoClientExt.setConfig({
+                common: {
+                    host: 'my.hostname.com',
+                    port: 27017,
+                    db: 'unit_test'
+                },
+                load: []
+            }),
+        ])
+        .catch(err => {
+            done(err);
+        });
+    }
+
+    /**
+     * We can add MongoModule without any config
+     */
+    @test('- We can add MongoModule without any config')
+    testMongoModuleWithoutAnyConfig(done) {
+        @HapinessModule({
+            version: '1.0.0',
+            providers: [],
+            imports: []
+        })
+        class MongoModuleTest implements OnStart {
+            constructor(
+                @Inject(HttpServerExt) private _httpServer: Server,
+                @Inject(MongoClientExt) private _mongoManager: MongoManager
+            ) { }
+
+            onStart(): void {
+                this._httpServer.stop().then(__ => done()).catch(err => done(err));
+            }
+        }
+
+        Hapiness.bootstrap(MongoModuleTest, [
+            HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
+            MongoClientExt,
+        ])
+        .catch(err => {
+            done(err);
+        });
     }
 }

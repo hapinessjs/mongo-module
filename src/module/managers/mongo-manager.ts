@@ -10,9 +10,9 @@ import {
 import { StringMap, defaultMongoConfig, Debugger } from '../shared/index';
 import { Observable } from 'rxjs';
 
-const __debugger = new Debugger('MongoManagerService');
+const __debugger = new Debugger('MongoManager');
 
-export class MongoManagerService {
+export class MongoManager {
 
     private _config: IHapinessMongoAdapterConstructorArgs;
     private _adapters: StringMap<typeof AbstractHapinessMongoAdapter>;

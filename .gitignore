@@ -24,7 +24,7 @@
 npm-debug.log
 testem.log
 /typings
-
+/_tmp
 
 #System Files
 .DS_Store
