@@ -1,0 +1,22 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": ".",
+        "rootDir": "./src",
+        "types": [
+            "node",
+            "boom",
+            "hapi",
+            "hoek",
+            "joi",
+            "mongoose",
+            "gridfs-stream"
+        ]
+    },
+    "exclude": [
+        "node_modules",
+        "dist",
+        "test",
+        "tools"
+    ]
+}
