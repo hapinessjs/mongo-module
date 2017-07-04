@@ -405,7 +405,8 @@ To set up your development environment:
     * Tests module API.
     * Documentation.
     * Module version related to core version.
-
+    
+[Back to top](#table-of-contents)
 
 ## Maintainers
 
