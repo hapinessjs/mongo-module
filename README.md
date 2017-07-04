@@ -48,6 +48,8 @@
 * [Using a registered adapter](#using-a-registered-adapter)
 * [Configuration](#configuration)
 * [Get your adapter anywhere](#get-your-adapter-anywhere)
+* [Contributing](#contributing)
+* [Change History](#change-history)
 * [Maintainers](#maintainers)
 * [License](#license)
 
@@ -381,7 +383,29 @@ class MyModelDocument {
 
 ```
 
+[Back to top](#table-of-contents)
 
+## Contributing
+
+To set up your development environment:
+
+1. clone the repo to your workspace,
+2. in the shell `cd` to the main folder,
+3. hit `npm or yarn install`,
+4. run `npm or yarn run test`.
+    * It will lint the code and execute all tests.
+    * The test coverage report can be viewed from `./coverage/lcov-report/index.html`.
+
+[Back to top](#table-of-contents)
+
+## Change History
+
+* v1.0.0-rc.3 (2017-07-04)
+    * `MongoDB` module implementation.
+    * Tests module API.
+    * Documentation.
+    * Module version related to core version.
+    
 [Back to top](#table-of-contents)
 
 ## Maintainers
