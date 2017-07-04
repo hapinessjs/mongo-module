@@ -1,10 +1,10 @@
 import * as mongoose from 'mongoose';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 
 import { CreateGridFsStream, GridFsStream } from '../shared/gridfs-stream';
-import { AbstractHapinessMongoAdapter } from './mongo-adapter.abstract';
+import { HapinessMongoAdapter } from './hapiness-mongo-adapter';
 
-export class MongooseGridFsAdapter extends AbstractHapinessMongoAdapter {
+export class MongooseGridFsAdapter extends HapinessMongoAdapter {
 
     private _gridfs: GridFsStream.Grid;
 
@@ -41,7 +41,6 @@ export class MongooseGridFsAdapter extends AbstractHapinessMongoAdapter {
 
                 this._connection.once('error', err => {
                     observer.error(err);
-                    observer.complete();
                 });
             });
     }

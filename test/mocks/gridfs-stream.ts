@@ -1,8 +1,6 @@
 import * as unit from 'unit.js';
 import * as gfs from '../../src/module/shared/gridfs-stream';
 
-import { EventEmitter } from 'events';
-
 export class GridFsMock {
     private _mocks;
 

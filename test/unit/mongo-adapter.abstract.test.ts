@@ -10,7 +10,7 @@ import * as unit from 'unit.js';
 
 import { Observable } from 'rxjs/Observable';
 
-import { AbstractHapinessMongoAdapter } from '../../src/index';
+import { HapinessMongoAdapter } from '../../src';
 
 
 @suite('- Unit AbstractMongoAdapterTest file')
@@ -50,7 +50,7 @@ class AbstractMongoAdapterTest {
         unit
             .assert
             .throws(
-                () => new AbstractHapinessMongoAdapter(null),
+                () => new HapinessMongoAdapter(null),
                 (err) => {
                     if (err.message === 'Missing mongodb configuration') {
                         return true;
@@ -68,7 +68,7 @@ class AbstractMongoAdapterTest {
         unit
             .assert
             .throws(
-                () => new AbstractHapinessMongoAdapter({}),
+                () => new HapinessMongoAdapter({}),
                 (err) => {
                     if (err.message === 'Missing mongodb configuration') {
                         return true;
@@ -83,7 +83,7 @@ class AbstractMongoAdapterTest {
      */
     @test('- If no db or database are given it should throw an error')
     testConfigNoDbNoDatabaseShouldThrow(done) {
-        const adapter = new AbstractHapinessMongoAdapter({ host: 'test.in.tdw' });
+        const adapter = new HapinessMongoAdapter({ host: 'test.in.tdw' });
         adapter
             .connect()
             .subscribe(_ => {
@@ -102,7 +102,7 @@ class AbstractMongoAdapterTest {
      */
     @test('- Calling parent _tryConnect() should throw an error')
     testCallingParentTryConnectShouldThrow(done) {
-        class TestAdapter extends AbstractHapinessMongoAdapter {
+        class TestAdapter extends HapinessMongoAdapter {
             constructor(options) { super(options); }
         }
 
@@ -125,7 +125,7 @@ class AbstractMongoAdapterTest {
      */
     @test('- Calling parent _afterConnect() should throw an error')
     testCallingParentAfterConnectShouldThrow(done) {
-        class TestAdapter extends AbstractHapinessMongoAdapter {
+        class TestAdapter extends HapinessMongoAdapter {
             constructor(options) {
                 super(options);
             }
@@ -158,7 +158,7 @@ class AbstractMongoAdapterTest {
      */
     @test('- Calling parent getLibrary() should throw an error')
     testCallingParentGetLibraryShouldThrow() {
-        class TestAdapter extends AbstractHapinessMongoAdapter {
+        class TestAdapter extends HapinessMongoAdapter {
             constructor(options) {
                 super(options);
             }
@@ -183,7 +183,7 @@ class AbstractMongoAdapterTest {
      */
     @test('- Calling onConnected should make the adapter ready')
     testCallingOnConnectedShouldMakeAdapterReady(done) {
-        class TestAdapter extends AbstractHapinessMongoAdapter {
+        class TestAdapter extends HapinessMongoAdapter {
             constructor(options) {
                 super(options);
             }
@@ -219,7 +219,7 @@ class AbstractMongoAdapterTest {
     testCallingOnDisconnectedShouldCallTryConnect(done) {
         let hasBeenCalled = false;
 
-        class TestAdapter extends AbstractHapinessMongoAdapter {
+        class TestAdapter extends HapinessMongoAdapter {
             constructor(options) {
                 super(options);
             }
@@ -260,7 +260,7 @@ class AbstractMongoAdapterTest {
     testCallGetConnection() {
         let hasBeenCalled = false;
 
-        class TestAdapter extends AbstractHapinessMongoAdapter {
+        class TestAdapter extends HapinessMongoAdapter {
             constructor(options) {
                 super(options);
                 this._connection = 'the_connection';
@@ -281,7 +281,7 @@ class AbstractMongoAdapterTest {
     testCallingOnErrorShouldCallTryConnect(done) {
         let hasBeenCalled = false;
 
-        class TestAdapter extends AbstractHapinessMongoAdapter {
+        class TestAdapter extends HapinessMongoAdapter {
             constructor(options) {
                 super(options);
             }
@@ -322,7 +322,7 @@ class AbstractMongoAdapterTest {
     testCallingConnectWithAnUri(done) {
         let hasBeenCalled = false;
 
-        class TestAdapter extends AbstractHapinessMongoAdapter {
+        class TestAdapter extends HapinessMongoAdapter {
             constructor(options) {
                 super(options);
             }

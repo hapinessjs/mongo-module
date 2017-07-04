@@ -1,24 +1,22 @@
-import { Injectable, Inject, Optional } from '@hapiness/core';
-
 import {
-    AbstractHapinessMongoAdapter,
-    IHapinessMongoAdapterConstructorArgs,
+    HapinessMongoAdapter,
+    HapinessMongoAdapterConstructorArgs,
     MongooseAdapter,
     MongooseGridFsAdapter
-} from '../adapters/index';
+} from '../adapters';
 
-import { StringMap, defaultMongoConfig, Debugger } from '../shared/index';
-import { Observable } from 'rxjs';
+import { StringMap, defaultMongoConfig, Debugger } from '../shared';
+import { Observable } from 'rxjs/Observable';
 
 const __debugger = new Debugger('MongoManager');
 
 export class MongoManager {
 
-    private _config: IHapinessMongoAdapterConstructorArgs;
-    private _adapters: StringMap<typeof AbstractHapinessMongoAdapter>;
-    private _adaptersInstances: StringMap<AbstractHapinessMongoAdapter>;
+    private _config: HapinessMongoAdapterConstructorArgs;
+    private _adapters: StringMap<typeof HapinessMongoAdapter>;
+    private _adaptersInstances: StringMap<HapinessMongoAdapter>;
 
-    constructor(config?: IHapinessMongoAdapterConstructorArgs) {
+    constructor(config?: HapinessMongoAdapterConstructorArgs) {
         this._config = this._fixConfig(config);
         this._adaptersInstances = {};
         this._adapters = {
@@ -27,9 +25,9 @@ export class MongoManager {
         };
     }
 
-    private _fixConfig(configValues?: IHapinessMongoAdapterConstructorArgs): IHapinessMongoAdapterConstructorArgs {
+    private _fixConfig(configValues?: HapinessMongoAdapterConstructorArgs): HapinessMongoAdapterConstructorArgs {
         __debugger.debug('_fixConfig', '');
-        return <IHapinessMongoAdapterConstructorArgs> (
+        return <HapinessMongoAdapterConstructorArgs> (
             Object.assign(
                 {},
                 defaultMongoConfig,
@@ -38,12 +36,12 @@ export class MongoManager {
         );
     }
 
-    private _keyForAdapter(adapterName: string, options: IHapinessMongoAdapterConstructorArgs): string {
+    private _keyForAdapter(adapterName: string, options: HapinessMongoAdapterConstructorArgs): string {
         __debugger.debug('_keyForAdapter', '');
         return `${adapterName}_${options.db || options.database}_${options.instance || 0}`;
     }
 
-    public registerAdapter(adapterClass: typeof AbstractHapinessMongoAdapter): boolean {
+    public registerAdapter(adapterClass: typeof HapinessMongoAdapter): boolean {
         __debugger.debug('registerAdapter', '');
         const adapterName: string = adapterClass.getInterfaceName();
         __debugger.debug('registerAdapter', `---->  ${adapterName}`);
@@ -56,13 +54,13 @@ export class MongoManager {
         return true;
     }
 
-    public loadAdapter(adapterName: string, options?: any): Observable<AbstractHapinessMongoAdapter> {
+    public loadAdapter(adapterName: string, options?: any): Observable<HapinessMongoAdapter> {
         __debugger.debug('loadAdapter', `Adapter name ---> ${adapterName}`);
         if (!this._adapters[adapterName]) {
             return Observable.throw(new Error(`Unknown adapter ${adapterName}, please register it before using it.`));
         }
 
-        const _options: IHapinessMongoAdapterConstructorArgs = <IHapinessMongoAdapterConstructorArgs>
+        const _options: HapinessMongoAdapterConstructorArgs = <HapinessMongoAdapterConstructorArgs>
             Object.assign({}, this._config, options);
 
         const key = this._keyForAdapter(adapterName, _options);
@@ -81,10 +79,10 @@ export class MongoManager {
             );
     }
 
-    public getAdapter(adapterName: string, options?: any): AbstractHapinessMongoAdapter {
+    public getAdapter(adapterName: string, options?: any): HapinessMongoAdapter {
         __debugger.debug('getAdapter', `Adapter name ---> ${adapterName}`);
 
-        const _options: IHapinessMongoAdapterConstructorArgs = <IHapinessMongoAdapterConstructorArgs>
+        const _options: HapinessMongoAdapterConstructorArgs = <HapinessMongoAdapterConstructorArgs>
             Object.assign({}, this._config, options);
 
         const key = this._keyForAdapter(adapterName, _options);

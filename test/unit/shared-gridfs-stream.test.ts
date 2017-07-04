@@ -8,8 +8,6 @@ import { test, suite } from 'mocha-typescript';
  */
 import * as unit from 'unit.js';
 
-import { Observable } from 'rxjs/Observable';
-
 // element to test
 import { CreateGridFsStream } from '../../src/module/shared';
 

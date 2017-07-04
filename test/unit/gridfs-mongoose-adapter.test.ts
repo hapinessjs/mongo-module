@@ -9,9 +9,9 @@ import { test, suite } from 'mocha-typescript';
 import * as unit from 'unit.js';
 import { Observable } from 'rxjs/Observable';
 
-import { MongooseMockInstance, GridFsMockInstance, ConnectionMock } from '../mocks/index';
+import { MongooseMockInstance, GridFsMockInstance, ConnectionMock } from '../mocks';
 
-import { MongooseGridFsAdapter } from '../../src/index';
+import { MongooseGridFsAdapter } from '../../src';
 
 @suite('- Unit MongooseGridFsAdapterTest file')
 class MongooseGridFsAdapterTest {

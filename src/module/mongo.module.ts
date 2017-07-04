@@ -2,7 +2,7 @@ import { HapinessModule } from '@hapiness/core';
 import { MongoClientService } from './services/index';
 
 @HapinessModule({
-    version: '1.0.0-beta.2',
+    version: '1.0.0-rc.6',
     declarations: [ ],
     providers: [ ],
     exports: [ MongoClientService ]

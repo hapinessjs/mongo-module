@@ -10,9 +10,9 @@ import * as unit from 'unit.js';
 
 import { Observable } from 'rxjs/Observable';
 
-import { MongooseMockInstance, ConnectionMock } from '../mocks/index';
+import { MongooseMockInstance, ConnectionMock } from '../mocks';
 
-import { MongooseAdapter } from '../../src/index';
+import { MongooseAdapter } from '../../src';
 
 @suite('- Unit MongooseAdapterTest file')
 class MongooseAdapterTest {

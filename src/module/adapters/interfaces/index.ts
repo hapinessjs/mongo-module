@@ -1,2 +1,2 @@
-export * from './ihapiness-mongo-adapter';
-export * from './ihapiness-mongo-config';
+export * from './hapiness-mongo-adapter-constructor-args';
+export * from './hapiness-mongo-config';

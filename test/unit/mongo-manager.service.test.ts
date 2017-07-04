@@ -9,9 +9,9 @@ import { test, suite } from 'mocha-typescript';
 import * as unit from 'unit.js';
 
 import { Observable } from 'rxjs/Observable';
-import { MongooseMockInstance, ConnectionMock } from '../mocks/index';
+import { MongooseMockInstance, ConnectionMock } from '../mocks';
 
-import { AbstractHapinessMongoAdapter, MongoManager, MongooseAdapter } from '../../src/index';
+import { HapinessMongoAdapter, MongoManager, MongooseAdapter } from '../../src';
 
 
 @suite('- Unit MongoManagerTest file')
@@ -124,7 +124,7 @@ class MongoManagerTest {
     testMongoManagerRegisterAdapterThrowErrorMissingFunctionGetInterfaceName() {
         this._mockConnection.emitAfter('connected');
 
-        class CustomAdapter extends AbstractHapinessMongoAdapter {
+        class CustomAdapter extends HapinessMongoAdapter {
             constructor(options) { super(options) }
         }
 
@@ -147,7 +147,7 @@ class MongoManagerTest {
      */
     @test('- `MongoManager.registerAdapter(...)` throw an error because we are trying to override an existing adapter')
     testMongoManagerRegisterAdapterThrowErrorAdapterAlreadyExists() {
-        class CustomMongooseAdapter extends AbstractHapinessMongoAdapter {
+        class CustomMongooseAdapter extends HapinessMongoAdapter {
             public static getInterfaceName(): string {
                 return 'mongoose';
             }
@@ -174,7 +174,7 @@ class MongoManagerTest {
      */
     @test('- `MongoManager.registerAdapter(...)` should return true')
     testMongoManagerRegisterAdapterShouldReturnTrue() {
-        class CustomAdapter extends AbstractHapinessMongoAdapter {
+        class CustomAdapter extends HapinessMongoAdapter {
             public static getInterfaceName(): string {
                 return 'custom';
             }
@@ -194,7 +194,7 @@ class MongoManagerTest {
      */
     @test('- Test if registering, then getting a custom adapter with db name will create the correct URI')
     testMongoManagerRegisterAndGetItForDb(done) {
-        class CustomAdapter extends AbstractHapinessMongoAdapter {
+        class CustomAdapter extends HapinessMongoAdapter {
             public static getInterfaceName(): string {
                 return 'custom';
             }
@@ -227,7 +227,7 @@ class MongoManagerTest {
 
     @test('- Test if registering, then getting a custom adapter with database name will create the correct URI')
     testMongoManagerRegisterAndGetItForDatabase(done) {
-        class CustomAdapter extends AbstractHapinessMongoAdapter {
+        class CustomAdapter extends HapinessMongoAdapter {
             public static getInterfaceName(): string {
                 return 'custom';
             }
@@ -263,7 +263,7 @@ class MongoManagerTest {
      */
     @test('- Test if we register a custom adapter and we get it twice, we got two different instances')
     testMongoManagerRegisterAndGetTwiceWithDifferentKey(done) {
-        class CustomAdapter extends AbstractHapinessMongoAdapter {
+        class CustomAdapter extends HapinessMongoAdapter {
             public static getInterfaceName(): string {
                 return 'custom';
             }

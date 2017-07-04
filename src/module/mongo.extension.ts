@@ -2,7 +2,7 @@ import { CoreModule, Extension, ExtensionWithConfig, OnExtensionLoad } from '@ha
 import { Observable } from 'rxjs';
 
 import { MongoManager } from './managers/index';
-import { AbstractHapinessMongoAdapter, IHapinessMongoConfig, IHapinessLoadAdapterConfig } from './adapters/index';
+import { HapinessMongoAdapter, HapinessMongoConfig, HapinessLoadAdapterConfig } from './adapters/index';
 
 import { Debugger } from './shared/index';
 
@@ -11,14 +11,14 @@ const __debugger = new Debugger('MongoClientExtension');
 export class MongoClientExt implements OnExtensionLoad {
 
 
-    static setConfig(config: IHapinessMongoConfig): ExtensionWithConfig {
+    static setConfig(config: HapinessMongoConfig): ExtensionWithConfig {
         return {
             token: MongoClientExt,
             config,
         };
     }
 
-    registerAdapters(mongoManager: MongoManager, adaptersToRegister: Array<typeof AbstractHapinessMongoAdapter>): Observable<void> {
+    registerAdapters(mongoManager: MongoManager, adaptersToRegister: Array<typeof HapinessMongoAdapter>): Observable<void> {
         __debugger.debug('registerAdapters', '');
         return Observable
             .create(
@@ -28,7 +28,7 @@ export class MongoClientExt implements OnExtensionLoad {
                         observer.complete();
                     } else {
                         const errors = adaptersToRegister
-                            .map((_adapter: typeof AbstractHapinessMongoAdapter) => {
+                            .map((_adapter: typeof HapinessMongoAdapter) => {
                                 try {
                                     const res = mongoManager.registerAdapter(_adapter);
                                     __debugger.debug('registerAdapters', `Correctly register ${JSON.stringify(res, null, 2)}`);
@@ -44,15 +44,14 @@ export class MongoClientExt implements OnExtensionLoad {
                             observer.next();
                             observer.complete();
                         } else {
-                            observer.error(errors);
-                            observer.complete();
+                            observer.error(errors.shift());
                         }
                     }
                 }
             );
     }
 
-    loadAdapters(mongoManager: MongoManager, adaptersToLoad: IHapinessLoadAdapterConfig[]): Observable<void> {
+    loadAdapters(mongoManager: MongoManager, adaptersToLoad: HapinessLoadAdapterConfig[]): Observable<void> {
         __debugger.debug('loadAdapters', `Params => ${JSON.stringify(adaptersToLoad, null, 2)}`);
         return Observable
             .create(
@@ -65,7 +64,7 @@ export class MongoClientExt implements OnExtensionLoad {
                             .forkJoin(
                                 adaptersToLoad
                                     .map(
-                                        (adapterConfig: IHapinessLoadAdapterConfig) =>
+                                        (adapterConfig: HapinessLoadAdapterConfig) =>
                                             mongoManager.loadAdapter(
                                                 adapterConfig.name,
                                                 adapterConfig.config
@@ -79,7 +78,6 @@ export class MongoClientExt implements OnExtensionLoad {
                             }, (err) => {
                                 __debugger.debug('loadAdapters', `GOT ERROR => ${err.message}`);
                                 observer.error(err);
-                                observer.complete();
                             });
                     }
                 }
@@ -94,7 +92,7 @@ export class MongoClientExt implements OnExtensionLoad {
      * @param  {SocketConfig} config
      * @returns Observable
      */
-    onExtensionLoad(module: CoreModule, config: IHapinessMongoConfig): Observable<Extension> {
+    onExtensionLoad(module: CoreModule, config: HapinessMongoConfig): Observable<Extension> {
         return Observable
             .create(observer => {
                 const instance = new MongoManager(config.common);
@@ -110,7 +108,6 @@ export class MongoClientExt implements OnExtensionLoad {
                         observer.complete();
                     }, (err) => {
                         observer.error(err);
-                        observer.complete();
                     });
             });
     }

@@ -8,8 +8,6 @@ import { test, suite } from 'mocha-typescript';
  */
 import * as unit from 'unit.js';
 
-import { Observable } from 'rxjs/Observable';
-
 // element to test
 import { UtilFunctions } from '../../src';
 
@@ -150,5 +148,18 @@ class SharedFunctionsTest {
                 UtilFunctions.getMongoUri(longUri, 'testdb')
             )
             .is('mongodb://pvadocdb:XuuXiiiXoooWooo==@pvadocdb.documents.azure.com:10250,backup.mongodb.server:9654/testdb?ssl=false');
+    }
+
+    /**
+     * Test `UtilFunctions.getMongoUri()` case 9
+     */
+    @test('- `UtilFunctions.getMongoUri(...)` case 9')
+    testUtilFunctionsGetMongoUriCase9() {
+        unit
+            .string(
+                UtilFunctions
+                    .getMongoUri('mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test&connectTimeoutMS=300000', 'testdb')
+            )
+            .is('mongodb://db1.example.net,db2.example.net:2500/testdb?replicaSet=test&connectTimeoutMS=300000');
     }
 }

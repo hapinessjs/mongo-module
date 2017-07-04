@@ -1,12 +1,12 @@
 import * as mongoose from 'mongoose';
 
-import { Observable } from 'rxjs';
-import { AbstractHapinessMongoAdapter } from './mongo-adapter.abstract';
-import { Debugger } from '../shared/index';
+import { Observable } from 'rxjs/Observable';
+import { HapinessMongoAdapter } from './hapiness-mongo-adapter';
+import { Debugger } from '../shared';
 
 const __debugger = new Debugger('MongooseAdapter');
 
-export class MongooseAdapter extends AbstractHapinessMongoAdapter {
+export class MongooseAdapter extends HapinessMongoAdapter {
 
     public static getInterfaceName(): string {
         return 'mongoose';
@@ -46,7 +46,6 @@ export class MongooseAdapter extends AbstractHapinessMongoAdapter {
                     __debugger.debug('_tryConnect', `connection once error ${JSON.stringify(err, null, 2)}`);
 
                     observer.error(err);
-                    observer.complete();
                 });
             });
     }

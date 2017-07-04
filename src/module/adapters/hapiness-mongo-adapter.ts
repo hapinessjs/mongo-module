@@ -1,15 +1,15 @@
 import { EventEmitter } from 'events';
-import { Observable } from 'rxjs';
-import { IHapinessMongoAdapterConstructorArgs } from './interfaces';
-import { UtilFunctions, Debugger } from '../shared/index';
+import { Observable } from 'rxjs/Observable';
+import { HapinessMongoAdapterConstructorArgs } from './interfaces';
+import { UtilFunctions, Debugger } from '../shared';
 
-const __debugger = new Debugger('AbstractHapinessMongoAdapter');
+const __debugger = new Debugger('HapinessMongoAdapter');
 
 /*
  * Not really abstract but we'll simulate it
  */
-export class AbstractHapinessMongoAdapter extends EventEmitter {
-    protected _config: IHapinessMongoAdapterConstructorArgs;
+export class HapinessMongoAdapter extends EventEmitter {
+    protected _config: HapinessMongoAdapterConstructorArgs;
     protected _uri: string;
     protected _isReady: boolean;
 
@@ -20,7 +20,7 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
         throw new Error('Your adapter should implements `getInterfaceName()`');
     }
 
-    constructor(options: IHapinessMongoAdapterConstructorArgs) {
+    constructor(options: HapinessMongoAdapterConstructorArgs) {
         super();
 
         this._config = options;
@@ -135,6 +135,7 @@ export class AbstractHapinessMongoAdapter extends EventEmitter {
 
                     observer.next();
                     observer.complete();
+                    return;
                 }
 
                 this.once('ready', () => {

@@ -1,6 +1,6 @@
-import { Injectable, Inject, Optional } from '@hapiness/core';
+import { Injectable, Inject } from '@hapiness/core';
 import { MongoClientExt } from '../mongo.extension';
-import { MongoManager } from '../managers/index';
+import { MongoManager } from '../managers';
 
 @Injectable()
 export class MongoClientService {

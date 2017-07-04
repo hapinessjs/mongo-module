@@ -8,25 +8,22 @@ import { test, suite } from 'mocha-typescript';
  */
 import * as unit from 'unit.js';
 
-import { Hapiness, HapinessModule, Lib, OnStart, Inject } from '@hapiness/core';
+import { Hapiness, HapinessModule, OnStart, Inject } from '@hapiness/core';
 import { HttpServerExt, Server } from '@hapiness/core/extensions/http-server';
 
 import { Observable } from 'rxjs/Observable';
 
 // Mongoose mocking
-import { MongooseMockInstance, ConnectionMock } from '../mocks/index';
+import { MongooseMockInstance, ConnectionMock } from '../mocks';
 
 // element to test
 import {
-    AbstractHapinessMongoAdapter,
+    HapinessMongoAdapter,
     MongoClientExt,
     MongoManager,
-    Debugger,
     MongoModule,
     MongoClientService
-} from '../../src/index';
-
-import { unitTestMongoConfig } from '../config/index';
+} from '../../src';
 
 @suite('- Integration MongoModule test file')
 class MongoModuleTest {
@@ -118,7 +115,7 @@ class MongoModuleTest {
      */
     @test('- Test if `MongoModule` can register a custom provider and if we can get it with its connection uri')
     testMongoModuleCustomAdapter(done) {
-        class CustomAdapter extends AbstractHapinessMongoAdapter {
+        class CustomAdapter extends HapinessMongoAdapter {
             public static getInterfaceName(): string {
                 return 'custom';
             }
@@ -181,7 +178,7 @@ class MongoModuleTest {
      */
     @test('- Trying to register an existing Adapter should lead to an error')
     testMongoModuleRegisterExistingAdapter(done) {
-        class MongooseAdapter extends AbstractHapinessMongoAdapter {
+        class MongooseAdapter extends HapinessMongoAdapter {
             public static getInterfaceName(): string {
                 return 'mongoose';
             }

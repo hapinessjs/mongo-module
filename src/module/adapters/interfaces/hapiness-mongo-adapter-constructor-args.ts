@@ -1,4 +1,4 @@
-export interface IHapinessMongoAdapterConstructorArgs {
+export interface HapinessMongoAdapterConstructorArgs {
     skip_connect?: boolean;
     db?: string;
     database?: string;
@@ -6,4 +6,4 @@ export interface IHapinessMongoAdapterConstructorArgs {
     port?: number;
     instance?: number;
     url?: string;
-};
+}
