@@ -76,8 +76,7 @@
         "@types/mongoose": "^4.7.18",
         "debug": "^2.6.8",
         "gridfs-stream": "^1.1.1",
-        "mongoose": "^4.11.1",
-        "rxjs": "^5.4.1"
+        "mongoose": "^4.11.1"
     },
     "devDependencies": {
         "@types/fs-extra": "^3.0.3",
