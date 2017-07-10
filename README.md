@@ -67,8 +67,8 @@ $ yarn add @hapiness/mongo
     
 ```javascript
 "dependencies": {
-    "@hapiness/core": "^1.0.0-rc.3",
-    "@hapiness/mongo": "^1.0.0-rc.3",
+    "@hapiness/core": "^1.0.0-rc.4",
+    "@hapiness/mongo": "^1.0.0-rc.4",
     //...
 }
 //...
@@ -400,6 +400,9 @@ To set up your development environment:
 
 ## Change History
 
+* v1.0.0-rc.4 (2017-07-10)
+    * Update tests for latest `tslint` version.
+    * Module version related to core version.
 * v1.0.0-rc.3 (2017-07-04)
     * `MongoDB` module implementation.
     * Tests module API.
