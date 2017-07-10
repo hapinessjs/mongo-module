@@ -70,9 +70,9 @@ class MongooseAdapterTest {
     @test('- Get librairy should return mongoose instance')
     testGetLibrairyShouldReturnInstance() {
         const _mongoose = this._mongooseAdapter.getLibrary();
-        const test = _mongoose.createConnection();
+        const _test = _mongoose.createConnection();
 
-        unit.assert(test instanceof ConnectionMock);
+        unit.assert(_test instanceof ConnectionMock);
     }
 
     /**

@@ -73,7 +73,7 @@ class MongoModuleTest {
             providers: [],
             imports: []
         })
-        class MongoModuleTest implements OnStart {
+        class MMTest implements OnStart {
             constructor(
                 @Inject(HttpServerExt) private _httpServer: Server,
                 @Inject(MongoClientExt) private _mongoManager: MongoManager
@@ -93,7 +93,7 @@ class MongoModuleTest {
             }
         }
 
-        Hapiness.bootstrap(MongoModuleTest, [
+        Hapiness.bootstrap(MMTest, [
             HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
             MongoClientExt.setConfig({
                 common: {
@@ -137,7 +137,7 @@ class MongoModuleTest {
             providers: [],
             imports: []
         })
-        class MongoModuleTest implements OnStart {
+        class MMTest implements OnStart {
             constructor(
                 @Inject(HttpServerExt) private _httpServer: Server,
                 @Inject(MongoClientExt) private _mongoManager: MongoManager
@@ -157,7 +157,7 @@ class MongoModuleTest {
             }
         }
 
-        Hapiness.bootstrap(MongoModuleTest, [
+        Hapiness.bootstrap(MMTest, [
             HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
             MongoClientExt.setConfig({
                 common: {
@@ -200,7 +200,7 @@ class MongoModuleTest {
             providers: [],
             imports: []
         })
-        class MongoModuleTest implements OnStart {
+        class MMTest implements OnStart {
             constructor(
                 @Inject(HttpServerExt) private _httpServer: Server,
                 @Inject(MongoClientExt) private _mongoManager: MongoManager
@@ -215,7 +215,7 @@ class MongoModuleTest {
             }
         }
 
-        Hapiness.bootstrap(MongoModuleTest, [
+        Hapiness.bootstrap(MMTest, [
             HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
             MongoClientExt.setConfig({
                 common: {
@@ -250,7 +250,7 @@ class MongoModuleTest {
             providers: [],
             imports: []
         })
-        class MongoModuleTest implements OnStart {
+        class MMTest implements OnStart {
             constructor(
                 @Inject(HttpServerExt) private _httpServer: Server,
                 @Inject(MongoClientExt) private _mongoManager: MongoManager
@@ -261,7 +261,7 @@ class MongoModuleTest {
             }
         }
 
-        Hapiness.bootstrap(MongoModuleTest, [
+        Hapiness.bootstrap(MMTest, [
             HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
             MongoClientExt.setConfig({
                 common: {
@@ -286,7 +286,7 @@ class MongoModuleTest {
             providers: [],
             imports: []
         })
-        class MongoModuleTest implements OnStart {
+        class MMTest implements OnStart {
             constructor(
                 @Inject(HttpServerExt) private _httpServer: Server,
                 @Inject(MongoClientExt) private _mongoManager: MongoManager
@@ -297,7 +297,7 @@ class MongoModuleTest {
             }
         }
 
-        Hapiness.bootstrap(MongoModuleTest, [
+        Hapiness.bootstrap(MMTest, [
             HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
             MongoClientExt.setConfig({
                 common: {
@@ -323,7 +323,7 @@ class MongoModuleTest {
             providers: [],
             imports: []
         })
-        class MongoModuleTest implements OnStart {
+        class MMTest implements OnStart {
             constructor(
                 @Inject(HttpServerExt) private _httpServer: Server,
                 @Inject(MongoClientExt) private _mongoManager: MongoManager
@@ -334,7 +334,7 @@ class MongoModuleTest {
             }
         }
 
-        Hapiness.bootstrap(MongoModuleTest, [
+        Hapiness.bootstrap(MMTest, [
             HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
             MongoClientExt,
         ])
@@ -353,7 +353,7 @@ class MongoModuleTest {
             providers: [],
             imports: []
         })
-        class MongoModuleTest implements OnStart {
+        class MMTest implements OnStart {
             constructor(
                 @Inject(HttpServerExt) private _httpServer: Server,
                 @Inject(MongoClientExt) private _mongoManager: MongoManager
@@ -366,7 +366,7 @@ class MongoModuleTest {
             }
         }
 
-        Hapiness.bootstrap(MongoModuleTest, [
+        Hapiness.bootstrap(MMTest, [
             HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
             MongoClientExt.setConfig({
                 load: [{
@@ -378,7 +378,7 @@ class MongoModuleTest {
         .catch(err => {
             unit
                 .string(err.message)
-                .is('Unknown adapter custom, please register it before using it.')
+                .is('Unknown adapter custom, please register it before using it.');
 
             Hapiness['extensions']
                 .find(ext => ext.token === HttpServerExt)
@@ -399,7 +399,7 @@ class MongoModuleTest {
             providers: [],
             imports: [ MongoModule ]
         })
-        class MongoModuleTest implements OnStart {
+        class MMTest implements OnStart {
 
             private _mongoManager: MongoManager;
 
@@ -423,7 +423,7 @@ class MongoModuleTest {
             }
         }
 
-        Hapiness.bootstrap(MongoModuleTest, [
+        Hapiness.bootstrap(MMTest, [
             HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
             MongoClientExt,
         ])
