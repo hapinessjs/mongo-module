@@ -24,7 +24,7 @@ export class MongoClientService {
         return adapter ? adapter.getLibrary() : undefined;
     }
 
-    getModels(connectionOptions: ConnectionOptions): ModelManager {
+    getStore(connectionOptions: ConnectionOptions): ModelManager {
         connectionOptions = Object.assign({}, connectionOptions);
         const adapter = this._mongoManager
             .getAdapter(connectionOptions.adapter, connectionOptions.options);

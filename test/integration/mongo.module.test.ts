@@ -472,7 +472,7 @@ class MongoModuleTest {
             onStart(): void {
                 const conn = { adapter: 'mongoose', options: { database: 'test_1', host: 'host_1' }};
                 unit
-                    .bool(this._mongoClientService.getModels(conn) instanceof ModelManager)
+                    .bool(this._mongoClientService.getStore(conn) instanceof ModelManager)
                     .isTrue();
 
                 unit
@@ -486,7 +486,7 @@ class MongoModuleTest {
                     .is(undefined);
 
                 unit
-                    .must(this._mongoClientService.getModels(null))
+                    .must(this._mongoClientService.getStore(null))
                     .is(undefined);
 
                 unit
