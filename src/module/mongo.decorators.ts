@@ -1,16 +1,32 @@
-import { Observable } from 'rxjs/Rx';
-import { CoreDecorator, Type, createDecorator } from '@hapiness/core/core/decorators';
-import { makeDecorator } from '@hapiness/core/externals/injection-js/util/decorators';
+import {
+    CoreDecorator,
+    Type,
+    createDecorator,
+    extractMetadata
+} from '@hapiness/core/core';
+
+import { ConnectionOptions } from './services';
 
 export interface MongoModel {
     adapter: string;
     collection: string;
+    options?: any;
 }
+
 export const MongoModel = createDecorator<MongoModel>('MongoModel', {
     adapter: undefined,
-    collection: undefined
+    collection: undefined,
+    options: undefined
 });
 
-export interface Schema {
-    readonly schema: any;
+export abstract class Model {
+    protected connectionOptions: ConnectionOptions;
+    abstract readonly schema: any;
+    constructor(token: any) {
+        const metadata: MongoModel = extractMetadata(token);
+        this.connectionOptions = {
+            adapter: metadata.adapter,
+            options: metadata.options
+        }
+    }
 }

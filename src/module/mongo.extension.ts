@@ -1,4 +1,4 @@
-import { MongoModel, Schema } from './mongo.decorators';
+import { MongoModel, Model } from './mongo.decorators';
 import {
     CoreModule,
     DependencyInjection,
@@ -99,9 +99,9 @@ export class MongoClientExt implements OnExtensionLoad, OnModuleInstantiated {
         [].concat(module.declarations)
             .filter(_ => !!extractMetadataByDecorator(_, 'MongoModel'))
             .forEach(_ => {
-                const instance = <Schema>DependencyInjection.instantiateComponent(_, module.di);
+                const instance = DependencyInjection.instantiateComponent<Model>(_, module.di);
                 const metadata = extractMetadataByDecorator<MongoModel>(_, 'MongoModel');
-                const adapter = this._mongoManager.getAdapter(metadata.adapter);
+                const adapter = this._mongoManager.getAdapter(metadata.adapter, metadata.options);
                 adapter.getModelManager().add({
                     token: _,
                     value: adapter.registerValue(instance.schema, metadata.collection)

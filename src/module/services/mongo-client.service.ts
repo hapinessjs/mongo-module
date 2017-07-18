@@ -2,6 +2,11 @@ import { Injectable, Inject, Type } from '@hapiness/core';
 import { MongoClientExt } from '../mongo.extension';
 import { MongoManager, ModelManager, ModelItem } from '../managers';
 
+export interface ConnectionOptions {
+    adapter: string;
+    options?: any;
+}
+
 @Injectable()
 export class MongoClientService {
     constructor(
@@ -12,25 +17,24 @@ export class MongoClientService {
         return this._mongoManager;
     }
 
-    getDao(adapterName: string) {
-        return this
-            ._mongoManager
-            .getAdapter(adapterName)
-            .getLibrary();
+    getDao(connectionOptions: ConnectionOptions) {
+        connectionOptions = Object.assign({}, connectionOptions);
+        const adapter = this._mongoManager
+            .getAdapter(connectionOptions.adapter, connectionOptions.options);
+        return adapter ? adapter.getLibrary() : undefined;
     }
 
-    getModels(adapterName: string): ModelManager {
-        return this
-            ._mongoManager
-            .getAdapter(adapterName)
-            .getModelManager();
+    getModels(connectionOptions: ConnectionOptions): ModelManager {
+        connectionOptions = Object.assign({}, connectionOptions);
+        const adapter = this._mongoManager
+            .getAdapter(connectionOptions.adapter, connectionOptions.options);
+        return adapter ? adapter.getModelManager() : undefined;
     }
 
-    getModel(adapterName: string, token: Type<any>): any {
-        return this
-            ._mongoManager
-            .getAdapter(adapterName)
-            .getModelManager()
-            .get(token);
+    getModel(connectionOptions: ConnectionOptions, token: Type<any>): any {
+        connectionOptions = Object.assign({}, connectionOptions);
+        const adapter = this._mongoManager
+            .getAdapter(connectionOptions.adapter, connectionOptions.options);
+        return adapter ? adapter.getModelManager().get(token) : undefined;
     }
 }

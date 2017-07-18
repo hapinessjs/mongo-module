@@ -405,14 +405,16 @@ Example:
 ```javascript
 @MongoModel({
     adapter: 'mongoose',
-    collection: 'collectionName'
+    collection: 'collectionName',
+    options: { ... }
 })
-class MyModel implements Schema {
+class MyModel extends Model {
 
     readonly schema;
 
     constructor(private mongoClientService: MongoClientService) {
-        const DAO = mongoClientService.getDao('mongoose');
+        super(MyModel) // /!\ Important to get connection options
+        const DAO = mongoClientService.getDao(this.connectionOptions);
         this.schema = new DAO.Schema({
             id: String
         });

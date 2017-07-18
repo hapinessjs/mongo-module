@@ -17,6 +17,7 @@ export class ModelManager {
     }
 
     public get(token: Type<any>) {
-        return this.models.find(_ => _.token === token).value;
+        const item = this.models.find(_ => _.token === token);
+        return item ? item.value : undefined;
     }
 }
