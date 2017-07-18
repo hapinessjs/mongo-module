@@ -179,6 +179,31 @@ class AbstractMongoAdapterTest {
     }
 
     /**
+     * Calling parent getLibrary() should throw an error
+     */
+    @test('- Calling parent registerValue() should throw an error')
+    testCallingParentRegisterValueShouldThrow() {
+        class TestAdapter extends HapinessMongoAdapter {
+            constructor(options) {
+                super(options);
+            }
+        }
+
+        const adapter = new TestAdapter({ host: 'test.in.tdw', db: 'test' });
+        unit
+            .assert
+            .throws(
+                () => adapter.registerValue(null, null),
+                (err) => {
+                    if (err.message === '`registerValue` is not implemented') {
+                        return true;
+                    }
+                    return false;
+                }
+            );
+    }
+
+    /**
      * Calling onConnected should make the adapter ready
      */
     @test('- Calling onConnected should make the adapter ready')

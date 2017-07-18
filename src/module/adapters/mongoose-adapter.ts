@@ -6,6 +6,8 @@ import { Debugger } from '../shared';
 
 const __debugger = new Debugger('MongooseAdapter');
 
+(<any>mongoose).Promise = global.Promise;
+
 export class MongooseAdapter extends HapinessMongoAdapter {
 
     public static getInterfaceName(): string {
@@ -84,5 +86,9 @@ export class MongooseAdapter extends HapinessMongoAdapter {
 
     public getLibrary(): any {
         return mongoose;
+    }
+
+    public registerValue(schema: any, collection: string) {
+        return this._connection.model(collection, schema);
     }
 }

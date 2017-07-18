@@ -22,7 +22,10 @@ import {
     MongoClientExt,
     MongoManager,
     MongoModule,
-    MongoClientService
+    MongoClientService,
+    MongoModel,
+    Schema,
+    ModelManager
 } from '../../src';
 
 @suite('- Integration MongoModule test file')
@@ -426,6 +429,60 @@ class MongoModuleTest {
         Hapiness.bootstrap(MMTest, [
             HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
             MongoClientExt,
+        ])
+        .catch(err => {
+           done(err);
+        });
+    }
+
+    @test('- We should be able to store mongo document and get it')
+    testMongoDocument(done) {
+        this._mockConnection.emitAfter('connected', 400);
+        @MongoModel({
+            adapter: 'mongoose',
+            collection: 'MyCollection'
+        })
+        class MyModel implements Schema {
+
+            readonly schema;
+
+            constructor(mongoService: MongoClientService) {
+                const dao = mongoService.getDao('mongoose');
+                this.schema = new dao.Schema({
+                    id: String
+                });
+            }
+
+        }
+
+        @HapinessModule({
+            version: '1.0.0',
+            declarations: [ MyModel ],
+            imports: [ MongoModule ]
+        })
+        class MMTest implements OnStart {
+
+            constructor(private _mongoClientService: MongoClientService) {}
+
+            onStart(): void {
+                unit
+                    .bool(this._mongoClientService.getModels('mongoose') instanceof ModelManager)
+                    .isTrue();
+                unit
+                    .object(this._mongoClientService.getModel('mongoose', MyModel).obj)
+                    .hasProperty('id');
+
+                done();
+            }
+        }
+
+        Hapiness.bootstrap(MMTest, [
+            MongoClientExt.setConfig({
+                load: [{
+                    name: 'mongoose',
+                    config: {}
+                }],
+            })
         ])
         .catch(err => {
            done(err);

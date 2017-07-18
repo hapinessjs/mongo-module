@@ -1,6 +1,15 @@
-import { CoreModule, Extension, ExtensionWithConfig, OnExtensionLoad } from '@hapiness/core/core';
-import { Observable } from 'rxjs';
+import { MongoModel, Schema } from './mongo.decorators';
+import {
+    CoreModule,
+    DependencyInjection,
+    Extension,
+    ExtensionWithConfig,
+    extractMetadataByDecorator,
+    OnExtensionLoad,
+    OnModuleInstantiated,
+} from '@hapiness/core/core';
 
+import { Observable } from 'rxjs';
 import { MongoManager } from './managers/index';
 import { HapinessMongoAdapter, HapinessMongoConfig, HapinessLoadAdapterConfig } from './adapters/index';
 
@@ -8,8 +17,9 @@ import { Debugger } from './shared/index';
 
 const __debugger = new Debugger('MongoClientExtension');
 
-export class MongoClientExt implements OnExtensionLoad {
+export class MongoClientExt implements OnExtensionLoad, OnModuleInstantiated {
 
+    private _mongoManager: MongoManager;
 
     static setConfig(config: HapinessMongoConfig): ExtensionWithConfig {
         return {
@@ -84,6 +94,22 @@ export class MongoClientExt implements OnExtensionLoad {
             );
     }
 
+
+    private storeDocuments(module: CoreModule) {
+        [].concat(module.declarations)
+            .filter(_ => !!extractMetadataByDecorator(_, 'MongoModel'))
+            .forEach(_ => {
+                const instance = <Schema>DependencyInjection.instantiateComponent(_, module.di);
+                const metadata = extractMetadataByDecorator<MongoModel>(_, 'MongoModel');
+                const adapter = this._mongoManager.getAdapter(metadata.adapter);
+                adapter.getModelManager().add({
+                    token: _,
+                    value: adapter.registerValue(instance.schema, metadata.collection)
+                });
+            });
+        module.modules.forEach(_ => this.storeDocuments(_));
+    }
+
     /**
      * Initilization of the extension
      * Create the socket server
@@ -95,20 +121,28 @@ export class MongoClientExt implements OnExtensionLoad {
     onExtensionLoad(module: CoreModule, config: HapinessMongoConfig): Observable<Extension> {
         return Observable
             .create(observer => {
-                const instance = new MongoManager(config.common);
+                this._mongoManager = new MongoManager(config.common);
                 this
-                    .registerAdapters(instance, config.register)
-                    .switchMap(_ => this.loadAdapters(instance, config.load))
+                    .registerAdapters(this._mongoManager, config.register)
+                    .switchMap(_ => this.loadAdapters(this._mongoManager, config.load))
                     .subscribe(_ => {
                         observer.next({
                             instance: this,
                             token: MongoClientExt,
-                            value: instance
+                            value: this._mongoManager
                         });
                         observer.complete();
                     }, (err) => {
                         observer.error(err);
                     });
             });
+    }
+
+    onModuleInstantiated(module: CoreModule): Observable<any> {
+        return Observable.create(observer => {
+            this.storeDocuments(module);
+            observer.next();
+            observer.complete();
+        });
     }
 }
