@@ -406,7 +406,7 @@ Example:
 @MongoModel({
     adapter: 'mongoose',
     collection: 'collectionName',
-    options: { ... }
+    options: { ... } // @see HapinessMongoAdapterConstructorArgs type
 })
 class MyModel extends Model {
 
@@ -431,7 +431,7 @@ class MyRoute implements OnGet {
     constructor(private mongoClientService: MongoClientService) {}
 
     onGet(request, reply) {
-        const model = this.mongoClientService.getModel('mongoose', MyModel);
+        const model = this.mongoClientService.getModel({ adapter: 'mongoose', options: {} }, MyModel);
         
         ...
     }
