@@ -19,9 +19,8 @@
         "url": "git+ssh://git@github.com/hapinessjs/mongo-module.git"
     },
     "keywords": [
-        "HapiJS",
-        "Hapi",
         "Mongo",
+        "Mongoose",
         "MongoDB",
         "Hapiness",
         "Framework",
@@ -71,26 +70,31 @@
     },
     "homepage": "https://github.com/hapinessjs/mongo-module#readme",
     "dependencies": {
-        "@hapiness/core": "^1.0.0-rc.6",
         "@types/gridfs-stream": "^0.5.29",
+        "@types/node": "^8.0.14",
         "@types/mongoose": "^4.7.18",
         "debug": "^2.6.8",
         "gridfs-stream": "^1.1.1",
-        "mongoose": "^4.11.1",
-        "rxjs": "^5.4.2"
+        "mongoose": "^4.11.1"
     },
     "devDependencies": {
+        "@hapiness/core": "^1.0.0-rc.6",
         "@types/fs-extra": "^3.0.3",
         "coveralls": "^2.13.0",
         "fs-extra": "^4.0.0",
         "istanbul": "^1.1.0-alpha.1",
         "mocha": "^3.4.2",
         "mocha-typescript": "^1.1.7",
+        "rxjs": "^5.4.2",
         "rimraf": "^2.6.1",
         "ts-node": "^3.2.0",
         "tslint": "^5.5.0",
         "typescript": "^2.4.1",
         "unit.js": "^2.0.0"
+    },
+    "peerDependencies": {
+        "@hapiness/core": "^1.0.0-rc.6",
+        "rxjs": "^5.4.2"
     },
     "engines": {
         "node": ">=7.0.0"
