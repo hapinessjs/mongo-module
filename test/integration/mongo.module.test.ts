@@ -1,13 +1,15 @@
+
 /**
  * @see https://github.com/pana-cc/mocha-typescript
  */
-import { test, suite } from 'mocha-typescript';
+import { test, suite, only } from 'mocha-typescript';
 
 /**
  * @see http://unitjs.com/
  */
 import * as unit from 'unit.js';
 
+import { extractMetadata } from '@hapiness/core/core';
 import { Hapiness, HapinessModule, OnStart, Inject } from '@hapiness/core';
 import { HttpServerExt, Server } from '@hapiness/core/extensions/http-server';
 
@@ -22,7 +24,10 @@ import {
     MongoClientExt,
     MongoManager,
     MongoModule,
-    MongoClientService
+    MongoClientService,
+    MongoModel,
+    Model,
+    ModelManager
 } from '../../src';
 
 @suite('- Integration MongoModule test file')
@@ -426,6 +431,89 @@ class MongoModuleTest {
         Hapiness.bootstrap(MMTest, [
             HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
             MongoClientExt,
+        ])
+        .catch(err => {
+           done(err);
+        });
+    }
+
+    @test('- We should be able to store mongo document and get it')
+    testMongoDocument(done) {
+        this._mockConnection.emitAfter('connected', 400);
+
+        @MongoModel({
+            adapter: 'mongoose',
+            collection: 'MyCollection',
+            options: { database: 'test_1', host: 'host_1' }
+        })
+        class MyModel extends Model {
+
+            readonly schema;
+
+            constructor(mongoService: MongoClientService) {
+                super(MyModel);
+                const dao = mongoService.getDao(this.connectionOptions);
+                this.schema = new dao.Schema({
+                    id: String
+                });
+            }
+
+        }
+
+        @HapinessModule({
+            version: '1.0.0',
+            declarations: [ MyModel ],
+            imports: [ MongoModule ]
+        })
+        class MMTest implements OnStart {
+
+            constructor(private _mongoClientService: MongoClientService) {}
+
+            onStart(): void {
+                const conn = { adapter: 'mongoose', options: { database: 'test_1', host: 'host_1' }};
+                unit
+                    .bool(this._mongoClientService.getStore(conn) instanceof ModelManager)
+                    .isTrue();
+
+                unit
+                    .object(this._mongoClientService.getModel(conn, MyModel).obj)
+                    .hasProperty('id');
+
+                conn.options = { database: 'test_2', host: 'host_2' };
+
+                unit
+                    .must(this._mongoClientService.getModel(conn, MyModel))
+                    .is(undefined);
+
+                unit
+                    .must(this._mongoClientService.getStore(null))
+                    .is(undefined);
+
+                unit
+                    .must(this._mongoClientService.getModel(null, null))
+                    .is(undefined);
+
+                unit
+                    .must(this._mongoClientService.getDao(null))
+                    .is(undefined);
+
+                done();
+            }
+        }
+
+        Hapiness.bootstrap(MMTest, [
+            MongoClientExt.setConfig({
+                load: [
+                    {
+                        name: 'mongoose',
+                        config: { database: 'test_1', host: 'host_1' }
+                    } ,
+                    {
+                        name: 'mongoose',
+                        config: { database: 'test_2', host: 'host_2' }
+                    }
+                ],
+            })
         ])
         .catch(err => {
            done(err);

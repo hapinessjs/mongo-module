@@ -48,6 +48,7 @@
 * [Using a registered adapter](#using-a-registered-adapter)
 * [Configuration](#configuration)
 * [Get your adapter anywhere](#get-your-adapter-anywhere)
+* [Model management](#model-management)
 * [Contributing](#contributing)
 * [Change History](#change-history)
 * [Maintainers](#maintainers)
@@ -67,8 +68,8 @@ $ yarn add @hapiness/mongo
     
 ```javascript
 "dependencies": {
-    "@hapiness/core": "^1.0.0-rc.4",
-    "@hapiness/mongo": "^1.0.0-rc.4",
+    "@hapiness/core": "^1.0.0-rc.6",
+    "@hapiness/mongo": "^1.0.0-rc.6",
     //...
 }
 //...
@@ -113,7 +114,7 @@ You absolutely needs to implement a static function ```getInterfaceName```, whic
 
 ### Step 3
 
-You need to override 3 functions
+You need to override 4 functions
 
 ```javascript
     _tryConnect(): Observable<void> { /* ... */ }
@@ -121,6 +122,8 @@ You need to override 3 functions
     _afterConnect(): Observable<void> { /* ... */ }
     
     getLibrary(): any { /* ... */ }
+
+    registerValue(): any { /* ... */ }
 ```
 
 *_tryConnect:* you will create your database connection inside
@@ -206,6 +209,15 @@ public getLibrary(): any {
 }
 ````
 
+*registerValue:* this will register your document and return a model value to get through the DI.
+
+Example for mongoose:
+
+```javascript
+public registerValue(document, collection): any {
+    return this._connection.model(collection, document);
+}
+````
 
 **NOTE**  DONT FORGET TO SET ```_isReady = true``` once you are done, else your adapter will never be ready.
 
@@ -380,8 +392,59 @@ class MyModelDocument {
         return this._myModelConnection;
     }
 }
+```
+
+[Back to top](#table-of-contents)
+
+## Model Management
+
+You can implement and register models in the adapter
+
+Example:
+
+```javascript
+@MongoModel({
+    adapter: 'mongoose',
+    collection: 'collectionName',
+    options: { ... } // @see HapinessMongoAdapterConstructorArgs type
+})
+class MyModel extends Model {
+
+    readonly schema;
+
+    constructor(private mongoClientService: MongoClientService) {
+        super(MyModel) // /!\ Important to get connection options
+        const DAO = mongoClientService.getDao(this.connectionOptions);
+        this.schema = new DAO.Schema({
+            id: String
+        });
+
+        ...
+    }
+}
+
+@Route({
+    path: '/my-route',
+    method: 'get'
+})
+class MyRoute implements OnGet {
+    constructor(private mongoClientService: MongoClientService) {}
+
+    onGet(request, reply) {
+        const model = this.mongoClientService.getModel({ adapter: 'mongoose', options: {} }, MyModel);
+        
+        ...
+    }
+}
+
+@HapinessModule({
+    version: '1.0.0',
+    declarations: [ MyModel, MyRoute ]
+})
+class MyModule {}
 
 ```
+
 
 [Back to top](#table-of-contents)
 
@@ -400,6 +463,9 @@ To set up your development environment:
 
 ## Change History
 
+* v1.0.0-rc.6 (2017-07-18)
+    * Document Manager
+    * Documentation
 * v1.0.0-rc.4 (2017-07-10)
     * Update tests for latest `tslint` version.
     * Module version related to core version.

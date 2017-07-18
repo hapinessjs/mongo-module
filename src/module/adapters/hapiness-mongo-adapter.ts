@@ -1,3 +1,4 @@
+import { ModelManager } from '../managers/model-manager';
 import { EventEmitter } from 'events';
 import { Observable } from 'rxjs/Observable';
 import { HapinessMongoAdapterConstructorArgs } from './interfaces';
@@ -15,6 +16,8 @@ export class HapinessMongoAdapter extends EventEmitter {
 
     protected _connection: any;
     protected _db: any;
+
+    protected _modelManager: ModelManager;
 
     public static getInterfaceName(): string {
         throw new Error('Your adapter should implements `getInterfaceName()`');
@@ -35,6 +38,8 @@ export class HapinessMongoAdapter extends EventEmitter {
         if (options.skip_connect) {
             return;
         }
+
+        this._modelManager = new ModelManager();
 
         this
             .connect()
@@ -94,6 +99,19 @@ export class HapinessMongoAdapter extends EventEmitter {
      */
     public getLibrary(): any {
         throw new Error('`getLibrary` is not implemented');
+    }
+
+    /*
+     *
+     *  This function should be overriden by all inherited classes.
+     *
+     */
+    public registerValue(schema: any, collection: string): any {
+        throw new Error('`registerValue` is not implemented');
+    }
+
+    public getModelManager(): ModelManager {
+        return this._modelManager;
     }
 
     protected onConnected(): Observable<void> {
