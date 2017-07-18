@@ -1,6 +1,11 @@
-import { Injectable, Inject } from '@hapiness/core';
+import { Injectable, Inject, Type } from '@hapiness/core';
 import { MongoClientExt } from '../mongo.extension';
-import { MongoManager } from '../managers';
+import { MongoManager, ModelManager, ModelItem } from '../managers';
+
+export interface ConnectionOptions {
+    adapter: string;
+    options?: any;
+}
 
 @Injectable()
 export class MongoClientService {
@@ -10,5 +15,26 @@ export class MongoClientService {
 
     get() {
         return this._mongoManager;
+    }
+
+    getDao(connectionOptions: ConnectionOptions) {
+        connectionOptions = Object.assign({}, connectionOptions);
+        const adapter = this._mongoManager
+            .getAdapter(connectionOptions.adapter, connectionOptions.options);
+        return adapter ? adapter.getLibrary() : undefined;
+    }
+
+    getStore(connectionOptions: ConnectionOptions): ModelManager {
+        connectionOptions = Object.assign({}, connectionOptions);
+        const adapter = this._mongoManager
+            .getAdapter(connectionOptions.adapter, connectionOptions.options);
+        return adapter ? adapter.getModelManager() : undefined;
+    }
+
+    getModel(connectionOptions: ConnectionOptions, token: Type<any>): any {
+        connectionOptions = Object.assign({}, connectionOptions);
+        const adapter = this._mongoManager
+            .getAdapter(connectionOptions.adapter, connectionOptions.options);
+        return adapter ? adapter.getModelManager().get(token) : undefined;
     }
 }

@@ -4,3 +4,4 @@ export * from './managers';
 export * from './services';
 export * from './adapters';
 export * from './shared';
+export * from './mongo.decorators';

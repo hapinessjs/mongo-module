@@ -417,4 +417,14 @@ class MongooseGridFsAdapterTest {
             });
     }
 
+    @test('- registerValue')
+    testRegisterValue() {
+        const adapter = new MongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        adapter['_connection'] = {
+            model: (col, doc) => doc
+        };
+        unit
+            .must(adapter.registerValue(123, 'test'))
+            .is(123);
+    }
 }

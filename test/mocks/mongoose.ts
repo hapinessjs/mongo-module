@@ -23,6 +23,10 @@ export class ConnectionMock extends EventEmitter {
     set db(theDb: string) {
         this._db = theDb;
     }
+
+    model(collection: string, schema: any) {
+        return schema;
+    }
 }
 
 export class MongooseMock {
