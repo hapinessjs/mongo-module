@@ -47,7 +47,6 @@ class MongoUtilTest {
     /**
      * `MongoUtil` function `toObjectId` should succeed
      */
-    @only
     @test('- `MongoUtil` function `toObjectId` should succeed')
     testMongoUtilToObjectIdOk() {
         unit
@@ -62,7 +61,6 @@ class MongoUtilTest {
     /**
      * `MongoUtil` function `toObjectId` should failed and return undefined
      */
-    @only
     @test('- `MongoUtil` function `toObjectId` should failed and return undefined')
     testMongoUtilToObjectIdFailed() {
         unit
@@ -72,7 +70,6 @@ class MongoUtilTest {
     /**
      * `MongoUtil` function `prepareUpdateObject` should return empty object because of null arg
      */
-    @only
     @test('- `MongoUtil` function `prepareUpdateObject` should return empty object because of null arg')
     testMongoUtilPrepareUpdateObjectNullArgs() {
         unit
@@ -83,7 +80,6 @@ class MongoUtilTest {
     /**
      * `MongoUtil` function `prepareUpdateObject` should return empty object because of empty arg
      */
-    @only
     @test('- `MongoUtil` function `prepareUpdateObject` should return empty object because of empty arg')
     testMongoUtilPrepareUpdateObjecEmptyArgs() {
         unit
@@ -94,7 +90,6 @@ class MongoUtilTest {
     /**
      * `MongoUtil` function `prepareUpdateObject` should return an unfold object (1)
      */
-    @only
     @test('- `MongoUtil` function `prepareUpdateObject` should return an unfold object (1)')
     testMongoUtilPrepareUpdateObjecUnfoldObject1() {
         unit
@@ -118,7 +113,6 @@ class MongoUtilTest {
     /**
      * `MongoUtil` function `prepareUpdateObject` should return an unfold object (2)
      */
-    @only
     @test('- `MongoUtil` function `prepareUpdateObject` should return an unfold object (2)')
     testMongoUtilPrepareUpdateObjecUnfoldObject2() {
         unit
@@ -142,7 +136,6 @@ class MongoUtilTest {
     /**
      * `MongoUtil` function `filterFindCondition` without id or _id should return the object
      */
-    @only
     @test('- `MongoUtil` function `filterFindCondition` without id or _id should return the object')
     testMongoUtilFilterFindConditionNoIdNorLodashId() {
         unit
@@ -164,7 +157,6 @@ class MongoUtilTest {
     /**
      * `MongoUtil` function `filterFindCondition` with a string _id should return an object with _id as an ObjectID
      */
-    @only
     @test('- `MongoUtil` function `filterFindCondition` with a string _id should return an object with _id as an ObjectID')
     testMongoUtilFilterFindConditionWithStringLodashId() {
         const res =  MongoUtil.filterFindCondition(
@@ -186,7 +178,6 @@ class MongoUtilTest {
     /**
      * `MongoUtil` function `filterFindCondition` with a string id should return an object with _id as an ObjectID
      */
-    @only
     @test('- `MongoUtil` function `filterFindCondition` with a string _id should return an object with _id as an ObjectID')
     testMongoUtilFilterFindConditionWithStringId() {
         const res =  MongoUtil.filterFindCondition(
@@ -212,7 +203,6 @@ class MongoUtilTest {
     /**
      * `MongoUtil` function `fieldsStringFromArray` should return empty string if no fields given
      */
-    @only
     @test('- `MongoUtil` function `fieldsStringFromArray` should return empty string if no fields given')
     testMongoUtilFieldsStringFromArrayReturnEmptyStringBecauseIfNullParam() {
         unit
@@ -223,7 +213,6 @@ class MongoUtilTest {
     /**
      * `MongoUtil` function `fieldsStringFromArray` should return empty string if empty array given
      */
-    @only
     @test('- `MongoUtil` function `fieldsStringFromArray` should return empty string if empty array given')
     testMongoUtilFieldsStringFromArrayReturnEmptyStringBecauseIfEmptyArray() {
         unit
@@ -234,7 +223,6 @@ class MongoUtilTest {
     /**
      * `MongoUtil` function `fieldsStringFromArray` should return empty string if bad values
      */
-    @only
     @test('- `MongoUtil` function `fieldsStringFromArray` should return empty string if bad values')
     testMongoUtilFieldsStringFromArrayReturnEmptyStringBecauseIfBadValues() {
         unit
@@ -245,7 +233,6 @@ class MongoUtilTest {
     /**
      * `MongoUtil` function `fieldsStringFromArray` should return a space separated list of fields
      */
-    @only
     @test('- `MongoUtil` function `fieldsStringFromArray` should return a space separated list of fields')
     testMongoUtilFieldsStringFromArrayReturnSpaceSeparatedListOfFields() {
         unit
