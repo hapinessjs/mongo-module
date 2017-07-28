@@ -49,6 +49,7 @@
 * [Configuration](#configuration)
 * [Get your adapter anywhere](#get-your-adapter-anywhere)
 * [Model management](#model-management)
+* [Helpers functions](#helpers-functions)
 * [Contributing](#contributing)
 * [Change History](#change-history)
 * [Maintainers](#maintainers)
@@ -68,8 +69,8 @@ $ yarn add @hapiness/mongo
     
 ```javascript
 "dependencies": {
-    "@hapiness/core": "^1.0.0-rc.6",
-    "@hapiness/mongo": "^1.0.0-rc.6",
+    "@hapiness/core": "^1.0.0-rc.6.1",
+    "@hapiness/mongo": "^1.0.0-rc.6.1",
     //...
 }
 //...
@@ -445,6 +446,27 @@ class MyModule {}
 
 ```
 
+[Back to top](#table-of-contents)
+
+## Helpers functions
+
+The module gives you an helpers to perform some basic mongo-related operation.
+
+Just import the class from the module
+
+```
+import { MongoUtils } from '@hapiness/mongo'
+```
+
+There is 4 static functions (for now)
+
+```public static prepareUpdateObject(dto: any): any```: You give to this function an object like ```{ "meta": { "key": "value" } }``` and it returns you the object ```{ "meta.key": "value" }```. Very usefull if you perform update operations!
+
+```public static toObjectId(id: string)```: it returns an ObjectID type from the given string (```null``` if the string is not a valid ObjectID)
+
+```public static fieldsStringFromArray(fields: string[]): string```: If you want to select only some fields and you need for that to compute a string from an array of string, use this function
+
+```public static filterFindCondition(condition: any): any```: If you have a query object for mongo, this function will parse your condition, convert the field ```id``` into ```_id``` and then convert ```_id``` to an ```ObjectID``` before giving back the query object
 
 [Back to top](#table-of-contents)
 
@@ -463,6 +485,9 @@ To set up your development environment:
 
 ## Change History
 
+* v1.0.0-rc.6.1 (2017-07-28)
+    * Add helpers
+    * Documentation
 * v1.0.0-rc.6 (2017-07-18)
     * Document Manager
     * Documentation

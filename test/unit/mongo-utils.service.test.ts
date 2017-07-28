@@ -13,7 +13,7 @@ import { ReplyNoContinue } from '@hapiness/core';
 import { Observable } from 'rxjs/Observable';
 
 // element to test
-import { MongoUtil } from '../../src/module/services';
+import { MongoUtils } from '../../src/module/services';
 
 @suite('- Unit MongoUtilTest file')
 class MongoUtilTest {
@@ -45,13 +45,13 @@ class MongoUtilTest {
     after() { }
 
     /**
-     * `MongoUtil` function `toObjectId` should succeed
+     * `MongoUtils` function `toObjectId` should succeed
      */
-    @test('- `MongoUtil` function `toObjectId` should succeed')
+    @test('- `MongoUtils` function `toObjectId` should succeed')
     testMongoUtilToObjectIdOk() {
         unit
             .string(
-                MongoUtil
+                MongoUtils
                     .toObjectId('596731037e58000100644adb')
                     .toHexString()
             )
@@ -59,42 +59,42 @@ class MongoUtilTest {
     }
 
     /**
-     * `MongoUtil` function `toObjectId` should failed and return undefined
+     * `MongoUtils` function `toObjectId` should failed and return undefined
      */
-    @test('- `MongoUtil` function `toObjectId` should failed and return undefined')
+    @test('- `MongoUtils` function `toObjectId` should failed and return undefined')
     testMongoUtilToObjectIdFailed() {
         unit
-            .undefined(MongoUtil.toObjectId('1234'));
+            .undefined(MongoUtils.toObjectId('1234'));
     }
 
     /**
-     * `MongoUtil` function `prepareUpdateObject` should return empty object because of null arg
+     * `MongoUtils` function `prepareUpdateObject` should return empty object because of null arg
      */
-    @test('- `MongoUtil` function `prepareUpdateObject` should return empty object because of null arg')
+    @test('- `MongoUtils` function `prepareUpdateObject` should return empty object because of null arg')
     testMongoUtilPrepareUpdateObjectNullArgs() {
         unit
-            .object(MongoUtil.prepareUpdateObject(null))
+            .object(MongoUtils.prepareUpdateObject(null))
             .is({});
     }
 
     /**
-     * `MongoUtil` function `prepareUpdateObject` should return empty object because of empty arg
+     * `MongoUtils` function `prepareUpdateObject` should return empty object because of empty arg
      */
-    @test('- `MongoUtil` function `prepareUpdateObject` should return empty object because of empty arg')
+    @test('- `MongoUtils` function `prepareUpdateObject` should return empty object because of empty arg')
     testMongoUtilPrepareUpdateObjecEmptyArgs() {
         unit
-            .object(MongoUtil.prepareUpdateObject({}))
+            .object(MongoUtils.prepareUpdateObject({}))
             .is({});
     }
 
     /**
-     * `MongoUtil` function `prepareUpdateObject` should return an unfold object (1)
+     * `MongoUtils` function `prepareUpdateObject` should return an unfold object (1)
      */
-    @test('- `MongoUtil` function `prepareUpdateObject` should return an unfold object (1)')
+    @test('- `MongoUtils` function `prepareUpdateObject` should return an unfold object (1)')
     testMongoUtilPrepareUpdateObjecUnfoldObject1() {
         unit
             .object(
-                MongoUtil
+                MongoUtils
                     .prepareUpdateObject(
                         {
                             test1: {
@@ -111,13 +111,13 @@ class MongoUtilTest {
     }
 
     /**
-     * `MongoUtil` function `prepareUpdateObject` should return an unfold object (2)
+     * `MongoUtils` function `prepareUpdateObject` should return an unfold object (2)
      */
-    @test('- `MongoUtil` function `prepareUpdateObject` should return an unfold object (2)')
+    @test('- `MongoUtils` function `prepareUpdateObject` should return an unfold object (2)')
     testMongoUtilPrepareUpdateObjecUnfoldObject2() {
         unit
             .object(
-                MongoUtil
+                MongoUtils
                     .prepareUpdateObject(
                         {
                             test1: 'value',
@@ -134,13 +134,13 @@ class MongoUtilTest {
     }
 
     /**
-     * `MongoUtil` function `filterFindCondition` without id or _id should return the object
+     * `MongoUtils` function `filterFindCondition` without id or _id should return the object
      */
-    @test('- `MongoUtil` function `filterFindCondition` without id or _id should return the object')
+    @test('- `MongoUtils` function `filterFindCondition` without id or _id should return the object')
     testMongoUtilFilterFindConditionNoIdNorLodashId() {
         unit
             .object(
-                MongoUtil
+                MongoUtils
                     .filterFindCondition(
                         {
                             test1: 'value'
@@ -155,11 +155,11 @@ class MongoUtilTest {
     }
 
     /**
-     * `MongoUtil` function `filterFindCondition` with a string _id should return an object with _id as an ObjectID
+     * `MongoUtils` function `filterFindCondition` with a string _id should return an object with _id as an ObjectID
      */
-    @test('- `MongoUtil` function `filterFindCondition` with a string _id should return an object with _id as an ObjectID')
+    @test('- `MongoUtils` function `filterFindCondition` with a string _id should return an object with _id as an ObjectID')
     testMongoUtilFilterFindConditionWithStringLodashId() {
-        const res =  MongoUtil.filterFindCondition(
+        const res =  MongoUtils.filterFindCondition(
             {
                 _id: '597080480230e0a6bda4eae4',
                 test: { micro: 'value' }
@@ -176,11 +176,11 @@ class MongoUtilTest {
     }
 
     /**
-     * `MongoUtil` function `filterFindCondition` with a string id should return an object with _id as an ObjectID
+     * `MongoUtils` function `filterFindCondition` with a string id should return an object with _id as an ObjectID
      */
-    @test('- `MongoUtil` function `filterFindCondition` with a string _id should return an object with _id as an ObjectID')
+    @test('- `MongoUtils` function `filterFindCondition` with a string _id should return an object with _id as an ObjectID')
     testMongoUtilFilterFindConditionWithStringId() {
-        const res =  MongoUtil.filterFindCondition(
+        const res =  MongoUtils.filterFindCondition(
             {
                 id: '597080480230e0a6bda4eae4',
                 test: { micro: 'value' }
@@ -201,42 +201,42 @@ class MongoUtilTest {
     }
 
     /**
-     * `MongoUtil` function `fieldsStringFromArray` should return empty string if no fields given
+     * `MongoUtils` function `fieldsStringFromArray` should return empty string if no fields given
      */
-    @test('- `MongoUtil` function `fieldsStringFromArray` should return empty string if no fields given')
+    @test('- `MongoUtils` function `fieldsStringFromArray` should return empty string if no fields given')
     testMongoUtilFieldsStringFromArrayReturnEmptyStringBecauseIfNullParam() {
         unit
-            .string(MongoUtil.fieldsStringFromArray(null))
+            .string(MongoUtils.fieldsStringFromArray(null))
             .is('');
     }
 
     /**
-     * `MongoUtil` function `fieldsStringFromArray` should return empty string if empty array given
+     * `MongoUtils` function `fieldsStringFromArray` should return empty string if empty array given
      */
-    @test('- `MongoUtil` function `fieldsStringFromArray` should return empty string if empty array given')
+    @test('- `MongoUtils` function `fieldsStringFromArray` should return empty string if empty array given')
     testMongoUtilFieldsStringFromArrayReturnEmptyStringBecauseIfEmptyArray() {
         unit
-            .string(MongoUtil.fieldsStringFromArray([]))
+            .string(MongoUtils.fieldsStringFromArray([]))
             .is('');
     }
 
     /**
-     * `MongoUtil` function `fieldsStringFromArray` should return empty string if bad values
+     * `MongoUtils` function `fieldsStringFromArray` should return empty string if bad values
      */
-    @test('- `MongoUtil` function `fieldsStringFromArray` should return empty string if bad values')
+    @test('- `MongoUtils` function `fieldsStringFromArray` should return empty string if bad values')
     testMongoUtilFieldsStringFromArrayReturnEmptyStringBecauseIfBadValues() {
         unit
-            .string(MongoUtil.fieldsStringFromArray([null, '', '      ']))
+            .string(MongoUtils.fieldsStringFromArray([null, '', '      ']))
             .is('');
     }
 
     /**
-     * `MongoUtil` function `fieldsStringFromArray` should return a space separated list of fields
+     * `MongoUtils` function `fieldsStringFromArray` should return a space separated list of fields
      */
-    @test('- `MongoUtil` function `fieldsStringFromArray` should return a space separated list of fields')
+    @test('- `MongoUtils` function `fieldsStringFromArray` should return a space separated list of fields')
     testMongoUtilFieldsStringFromArrayReturnSpaceSeparatedListOfFields() {
         unit
-            .string(MongoUtil.fieldsStringFromArray(['test', 'micro']))
+            .string(MongoUtils.fieldsStringFromArray(['test', 'micro']))
             .is('test micro');
     }
 }

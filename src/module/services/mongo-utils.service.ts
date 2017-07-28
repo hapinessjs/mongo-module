@@ -1,6 +1,6 @@
 import { ObjectID } from 'mongodb';
 
-export class MongoUtil {
+export class MongoUtils {
 
     public static toObjectId(id: string) {
         try {
@@ -38,7 +38,7 @@ export class MongoUtil {
 
     static filterFindCondition(condition: any): any {
         if (condition.id || condition._id) {
-            condition._id = MongoUtil.toObjectId(condition.id || condition._id);
+            condition._id = MongoUtils.toObjectId(condition.id || condition._id);
             delete condition.id;
         }
 
