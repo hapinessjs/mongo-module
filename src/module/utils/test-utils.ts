@@ -17,7 +17,7 @@ export class MongoTestUtils {
         if (this.spawn) {
             this.spawn.kill();
         }
-        this.spawn = require('child_process')('mongod', ['--dbpath', '/tmp']);
+        this.spawn = require('child_process').spawn('mongod', ['--dbpath', '/tmp']);
         this.spawn.on('error', (err) => {
             done(err);
         });
