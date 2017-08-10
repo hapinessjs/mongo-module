@@ -1,6 +1,6 @@
 {
     "name": "@hapiness/mongo",
-    "version": "1.0.0-rc.6.2",
+    "version": "1.0.0-rc.6.3",
     "description": "Hapiness Module for MongoDB usage",
     "main": "index.js",
     "types": "index.d.ts",
