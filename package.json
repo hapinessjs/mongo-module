@@ -1,6 +1,6 @@
 {
     "name": "@hapiness/mongo",
-    "version": "1.0.0-rc.6.1",
+    "version": "1.0.0-rc.6.2",
     "description": "Hapiness Module for MongoDB usage",
     "main": "index.js",
     "types": "index.d.ts",
@@ -71,9 +71,9 @@
     "homepage": "https://github.com/hapinessjs/mongo-module#readme",
     "dependencies": {
         "@types/gridfs-stream": "^0.5.29",
-        "@types/node": "^8.0.17",
+        "@types/node": "^8.0.20",
         "@types/mongoose": "^4.7.19",
-        "debug": "^2.6.8",
+        "debug": "^3.0.0",
         "gridfs-stream": "^1.1.1",
         "mongoose": "^4.11.6"
     },
