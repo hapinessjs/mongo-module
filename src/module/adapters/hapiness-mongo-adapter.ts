@@ -46,6 +46,7 @@ export class HapinessMongoAdapter extends EventEmitter {
             .subscribe(_ => {
                 __debugger.debug('constructor', 'OK');
             }, (err) => {
+                __debugger.debug('constructor', `Err catched :: ${err.message}`);
                 __debugger.debug('constructor', `Err catched :: ${JSON.stringify(err, null, 2)}`);
             });
     }
@@ -60,7 +61,7 @@ export class HapinessMongoAdapter extends EventEmitter {
         } else if (!!db) {
             this._uri = `mongodb://${this._config.host}:${this._config.port || 27017}/${db}`;
         } else {
-            return Observable.throw(new Error('No db name provided'));
+            return Observable.throw(new Error('No db name nor url provided'));
         }
 
         return this.tryConnect();

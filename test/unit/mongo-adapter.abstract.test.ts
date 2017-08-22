@@ -91,7 +91,7 @@ class AbstractMongoAdapterTest {
             }, err => {
                 unit
                     .string(err.message)
-                    .is('No db name provided');
+                    .is('No db name nor url provided');
 
                 done();
             });

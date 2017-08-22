@@ -85,12 +85,10 @@ class MongoManagerTest {
         this._mockConnection.emitAfter('connected', 400);
         this
             ._mongoManager
-            .loadAdapter('mongoose')
+            .loadAdapter('mongoose', { db: 'unit_test' })
             .subscribe(adapter => {
                 unit
-                    .object(
-                        adapter
-                    )
+                    .object(adapter)
                     .isInstanceOf(MongooseAdapter);
 
                 done();

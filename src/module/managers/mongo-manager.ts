@@ -5,7 +5,7 @@ import {
     MongooseGridFsAdapter
 } from '../adapters';
 
-import { StringMap, defaultMongoConfig, Debugger } from '../shared';
+import { StringMap, Debugger } from '../shared';
 import { Observable } from 'rxjs/Observable';
 
 const __debugger = new Debugger('MongoManager');
@@ -27,23 +27,27 @@ export class MongoManager {
 
     private _fixConfig(configValues?: HapinessMongoAdapterConstructorArgs): HapinessMongoAdapterConstructorArgs {
         __debugger.debug('_fixConfig', '');
-        return <HapinessMongoAdapterConstructorArgs> (
-            Object.assign(
-                {},
-                defaultMongoConfig,
-                configValues
-            )
-        );
+        return <HapinessMongoAdapterConstructorArgs> Object.assign({}, configValues);
     }
 
     private _keyForAdapter(adapterName: string, options: HapinessMongoAdapterConstructorArgs): string {
         __debugger.debug('_keyForAdapter', '');
-        return `${adapterName}_${options.db || options.database}_${options.instance || 0}`;
+        const key = `${adapterName}_${options.host }`
+            .concat(
+                !!options.db ?
+                    `_${options.db}` :
+                    !!options.database ?
+                        `_${options.db}` : ''
+            )
+            .concat(`${options.instance || 0 }`);
+
+        return key;
     }
 
     public registerAdapter(adapterClass: typeof HapinessMongoAdapter): boolean {
         __debugger.debug('registerAdapter', '');
         const adapterName: string = adapterClass.getInterfaceName();
+
         __debugger.debug('registerAdapter', `---->  ${adapterName}`);
         if (!this._adapters[adapterName]) {
             this._adapters[adapterName] = adapterClass;
