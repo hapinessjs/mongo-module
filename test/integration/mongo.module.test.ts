@@ -297,12 +297,15 @@ class MongoModuleTest {
             }),
         ])
         .catch(err => {
-            Hapiness['extensions']
+            if (Hapiness['extensions']) { Hapiness['extensions']
                 .find(ext => ext.token === HttpServerExt)
                 .value
                 .stop()
                 .then(__ => done())
                 .catch(e => done(e));
+            } else {
+                done()
+            }
         });
     }
 
@@ -446,12 +449,15 @@ class MongoModuleTest {
                 .string(err.message)
                 .is('Unknown adapter custom, please register it before using it.');
 
-            Hapiness['extensions']
+            if (Hapiness['extensions']) { Hapiness['extensions']
                 .find(ext => ext.token === HttpServerExt)
                 .value
                 .stop()
                 .then(__ => done())
                 .catch(e => done(e));
+            } else {
+                done()
+            }
         });
     }
 
