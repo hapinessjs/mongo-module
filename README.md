@@ -69,8 +69,8 @@ $ yarn add @hapiness/mongo
     
 ```javascript
 "dependencies": {
-    "@hapiness/core": "^1.0.0-rc.6",
-    "@hapiness/mongo": "^1.0.0-rc.6.3",
+    "@hapiness/core": "^1.0.0-rc.7",
+    "@hapiness/mongo": "^1.0.0-rc.7",
     //...
 }
 //...
@@ -485,6 +485,8 @@ To set up your development environment:
 
 ## Change History
 
+* v1.0.0-rc.7 (2017-08-29)
+    * Fix test utils
 * v1.0.0-rc.6.3 (2017-08-10)
     * Fix test utils
 * v1.0.0-rc.6.2 (2017-08-10)

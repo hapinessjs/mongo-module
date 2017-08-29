@@ -95,19 +95,33 @@ export class MongoClientExt implements OnExtensionLoad, OnModuleInstantiated {
     }
 
 
-    private storeDocuments(module: CoreModule) {
-        [].concat(module.declarations)
+    private storeDocuments(module: CoreModule): Observable<any> {
+        return Observable
+            .from([].concat(module.declarations))
             .filter(_ => !!extractMetadataByDecorator(_, 'MongoModel'))
-            .forEach(_ => {
-                const instance = DependencyInjection.instantiateComponent<Model>(_, module.di);
-                const metadata = extractMetadataByDecorator<MongoModel>(_, 'MongoModel');
-                const adapter = this._mongoManager.getAdapter(metadata.adapter, metadata.options);
-                adapter.getModelManager().add({
-                    token: _,
-                    value: adapter.registerValue(instance.schema, metadata.collection)
-                });
-            });
-        module.modules.forEach(_ => this.storeDocuments(_));
+            .flatMap(_ =>
+                DependencyInjection
+                .instantiateComponent<Model>(_, module.di)
+                .map(instance => ({ instance, token: _ }))
+            )
+            .flatMap(instanceToken =>
+                Observable
+                    .of(extractMetadataByDecorator<MongoModel>(instanceToken.token, 'MongoModel'))
+                    .map(_ => ({
+                        metadata: _,
+                        adapter: this._mongoManager.getAdapter(_.adapter, _.options)
+                    }))
+                    .do(_ => _.adapter.getModelManager().add({
+                        token: instanceToken.token,
+                        value: _.adapter.registerValue(instanceToken.instance.schema, _.metadata.collection)
+                    }))
+            )
+            .toArray()
+            .flatMap(_ =>
+                Observable
+                    .from([].concat(module.modules).filter(__ => !!__))
+                    .flatMap(__ => this.storeDocuments(__))
+            );
     }
 
     /**
@@ -139,10 +153,9 @@ export class MongoClientExt implements OnExtensionLoad, OnModuleInstantiated {
     }
 
     onModuleInstantiated(module: CoreModule): Observable<any> {
-        return Observable.create(observer => {
-            this.storeDocuments(module);
-            observer.next();
-            observer.complete();
-        });
+        return this
+            .storeDocuments(module)
+            .ignoreElements()
+            .defaultIfEmpty(null);
     }
 }
