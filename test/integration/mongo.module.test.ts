@@ -179,6 +179,67 @@ class MongoModuleTest {
     }
 
     /**
+     * Test if `MongoModule` can register with only a connection uri
+     */
+    @test('- Test if `MongoModule` can register with only a connection uri')
+    testMongoModuleOnlyConnectionUri(done) {
+        class CustomAdapter extends HapinessMongoAdapter {
+            public static getInterfaceName(): string {
+                return 'custom';
+            }
+
+            constructor(options) { super(options); }
+
+            protected _tryConnect(): Observable<void> {
+                return Observable.create(observer => { observer.next(); observer.complete(); })
+            }
+
+            protected _afterConnect(): Observable<void> {
+                return this.onConnected();
+            }
+        }
+
+
+        @HapinessModule({
+            version: '1.0.0',
+            providers: [],
+            imports: []
+        })
+        class MMTest implements OnStart {
+            constructor(
+                @Inject(HttpServerExt) private _httpServer: Server,
+                @Inject(MongoClientExt) private _mongoManager: MongoManager
+            ) { }
+
+            onStart(): void {
+                const customAdapter = this._mongoManager.getAdapter('custom');
+                try {
+                    unit
+                        .string(customAdapter.getUri())
+                        .is('mongodb://my.hostname.com:27017/my_db');
+
+                    this._httpServer.stop().then(__ => done()).catch(err => done(err));
+                } catch (err) {
+                    this._httpServer.stop().then(__ => done(err)).catch(e => done(e));
+                }
+            }
+        }
+
+        Hapiness.bootstrap(MMTest, [
+            HttpServerExt.setConfig({ host: '0.0.0.0', port: 1234 }),
+            MongoClientExt.setConfig({
+                common: {
+                    url: 'mongodb://my.hostname.com:27017/my_db',
+                },
+                register: [CustomAdapter],
+                load: [{
+                    name: 'custom',
+                }],
+            }),
+        ]);
+    }
+
+    /**
      * Trying to register an existing Adapter should lead to an error
      */
     @test('- Trying to register an existing Adapter should lead to an error')
