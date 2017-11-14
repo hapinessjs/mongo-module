@@ -2,14 +2,13 @@
 /**
  * @see https://github.com/pana-cc/mocha-typescript
  */
-import { test, suite, only } from 'mocha-typescript';
+import { test, suite } from 'mocha-typescript';
 
 /**
  * @see http://unitjs.com/
  */
 import * as unit from 'unit.js';
 
-import { extractMetadata } from '@hapiness/core/core';
 import { Hapiness, HapinessModule, OnStart, Inject } from '@hapiness/core';
 import { HttpServerExt, Server } from '@hapiness/core/extensions/http-server';
 
@@ -31,7 +30,7 @@ import {
 } from '../../src';
 
 @suite('- Integration MongoModule test file')
-class MongoModuleTest {
+export class MongoModuleTest {
     private _mockConnection: ConnectionMock;
 
     /**
@@ -268,8 +267,7 @@ class MongoModuleTest {
         })
         class MMTest implements OnStart {
             constructor(
-                @Inject(HttpServerExt) private _httpServer: Server,
-                @Inject(MongoClientExt) private _mongoManager: MongoManager
+                @Inject(HttpServerExt) private _httpServer: Server
             ) { }
 
             onStart(): void {
@@ -296,7 +294,7 @@ class MongoModuleTest {
                 }],
             }),
         ])
-        .catch(err => {
+        .catch(() => {
             if (Hapiness['extensions']) { Hapiness['extensions']
                 .find(ext => ext.token === HttpServerExt)
                 .value
@@ -321,8 +319,7 @@ class MongoModuleTest {
         })
         class MMTest implements OnStart {
             constructor(
-                @Inject(HttpServerExt) private _httpServer: Server,
-                @Inject(MongoClientExt) private _mongoManager: MongoManager
+                @Inject(HttpServerExt) private _httpServer: Server
             ) { }
 
             onStart(): void {
@@ -357,8 +354,7 @@ class MongoModuleTest {
         })
         class MMTest implements OnStart {
             constructor(
-                @Inject(HttpServerExt) private _httpServer: Server,
-                @Inject(MongoClientExt) private _mongoManager: MongoManager
+                @Inject(HttpServerExt) private _httpServer: Server
             ) { }
 
             onStart(): void {
@@ -394,8 +390,7 @@ class MongoModuleTest {
         })
         class MMTest implements OnStart {
             constructor(
-                @Inject(HttpServerExt) private _httpServer: Server,
-                @Inject(MongoClientExt) private _mongoManager: MongoManager
+                @Inject(HttpServerExt) private _httpServer: Server
             ) { }
 
             onStart(): void {
@@ -424,8 +419,7 @@ class MongoModuleTest {
         })
         class MMTest implements OnStart {
             constructor(
-                @Inject(HttpServerExt) private _httpServer: Server,
-                @Inject(MongoClientExt) private _mongoManager: MongoManager
+                @Inject(HttpServerExt) private _httpServer: Server
             ) { }
 
             onStart(): void {
@@ -479,7 +473,7 @@ class MongoModuleTest {
                 @Inject(HttpServerExt) private _httpServer: Server,
                 private _mongoClientService: MongoClientService
             ) {
-                this._mongoManager = _mongoClientService.get();
+                this._mongoManager = this._mongoClientService.get();
             }
 
             onStart(): void {

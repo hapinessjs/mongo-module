@@ -14,7 +14,7 @@ import { MongooseMockInstance, GridFsMockInstance, ConnectionMock } from '../moc
 import { MongooseGridFsAdapter } from '../../src';
 
 @suite('- Unit MongooseGridFsAdapterTest file')
-class MongooseGridFsAdapterTest {
+export class MongooseGridFsAdapterTest {
     private _mockConnection: ConnectionMock;
     private _gridfsMock: any;
 
@@ -157,8 +157,6 @@ class MongooseGridFsAdapterTest {
      */
     @test('- If the connection emit the event connected, the onConnected function inside afterConnect should resolve observable')
     testConnectionSucceedOnConnectedInsideAfterConnect(done) {
-        const gridfsMock = this._gridfsMock;
-
         this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
 
@@ -245,8 +243,6 @@ class MongooseGridFsAdapterTest {
      */
     @test('- When afterConnect got error, the onError function should be called')
     testAfterConnectGotConnectionError(done) {
-        const gridfsMock = this._gridfsMock;
-
         this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
 
@@ -260,7 +256,7 @@ class MongooseGridFsAdapterTest {
                 return this._afterConnect();
             }
 
-            protected onError(err?: any) {
+            protected onError() {
                 return Observable.create(
                     observer => {
                         observer.next();
@@ -289,8 +285,6 @@ class MongooseGridFsAdapterTest {
      */
     @test('- When afterConnect got error, the onError function should be called and go to the error block of observer if there is an error')
     testAfterConnectGotConnectionErrorGoToObservableErrBlock(done) {
-        const gridfsMock = this._gridfsMock;
-
         this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
 
@@ -304,7 +298,7 @@ class MongooseGridFsAdapterTest {
                 return this._afterConnect();
             }
 
-            protected onError(err?: any) {
+            protected onError() {
                 return Observable.create(
                     observer => {
                         observer.error(new Error('test error'));
@@ -333,8 +327,6 @@ class MongooseGridFsAdapterTest {
      */
     @test('- When afterConnect got disconnected, the onDisconnected function should be called')
     testAfterConnectGotConnectionDisconnected(done) {
-        const gridfsMock = this._gridfsMock;
-
         this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
 
@@ -348,7 +340,7 @@ class MongooseGridFsAdapterTest {
                 return this._afterConnect();
             }
 
-            protected onDisconnected(err?: any) {
+            protected onDisconnected() {
                 return Observable.create(
                     observer => {
                         observer.next();
@@ -378,8 +370,6 @@ class MongooseGridFsAdapterTest {
      */
     @test('- If afterConnect got disconnected, onDisconnected func should be called and go to the err block of observer if there is an err')
     testAfterConnectGotConnectionDisconnectedGoToObservableErrBlock(done) {
-        const gridfsMock = this._gridfsMock;
-
         this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
 
@@ -393,7 +383,7 @@ class MongooseGridFsAdapterTest {
                 return this._afterConnect();
             }
 
-            protected onDisconnected(err?: any) {
+            protected onDisconnected() {
                 return Observable.create(
                     observer => {
                         observer.error(new Error('test error'));
@@ -421,7 +411,7 @@ class MongooseGridFsAdapterTest {
     testRegisterValue() {
         const adapter = new MongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
         adapter['_connection'] = {
-            model: (col, doc) => doc
+            model: (_, doc) => doc
         };
         unit
             .must(adapter.registerValue(123, 'test'))

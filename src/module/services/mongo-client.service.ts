@@ -1,6 +1,6 @@
 import { Injectable, Inject, Type } from '@hapiness/core';
 import { MongoClientExt } from '../mongo.extension';
-import { MongoManager, ModelManager, ModelItem } from '../managers';
+import { MongoManager, ModelManager } from '../managers';
 
 export interface ConnectionOptions {
     adapter: string;

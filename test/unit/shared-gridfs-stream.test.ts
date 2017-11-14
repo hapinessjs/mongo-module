@@ -12,7 +12,7 @@ import * as unit from 'unit.js';
 import { CreateGridFsStream } from '../../src/module/shared';
 
 @suite('- Unit Shared#GridFsStream file')
-class SharedGridFsStreamTest {
+export class SharedGridFsStreamTest {
     /**
      * Function executed before the suite
      */

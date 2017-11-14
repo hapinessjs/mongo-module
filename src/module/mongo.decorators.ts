@@ -1,6 +1,5 @@
 import {
     CoreDecorator,
-    Type,
     createDecorator,
     extractMetadata
 } from '@hapiness/core/core';
@@ -13,7 +12,7 @@ export interface MongoModel {
     options?: any;
 }
 
-export const MongoModel = createDecorator<MongoModel>('MongoModel', {
+export const MongoModel: CoreDecorator<MongoModel> = createDecorator<MongoModel>('MongoModel', {
     adapter: undefined,
     collection: undefined,
     options: undefined
