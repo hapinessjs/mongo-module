@@ -12,7 +12,7 @@ import * as unit from 'unit.js';
 import { UtilFunctions } from '../../src';
 
 @suite('- Unit Shared#funct file')
-class SharedFunctionsTest {
+export class SharedFunctionsTest {
     /**
      * Function executed before the suite
      */

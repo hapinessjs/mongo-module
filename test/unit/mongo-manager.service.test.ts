@@ -15,7 +15,7 @@ import { HapinessMongoAdapter, MongoManager, MongooseAdapter } from '../../src';
 
 
 @suite('- Unit MongoManagerTest file')
-class MongoManagerTest {
+export class MongoManagerTest {
 
     // private property to store service instance
     private _mongoManager: MongoManager;

@@ -14,7 +14,7 @@ import { HapinessMongoAdapter } from '../../src';
 
 
 @suite('- Unit AbstractMongoAdapterTest file')
-class AbstractMongoAdapterTest {
+export class AbstractMongoAdapterTest {
 
     /**
      * Function executed before the suite
@@ -283,8 +283,6 @@ class AbstractMongoAdapterTest {
      */
     @test('- Calling getConnection should return the value of the connection')
     testCallGetConnection() {
-        let hasBeenCalled = false;
-
         class TestAdapter extends HapinessMongoAdapter {
             constructor(options) {
                 super(options);

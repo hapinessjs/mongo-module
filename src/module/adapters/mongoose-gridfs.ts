@@ -45,12 +45,16 @@ export class MongooseGridFsAdapter extends HapinessMongoAdapter {
             });
     }
 
+    protected _createGridFsStream(db, mongo) {
+        return CreateGridFsStream(db, mongo);
+    }
+
     protected _afterConnect(): Observable<void> {
         return Observable
             .create(observer => {
                 this._db = this._connection.db;
 
-                this._gridfs = CreateGridFsStream(this._db, mongoose.mongo);
+                this._gridfs = this._createGridFsStream(this._db, mongoose.mongo);
 
                 this.onConnected().subscribe(_ => {}, (e) => {});
 
@@ -69,5 +73,9 @@ export class MongooseGridFsAdapter extends HapinessMongoAdapter {
 
     public registerValue(schema: any, collection: string) {
         return this._connection.model(collection, schema);
+    }
+
+    public getLibrary(): any {
+        return this._gridfs;
     }
 }
