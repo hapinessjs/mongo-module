@@ -60,17 +60,18 @@
 ### `yarn` or `npm` it in your `package.json`
 
 ```bash
-$ npm install --save @hapiness/mongo
+$ npm install --save @hapiness/core @hapiness/mongo rxjs
 
 or
 
-$ yarn add @hapiness/mongo
+$ yarn add @hapiness/core @hapiness/mongo rxjs
 ```
     
 ```javascript
 "dependencies": {
-    "@hapiness/core": "^1.0.0-rc.7",
-    "@hapiness/mongo": "^1.0.0-rc.7",
+    "@hapiness/core": "^1.1.1",
+    "@hapiness/mongo": "^1.0.0",
+    "rxjs": "^5.5.2",
     //...
 }
 //...
@@ -485,26 +486,10 @@ To set up your development environment:
 
 ## Change History
 
-* v1.0.0-rc.7 (2017-08-29)
-    * Fix test utils
-* v1.0.0-rc.6.3 (2017-08-10)
-    * Fix test utils
-* v1.0.0-rc.6.2 (2017-08-10)
-    * Test utils
-* v1.0.0-rc.6.1 (2017-07-28)
-    * Add helpers
-    * Documentation
-* v1.0.0-rc.6 (2017-07-18)
-    * Document Manager
-    * Documentation
-* v1.0.0-rc.4 (2017-07-10)
-    * Update tests for latest `tslint` version.
-    * Module version related to core version.
-* v1.0.0-rc.3 (2017-07-04)
+* v1.0.0 (2017-11-14)
     * `MongoDB` module implementation.
     * Tests module API.
     * Documentation.
-    * Module version related to core version.
     
 [Back to top](#table-of-contents)
 
@@ -512,7 +497,7 @@ To set up your development environment:
 
 <table>
     <tr>
-        <td colspan="4" align="center"><a href="https://www.tadaweb.com"><img src="https://tadaweb.com/images/tadaweb/logo.png" width="117" alt="tadaweb" /></a></td>
+        <td colspan="4" align="center"><a href="https://www.tadaweb.com"><img src="http://bit.ly/2xHQkTi" width="117" alt="tadaweb" /></a></td>
     </tr>
     <tr>
         <td align="center"><a href="https://github.com/Juneil"><img src="https://avatars3.githubusercontent.com/u/6546204?v=3&s=117" width="117"/></a></td>
