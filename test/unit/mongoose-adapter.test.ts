@@ -15,7 +15,7 @@ import { MongooseMockInstance, ConnectionMock } from '../mocks';
 import { MongooseAdapter } from '../../src';
 
 @suite('- Unit MongooseAdapterTest file')
-class MongooseAdapterTest {
+export class MongooseAdapterTest {
 
     private _mongooseAdapter: MongooseAdapter;
     private _mockConnection: ConnectionMock;
@@ -224,7 +224,7 @@ class MongooseAdapterTest {
                 return this._afterConnect();
             }
 
-            protected onError(err?: any) {
+            protected onError() {
                 return Observable.create(
                     observer => {
                         observer.next();
@@ -266,7 +266,7 @@ class MongooseAdapterTest {
                 return this._afterConnect();
             }
 
-            protected onError(err?: any) {
+            protected onError() {
                 return Observable.create(
                     observer => {
                         observer.error(new Error('test error'));
@@ -308,7 +308,7 @@ class MongooseAdapterTest {
                 return this._afterConnect();
             }
 
-            protected onDisconnected(err?: any) {
+            protected onDisconnected() {
                 return Observable.create(
                     observer => {
                         observer.next();
@@ -350,7 +350,7 @@ class MongooseAdapterTest {
                 return this._afterConnect();
             }
 
-            protected onDisconnected(err?: any) {
+            protected onDisconnected() {
                 return Observable.create(
                     observer => {
                         observer.error(new Error('test error'));

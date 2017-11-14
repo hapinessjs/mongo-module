@@ -1,22 +1,18 @@
 /**
  * @see https://github.com/pana-cc/mocha-typescript
  */
-import { test, suite, only } from 'mocha-typescript';
+import { test, suite } from 'mocha-typescript';
 
 /**
  * @see http://unitjs.com/
  */
 import * as unit from 'unit.js';
 
-import { ReplyNoContinue } from '@hapiness/core';
-
-import { Observable } from 'rxjs/Observable';
-
 // element to test
 import { MongoUtils } from '../../src/module/services';
 
 @suite('- Unit MongoUtilTest file')
-class MongoUtilTest {
+export class MongoUtilTest {
 
     /**
      * Function executed before the suite
