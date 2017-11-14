@@ -417,4 +417,48 @@ export class MongooseGridFsAdapterTest {
             .must(adapter.registerValue(123, 'test'))
             .is(123);
     }
+
+    @test('- getLibrary')
+    testGetLibrary(done) {
+        this._mockConnection.db = 'toto';
+        const mockConnection = this._mockConnection;
+
+        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
+            constructor(opts) {
+                super(opts);
+            }
+
+            publicAfterConnect() {
+                this._connection = mockConnection;
+                return this._afterConnect();
+            }
+
+            onConnected() {
+                return Observable.create(
+                    observer => {
+                        observer.next();
+                        observer.complete();
+
+                        done();
+                    }
+                );
+            }
+
+            protected _createGridFsStream(db, mongo) {
+                return <any>'test';
+            }
+        }
+
+        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+
+        _tmpObject
+            .publicAfterConnect()
+            .subscribe(_ => {
+                unit.value(_tmpObject.getLibrary()).is('test');
+                this._mockConnection.emitAfter('connected', 400);
+            }, (err) => {
+                unit.assert(false);
+                done(err);
+            });
+    }
 }
