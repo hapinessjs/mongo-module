@@ -9,7 +9,6 @@ import * as fs from 'fs-extra';
  */
 interface FileObject {
     name: string;
-    remove?: boolean;
 }
 
 /**
@@ -41,7 +40,7 @@ class Packaging {
      *
      * @param file {string}
      *
-     * @return {Observable<R>}
+     * @return {Observable<any>}
      */
     private _copy(file: string): Observable<any> {
         // copy package.json
@@ -51,43 +50,24 @@ class Packaging {
 
         // copy other files
         return <Observable<any>> Observable.create((observer) => {
-            fs.copy(`${this._srcPath}${file}`, `${this._destPath}${file}`, (error) => {
+            fs.stat(`${this._srcPath}${file}`, (error, stats) => {
                 if (error) {
-                    return observer.error(error);
+                    console.error('doesn\'t exist on copy =>', error.message);
                 }
+                if (stats && (stats.isFile() || stats.isDirectory())) {
+                    fs.copy(`${this._srcPath}${file}`, `${this._destPath}${file}`, (err) => {
+                        if (err) {
+                            console.error('copy failed =>', err.message);
+                        }
 
-                observer.next();
-                observer.complete();
-            });
-        });
-    }
-
-    /**
-     * Function to remove original file
-     *
-     * @param file {string}
-     * @param remove {boolean}
-     *
-     * @return {Observable<any>}
-     *
-     * @private
-     */
-    private _remove(file: string, remove?: boolean): Observable<any> {
-        // remove original files
-        return <Observable<any>> Observable.create((observer) => {
-            if (remove) {
-                fs.remove(`${this._srcPath}${file}`, (error) => {
-                    if (error) {
-                        return observer.error(error);
-                    }
-
+                        observer.next();
+                        observer.complete();
+                    });
+                } else {
                     observer.next();
                     observer.complete();
-                });
-            } else {
-                observer.next();
-                observer.complete();
-            }
+                }
+            });
         });
     }
 
@@ -96,7 +76,7 @@ class Packaging {
      *
      * @param file {string}
      *
-     * @return {Observable<R>}
+     * @return {Observable<any>}
      *
      * @private
      */
@@ -144,8 +124,12 @@ class Packaging {
      * Function that _copy all files in dist directory
      */
     process() {
-        Observable.forkJoin(this._files.map((fileObject: FileObject) => this._copy(fileObject.name)
-            .flatMap(_ => this._remove(fileObject.name, fileObject.remove)))).subscribe(null, error => console.error(error));
+        Observable.forkJoin(
+            this._files.map(
+                (fileObject: FileObject) => this._copy(fileObject.name)
+            )
+        )
+            .subscribe(null, error => console.error(error));
     }
 }
 
