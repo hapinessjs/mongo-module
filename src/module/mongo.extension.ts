@@ -7,7 +7,7 @@ import {
     extractMetadataByDecorator,
     OnExtensionLoad,
     OnModuleInstantiated,
-} from '@hapiness/core/core';
+} from '@hapiness/core';
 
 import { Observable } from 'rxjs';
 import { MongoManager } from './managers/index';

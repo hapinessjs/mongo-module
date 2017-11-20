@@ -9,8 +9,7 @@ import { test, suite } from 'mocha-typescript';
  */
 import * as unit from 'unit.js';
 
-import { Hapiness, HapinessModule, OnStart, Inject } from '@hapiness/core';
-import { HttpServerExt, Server } from '@hapiness/core/extensions/http-server';
+import { Hapiness, HapinessModule, OnStart, Inject, HttpServerExt, Server } from '@hapiness/core';
 
 import { Observable } from 'rxjs/Observable';
 

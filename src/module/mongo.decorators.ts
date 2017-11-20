@@ -2,7 +2,7 @@ import {
     CoreDecorator,
     createDecorator,
     extractMetadata
-} from '@hapiness/core/core';
+} from '@hapiness/core';
 
 import { ConnectionOptions } from './services';
 

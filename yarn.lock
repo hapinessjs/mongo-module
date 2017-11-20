@@ -2,17 +2,18 @@
 # yarn lockfile v1
 
 
-"@hapiness/core@1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@hapiness/core/-/core-1.1.1.tgz#6657e29bf7a8cdcba04912c62da26b8a6e8b6221"
+"@hapiness/core@1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@hapiness/core/-/core-1.2.2.tgz#3fbc377aacdafa43be871485e983707b75e72155"
   dependencies:
-    "@types/hapi" "^16.1.10"
+    "@types/hapi" "^16.1.11"
     "@types/hoek" "^4.1.3"
-    "@types/joi" "^10.4.4"
-    "@types/node" "^8.0.46"
+    "@types/joi" "^13.0.0"
+    "@types/node" "^8.0.53"
     "@types/websocket" "^0.0.34"
     debug "^3.1.0"
     hapi "^16.6.2"
+    injection-js "^2.2.0"
     reflect-metadata "^0.1.10"
     websocket "^1.0.25"
 
@@ -45,7 +46,7 @@
     "@types/mongodb" "*"
     "@types/node" "*"
 
-"@types/hapi@^16.1.10":
+"@types/hapi@^16.1.11":
   version "16.1.11"
   resolved "https://registry.yarnpkg.com/@types/hapi/-/hapi-16.1.11.tgz#a9b8fe6eee2f8cefb94f4f447d3c23a2b2c308cf"
   dependencies:
@@ -61,13 +62,9 @@
   version "4.1.3"
   resolved "https://registry.yarnpkg.com/@types/hoek/-/hoek-4.1.3.tgz#d1982d48fb0d2a0e5d7e9d91838264d8e428d337"
 
-"@types/joi@*":
+"@types/joi@*", "@types/joi@^13.0.0":
   version "13.0.0"
   resolved "https://registry.yarnpkg.com/@types/joi/-/joi-13.0.0.tgz#63c066d901e87f464fa075d02bf2f390344241fc"
-
-"@types/joi@^10.4.4":
-  version "10.6.0"
-  resolved "https://registry.yarnpkg.com/@types/joi/-/joi-10.6.0.tgz#97c284abb6df59add93ec53a2970f52796409ba0"
 
 "@types/mime-db@*":
   version "1.27.0"
@@ -93,9 +90,9 @@
     "@types/mongodb" "*"
     "@types/node" "*"
 
-"@types/node@*", "@types/node@^8.0.46", "@types/node@^8.0.51":
-  version "8.0.51"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.51.tgz#b31d716fb8d58eeb95c068a039b9b6292817d5fb"
+"@types/node@*", "@types/node@^8.0.53":
+  version "8.0.53"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.53.tgz#396b35af826fa66aad472c8cb7b8d5e277f4e6d8"
 
 "@types/podium@*":
   version "1.0.0"
@@ -829,6 +826,10 @@ inherits@2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.1.tgz#b17d08d326b4423e568eff719f91b0b1cbdf69f1"
 
+injection-js@^2.2.0:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/injection-js/-/injection-js-2.2.1.tgz#a8d6a085b2f0b8d8650f6f4487f6abb8cc0d67ce"
+
 invariant@^2.2.2:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/invariant/-/invariant-2.2.2.tgz#9e1f56ac0acdb6bf303306f338be3b204ae60360"
@@ -1224,9 +1225,9 @@ mongodb@2.2.33:
     mongodb-core "2.1.17"
     readable-stream "2.2.7"
 
-mongoose@^4.11.9:
-  version "4.13.2"
-  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-4.13.2.tgz#9639241ce9cd1dfedcd164aef941c09c9eb12b1a"
+mongoose@^4.13.4:
+  version "4.13.4"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-4.13.4.tgz#31afd5fe865911678adbc892c4d3f66d0a821dfb"
   dependencies:
     async "2.1.4"
     bson "~1.0.4"
@@ -1274,8 +1275,8 @@ must@^0.12.0:
     kindof ">= 1.0.0 < 2"
 
 nan@^2.3.3:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.7.0.tgz#d95bf721ec877e08db276ed3fc6eb78f9083ad46"
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.8.0.tgz#ed715f3fe9de02b57a5e6252d90a96675e1f085a"
 
 nigel@2.x.x:
   version "2.0.2"

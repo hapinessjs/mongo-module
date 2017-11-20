@@ -69,8 +69,8 @@ $ yarn add @hapiness/core @hapiness/mongo rxjs
     
 ```javascript
 "dependencies": {
-    "@hapiness/core": "^1.1.1",
-    "@hapiness/mongo": "^1.0.0",
+    "@hapiness/core": "^1.2.0",
+    "@hapiness/mongo": "^1.1.0",
     "rxjs": "^5.5.2",
     //...
 }
@@ -486,6 +486,11 @@ To set up your development environment:
 
 ## Change History
 
+* v1.1.0 (2017-11-20)
+    * Latest packages' versions.
+    * Update Module + Tests related to latest `core` version.
+    * Documentation.
+    * Change packaging process.
 * v1.0.0 (2017-11-14)
     * `MongoDB` module implementation.
     * Tests module API.

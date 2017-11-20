@@ -1,4 +1,4 @@
-import { Type } from '@hapiness/core/core';
+import { Type } from '@hapiness/core';
 
 export class ModelItem {
     token: Type<any>;
