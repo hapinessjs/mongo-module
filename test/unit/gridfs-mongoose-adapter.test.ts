@@ -418,6 +418,17 @@ export class MongooseGridFsAdapterTest {
             .is(123);
     }
 
+    @test('- registerValue with collectionName')
+    testRegisterValueWithCollectionName() {
+        const adapter = new MongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        adapter['_connection'] = {
+            model: (_, doc, name) => name
+        };
+        unit
+            .string(adapter.registerValue(123, 'test', 'test2'))
+            .is('test2');
+    }
+
     @test('- getLibrary')
     testGetLibrary(done) {
         this._mockConnection.db = 'toto';

@@ -136,6 +136,29 @@ export class MongooseAdapterTest {
             });
     }
 
+
+    @test('- registerValue')
+    testRegisterValue() {
+        const adapter = new MongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        adapter['_connection'] = {
+            model: (_, doc) => doc
+        };
+        unit
+            .must(adapter.registerValue(123, 'test'))
+            .is(123);
+    }
+
+    @test('- registerValue with collectionName')
+    testRegisterValueWithCollectionName() {
+        const adapter = new MongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        adapter['_connection'] = {
+            model: (_, doc, name) => name
+        };
+        unit
+            .string(adapter.registerValue(123, 'test', 'test2'))
+            .is('test2');
+    }
+
     /**
      *  If the connection emit the event connected, the _tryConnect function should resolve observable
      */

@@ -71,7 +71,10 @@ export class MongooseGridFsAdapter extends HapinessMongoAdapter {
             });
     }
 
-    public registerValue(schema: any, collection: string) {
+    public registerValue(schema: any, collection: string, collectionName?: string) {
+        if (!!collectionName && collectionName.length) {
+            return this._connection.model(collection, schema, collectionName);
+        }
         return this._connection.model(collection, schema);
     }
 

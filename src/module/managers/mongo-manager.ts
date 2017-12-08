@@ -25,23 +25,24 @@ export class MongoManager {
         };
     }
 
-    private _fixConfig(configValues?: HapinessMongoAdapterConstructorArgs): HapinessMongoAdapterConstructorArgs {
+    protected _fixConfig(configValues?: HapinessMongoAdapterConstructorArgs): HapinessMongoAdapterConstructorArgs {
         __debugger.debug('_fixConfig', '');
         return <HapinessMongoAdapterConstructorArgs> Object.assign({}, configValues);
     }
 
-    private _keyForAdapter(adapterName: string, options: HapinessMongoAdapterConstructorArgs): string {
+    protected _keyForAdapter(adapterName: string, options: HapinessMongoAdapterConstructorArgs): string {
         __debugger.debug('_keyForAdapter', '');
-        const key = `${adapterName}_${options.host }`
-            .concat(
-                !!options.db ?
-                    `_${options.db}` :
-                    !!options.database ?
-                        `_${options.db}` : ''
-            )
-            .concat(`${options.instance || 0 }`);
+        const usedKeyForKeyComputation = ['db', 'database', 'url', 'instance'];
+        const _keyElements = [adapterName].concat(
+            Object.keys(options).reduce((acc, k) => {
+                if (usedKeyForKeyComputation.indexOf(k) !== -1) {
+                    return acc.concat(options[k]);
+                }
+                return acc;
+            }, [])
+        );
 
-        return key;
+        return _keyElements.join('_');
     }
 
     public registerAdapter(adapterClass: typeof HapinessMongoAdapter): boolean {
@@ -75,12 +76,7 @@ export class MongoManager {
         return this
             ._adaptersInstances[key]
             .whenReady()
-            .switchMap(_ => Observable
-                .create(observer => {
-                    observer.next(this._adaptersInstances[key]);
-                    observer.complete();
-                })
-            );
+            .map(_ => this._adaptersInstances[key]);
     }
 
     public getAdapter(adapterName: string, options?: any): HapinessMongoAdapter {
@@ -89,7 +85,14 @@ export class MongoManager {
         const _options: HapinessMongoAdapterConstructorArgs = <HapinessMongoAdapterConstructorArgs>
             Object.assign({}, this._config, options);
 
-        const key = this._keyForAdapter(adapterName, _options);
+        // If there is only one registered provider for the wanted adapter, dont compute the key but return it directly
+        let key = '';
+        const _keysForAdapterInstances = Object.keys(this._adaptersInstances).filter(k => k.indexOf(adapterName) !== 1);
+        if (_keysForAdapterInstances.length === 1) {
+            key = _keysForAdapterInstances.shift();
+        } else {
+            key = this._keyForAdapter(adapterName, _options);
+        }
 
         return this._adaptersInstances[key];
     }
