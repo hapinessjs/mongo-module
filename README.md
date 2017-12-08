@@ -66,17 +66,17 @@ or
 
 $ yarn add @hapiness/core @hapiness/mongo rxjs
 ```
-    
+
 ```javascript
 "dependencies": {
-    "@hapiness/core": "^1.2.0",
-    "@hapiness/mongo": "^1.1.0",
+    "@hapiness/core": "^1.2.2",
+    "@hapiness/mongo": "^1.1.1",
     "rxjs": "^5.5.2",
     //...
 }
 //...
 ```
- 
+
 ### Importing `MongoModule` from the library
 
 This module provide an Hapiness extension for Mongo. To use it, simply register it during the ```bootstrap``` step of your project like that:
@@ -120,9 +120,9 @@ You need to override 4 functions
 
 ```javascript
     _tryConnect(): Observable<void> { /* ... */ }
-    
+
     _afterConnect(): Observable<void> { /* ... */ }
-    
+
     getLibrary(): any { /* ... */ }
 
     registerValue(): any { /* ... */ }
@@ -379,7 +379,7 @@ class MyModelDocument {
     init() {
         // You can do that...
         const dao = this._mongoClient.get().getAdapter('mongoose').getLibrary();
-        
+
         // ... or that
         const connection = this._mongoClient.get().getAdapter('mongoose', { db: 'my_database' }).getConnection();
 
@@ -407,7 +407,8 @@ Example:
 ```javascript
 @MongoModel({
     adapter: 'mongoose',
-    collection: 'collectionName',
+    collection: 'collection', // The name of the collection, will be pluralize using mongoose if no collectionName is explicitly given
+    collectionName: 'collectionName', // Optional, will force this name as the collection name
     options: { ... } // @see HapinessMongoAdapterConstructorArgs type
 })
 class MyModel extends Model {
@@ -434,7 +435,7 @@ class MyRoute implements OnGet {
 
     onGet(request, reply) {
         const model = this.mongoClientService.getModel({ adapter: 'mongoose', options: {} }, MyModel);
-        
+
         ...
     }
 }
@@ -495,7 +496,7 @@ To set up your development environment:
     * `MongoDB` module implementation.
     * Tests module API.
     * Documentation.
-    
+
 [Back to top](#table-of-contents)
 
 ## Maintainers
