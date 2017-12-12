@@ -69,9 +69,9 @@ $ yarn add @hapiness/core @hapiness/mongo rxjs
 
 ```javascript
 "dependencies": {
-    "@hapiness/core": "^1.2.2",
+    "@hapiness/core": "^1.3.0",
     "@hapiness/mongo": "^1.1.1",
-    "rxjs": "^5.5.2",
+    "rxjs": "^5.5.5",
     //...
 }
 //...
@@ -487,6 +487,12 @@ To set up your development environment:
 
 ## Change History
 
+* v1.1.1 (2017-12-12)
+    * Latest packages' versions.
+    * Add field `collectionName` to force using a specific name for a collection.
+    * Fix key computation when retrieving an adapter.
+    * Allow developers to not give all options for the adapter when getting a document.
+    * Documentation.
 * v1.1.0 (2017-11-20)
     * Latest packages' versions.
     * Update Module + Tests related to latest `core` version.
