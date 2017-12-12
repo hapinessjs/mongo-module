@@ -1,20 +1,18 @@
-import {
-    CoreDecorator,
-    createDecorator,
-    extractMetadata
-} from '@hapiness/core';
+import { CoreDecorator, createDecorator, extractMetadata } from '@hapiness/core';
 
 import { ConnectionOptions } from './services';
 
 export interface MongoModel {
     adapter: string;
     collection: string;
+    collectionName?: string;
     options?: any;
 }
 
 export const MongoModel: CoreDecorator<MongoModel> = createDecorator<MongoModel>('MongoModel', {
     adapter: undefined,
     collection: undefined,
+    collectionName: undefined,
     options: undefined
 });
 

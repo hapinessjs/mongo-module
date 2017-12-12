@@ -107,7 +107,7 @@ export class HapinessMongoAdapter extends EventEmitter {
      *  This function should be overriden by all inherited classes.
      *
      */
-    public registerValue(schema: any, collection: string): any {
+    public registerValue(schema: any, collection: string, collectionName?: string): any {
         throw new Error('`registerValue` is not implemented');
     }
 
