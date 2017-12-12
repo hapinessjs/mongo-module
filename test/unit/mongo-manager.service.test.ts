@@ -346,4 +346,28 @@ export class MongoManagerTest {
                 }
             }, (err) => done(err));
     }
+
+    /**
+     * Test function _keyForAdapter
+     */
+    @test('- Test function _keyForAdapter')
+    testKeyForAdapter() {
+        class MyMongoManager extends MongoManager {
+            constructor(opts) {
+                super(opts);
+            }
+            keyForAdapter(adapter: string, options: any) {
+                return this._keyForAdapter(adapter, options);
+            }
+        }
+
+        const mongoManager = new MyMongoManager({ db: 'toto', host: 'test.in.tdw' });
+
+        unit.value(mongoManager.keyForAdapter('mongoose', { test: 'micro' })).is('mongoose');
+        unit.value(mongoManager.keyForAdapter('mongoose', { db: 'micro' })).is('mongoose_micro');
+        unit.value(mongoManager.keyForAdapter('mongoose', { db: 'micro', instance: 1 })).is('mongoose_micro_1');
+        unit.value(mongoManager.keyForAdapter('mongoose', { url: 'mongodb://xxxxxx:30153/test' }))
+            .is('mongoose_mongodb://xxxxxx:30153/test');
+    }
+
 }
