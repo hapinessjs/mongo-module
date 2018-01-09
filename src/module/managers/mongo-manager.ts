@@ -91,7 +91,7 @@ export class MongoManager {
 
         // If there is only one registered provider for the wanted adapter, dont compute the key but return it directly
         let key = '';
-        const _keysForAdapterInstances = Object.keys(this._adaptersInstances).filter(k => k.indexOf(adapterName) !== 1);
+        const _keysForAdapterInstances = Object.keys(this._adaptersInstances).filter(k => k.indexOf(adapterName) !== -1);
         if (_keysForAdapterInstances.length === 1) {
             key = _keysForAdapterInstances.shift();
         } else {
