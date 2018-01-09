@@ -32,6 +32,10 @@ export class MongoManager {
 
     protected _keyForAdapter(adapterName: string, options: HapinessMongoAdapterConstructorArgs): string {
         __debugger.debug('_keyForAdapter', '');
+        if (options.connectionName) {
+            return options.connectionName;
+        }
+
         const usedKeyForKeyComputation = ['db', 'database', 'url', 'instance'];
         const _keyElements = [adapterName].concat(
             Object.keys(options).reduce((acc, k) => {
@@ -87,7 +91,7 @@ export class MongoManager {
 
         // If there is only one registered provider for the wanted adapter, dont compute the key but return it directly
         let key = '';
-        const _keysForAdapterInstances = Object.keys(this._adaptersInstances).filter(k => k.indexOf(adapterName) !== 1);
+        const _keysForAdapterInstances = Object.keys(this._adaptersInstances).filter(k => k.indexOf(adapterName) !== -1);
         if (_keysForAdapterInstances.length === 1) {
             key = _keysForAdapterInstances.shift();
         } else {

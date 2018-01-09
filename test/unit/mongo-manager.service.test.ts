@@ -366,8 +366,8 @@ export class MongoManagerTest {
         unit.value(mongoManager.keyForAdapter('mongoose', { test: 'micro' })).is('mongoose');
         unit.value(mongoManager.keyForAdapter('mongoose', { db: 'micro' })).is('mongoose_micro');
         unit.value(mongoManager.keyForAdapter('mongoose', { db: 'micro', instance: 1 })).is('mongoose_micro_1');
+        unit.value(mongoManager.keyForAdapter('mongoose', { connectionName: 'alias' })).is('alias');
         unit.value(mongoManager.keyForAdapter('mongoose', { url: 'mongodb://xxxxxx:30153/test' }))
             .is('mongoose_mongodb://xxxxxx:30153/test');
     }
-
 }

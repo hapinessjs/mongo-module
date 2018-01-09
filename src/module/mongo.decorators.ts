@@ -17,7 +17,7 @@ export const MongoModel: CoreDecorator<MongoModel> = createDecorator<MongoModel>
 });
 
 export abstract class Model {
-    protected connectionOptions: ConnectionOptions;
+    public connectionOptions: ConnectionOptions;
     abstract readonly schema: any;
     constructor(token: any) {
         const metadata: MongoModel = extractMetadata(token);
