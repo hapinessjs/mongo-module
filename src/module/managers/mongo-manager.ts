@@ -32,6 +32,10 @@ export class MongoManager {
 
     protected _keyForAdapter(adapterName: string, options: HapinessMongoAdapterConstructorArgs): string {
         __debugger.debug('_keyForAdapter', '');
+        if (options.connectionName) {
+            return options.connectionName;
+        }
+
         const usedKeyForKeyComputation = ['db', 'database', 'url', 'instance'];
         const _keyElements = [adapterName].concat(
             Object.keys(options).reduce((acc, k) => {

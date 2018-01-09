@@ -6,4 +6,5 @@ export interface HapinessMongoAdapterConstructorArgs {
     port?: number;
     instance?: number;
     url?: string;
+    connectionName?: string;
 }

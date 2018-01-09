@@ -109,7 +109,10 @@ export class MongoClientExt implements OnExtensionLoad, OnModuleInstantiated {
                     .of(extractMetadataByDecorator<MongoModel>(instanceToken.token, 'MongoModel'))
                     .map(_ => ({
                         metadata: _,
-                        adapter: this._mongoManager.getAdapter(_.adapter, _.options)
+                        adapter: this._mongoManager.getAdapter(
+                            instanceToken.instance.connectionOptions.adapter,
+                            instanceToken.instance.connectionOptions.options
+                        )
                     }))
                     .do(_ => _.adapter.getModelManager().add({
                         token: instanceToken.token,
