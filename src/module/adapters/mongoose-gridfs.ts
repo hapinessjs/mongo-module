@@ -21,6 +21,10 @@ export class MongooseGridFsAdapter extends HapinessMongoAdapter {
             .create(observer => {
                 this._isReady = false;
 
+                if (this._db && !this._db.close) {
+                    return observer.error(new Error('_db needs a close function.'));
+                }
+
                 if (this._db) {
                     this._db.close();
                 }
