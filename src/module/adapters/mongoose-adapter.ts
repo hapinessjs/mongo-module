@@ -23,6 +23,10 @@ export class MongooseAdapter extends HapinessMongoAdapter {
             .create(observer => {
                 this._isReady = false;
 
+                if (this._db && !this._db.close) {
+                    return observer.error(new Error('_db needs a close function.'));
+                }
+
                 if (this._db) {
                     __debugger.debug('_tryConnect', 'db already exists');
                     this._db.close();
