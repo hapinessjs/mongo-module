@@ -24,8 +24,8 @@ export class MongoTestUtils {
         setTimeout(() => done(), 1500);
 
         if (!silent) {
-            this.spawn.stdout.on('data', console.log);
-            this.spawn.stderr.on('data', console.log);
+            this.spawn.stdout.on('data', d => console.log(d.toString()));
+            this.spawn.stderr.on('data', d => console.log(d.toString()));
         }
     }
 
