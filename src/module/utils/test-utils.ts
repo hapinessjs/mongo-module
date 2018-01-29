@@ -13,7 +13,7 @@ export class MongoTestUtils {
      * @returns void
      */
     /* istanbul ignore next */
-    public static startMongo(done: (err?) => {}): void {
+    public static startMongo(done: (err?) => {}, silent = true): void {
         if (this.spawn) {
             this.spawn.kill();
         }
@@ -22,6 +22,11 @@ export class MongoTestUtils {
             done(err);
         });
         setTimeout(() => done(), 1500);
+
+        if (!silent) {
+            this.spawn.stdout.on('data', console.log);
+            this.spawn.stderr.on('data', console.log);
+        }
     }
 
     /**
