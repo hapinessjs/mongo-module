@@ -378,4 +378,23 @@ export class AbstractMongoAdapterTest {
                 done(err);
             });
     }
+
+    /**
+     *  Close
+     */
+    @test('- Close')
+    testClose(done) {
+        const _tmpObject = new HapinessMongoAdapter({ host: 'test.in.tdw', skip_connect: true });
+        unit.spy(_tmpObject, 'close');
+
+        _tmpObject
+            .close()
+            .subscribe(_ => {
+                unit.bool((_tmpObject.close as any).calledOnce).isTrue();
+                done();
+            }, (err) => {
+                unit.assert(false);
+                done(err);
+            });
+    }
 }

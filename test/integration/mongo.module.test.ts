@@ -440,14 +440,15 @@ export class MongoModuleTest {
         .catch(err => {
             unit
                 .string(err.message)
-                .is('Unknown adapter custom, please register it before using it.');
+                .is('[MongoClientExt] Unknown adapter custom, please register it before using it.');
 
-            if (Hapiness['extensions']) { Hapiness['extensions']
-                .find(ext => ext.token === HttpServerExt)
-                .value
-                .stop()
-                .then(__ => done())
-                .catch(e => done(e));
+            if (Hapiness['extensions']) {
+                Hapiness['extensions']
+                    .find(ext => ext.token === HttpServerExt)
+                    .value
+                    .stop()
+                    .then(__ => done())
+                    .catch(e => done(e));
             } else {
                 done()
             }

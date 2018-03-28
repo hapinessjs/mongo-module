@@ -85,4 +85,8 @@ export class MongooseGridFsAdapter extends HapinessMongoAdapter {
     public getLibrary(): any {
         return this._gridfs;
     }
+
+    public close(): Observable<void> {
+        return Observable.fromPromise(this._db.close());
+    }
 }

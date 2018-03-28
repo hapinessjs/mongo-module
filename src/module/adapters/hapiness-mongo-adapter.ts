@@ -185,4 +185,8 @@ export class HapinessMongoAdapter extends EventEmitter {
         return this._connection;
     }
 
+    public close(): Observable<void> {
+        return Observable.of(null);
+    }
+
 }

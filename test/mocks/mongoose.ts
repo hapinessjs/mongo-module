@@ -4,7 +4,7 @@ import * as mongoose from 'mongoose';
 import { EventEmitter } from 'events';
 
 export class ConnectionMock extends EventEmitter {
-    private _db: string;
+    private _db: any;
 
     emitAfter(evt: string, delay?: number, objectToSend?: any) {
         setTimeout(() => {
@@ -16,11 +16,11 @@ export class ConnectionMock extends EventEmitter {
         }, delay || 200);
     }
 
-    get db(): string {
+    get db(): any {
         return this._db;
     }
 
-    set db(theDb: string) {
+    set db(theDb: any) {
         this._db = theDb;
     }
 
