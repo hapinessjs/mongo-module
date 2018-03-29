@@ -67,7 +67,7 @@ or
 $ yarn add @hapiness/core @hapiness/mongo rxjs
 ```
 
-```json
+```json5
 "dependencies": {
     "@hapiness/core": "^1.3.0",
     "@hapiness/mongo": "^1.1.3",
