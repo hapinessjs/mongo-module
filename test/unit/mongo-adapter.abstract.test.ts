@@ -84,6 +84,7 @@ export class AbstractMongoAdapterTest {
     @test('- If no db or database are given it should throw an error')
     testConfigNoDbNoDatabaseShouldThrow(done) {
         const adapter = new HapinessMongoAdapter({ host: 'test.in.tdw' });
+
         adapter
             .connect()
             .subscribe(_ => {

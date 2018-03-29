@@ -164,12 +164,12 @@ export class MongoClientExt implements OnExtensionLoad, OnModuleInstantiated, On
             .defaultIfEmpty(null);
     }
 
-    onShutdown(module: CoreModule, server: any): ExtensionShutdown {
+    onShutdown(): ExtensionShutdown {
         __debugger.debug('kill received, starting shutdown procedure', '');
 
         const adapters = Object.values(this._mongoManager['_adaptersInstances']);
 
-        const exitObsersavle = Observable
+        const exitObservable = Observable
             .from(adapters)
             .flatMap(adapter => adapter.close())
             .do(() => {
@@ -178,7 +178,7 @@ export class MongoClientExt implements OnExtensionLoad, OnModuleInstantiated, On
 
         return {
             priority: ExtensionShutdownPriority.NORMAL,
-            resolver: exitObsersavle
+            resolver: exitObservable
         };
     }
 }

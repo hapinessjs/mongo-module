@@ -104,7 +104,7 @@ Hapiness.bootstrap(MyModule, [ MongoClientExt.setConfig(/* ... */) ]);
 
 The `Mongo` module is based on adapters. Included to the module, there is an adapter using mongoose and one using mongoose to manage gridfs.
 
-But you can create your own adapters if you want by following some required steps describe belows.
+But you can create your own adapters if you want by following some required steps described belows.
 
 ### Step 1
 
@@ -112,7 +112,7 @@ Your adapter should be a class which inherits from `AbstractHapinessMongoAdapter
 
 ### Step 2
 
-You absolutely needs to implement a static function `getInterfaceName`, which will return a uniq string identifier for your adapter (**NOTE** `mongoose` and `mongoose-gridfs` are already use for included adapters of this module).
+You absolutely need to implement a static function `getInterfaceName`, which will return a uniq string identifier for your adapter (**NOTE** `mongoose` and `mongoose-gridfs` are already used by adapters provided by this module).
 
 ### Step 3
 
@@ -486,7 +486,7 @@ To set up your development environment:
 
 ## Change History
 
-* v1.1.6 (2018-03-28)
+* next
     * Updated packages' versions.
     * added support of `OnShutdown` of `hapiness Core`
     * added `close` functions to adapters.
