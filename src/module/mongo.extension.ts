@@ -174,7 +174,8 @@ export class MongoClientExt implements OnExtensionLoad, OnModuleInstantiated, On
             .flatMap(adapter => adapter.close())
             .do(() => {
                 __debugger.debug('bye', '');
-            });
+            })
+            .toArray();
 
         return {
             priority: ExtensionShutdownPriority.NORMAL,
