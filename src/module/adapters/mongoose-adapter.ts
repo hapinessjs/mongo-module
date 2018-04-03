@@ -23,36 +23,20 @@ export class MongooseAdapter extends HapinessMongoAdapter {
             .create(observer => {
                 this._isReady = false;
 
-                if (this._db && !this._db.close) {
-                    return observer.error(new Error('_db needs a close function.'));
-                }
-
-                if (this._db) {
-                    __debugger.debug('_tryConnect', 'db already exists');
-                    this._db.close();
-                }
-
-                const connectOptions = {
-                    server: {
-                        reconnectTries: Number.MAX_VALUE,
-                        reconnectInterval: 5000,
-                    },
+                const connectOptions: mongoose.ConnectionOptions = {
+                    promiseLibrary: global.Promise,
+                    reconnectTries: Number.MAX_VALUE,
+                    reconnectInterval: 5000,
                 };
 
-                this._connection = mongoose.createConnection(this._uri, connectOptions);
+                this._connection = mongoose.createConnection(this._uri, connectOptions)
 
-                this._connection.once('connected', () => {
-                    __debugger.debug('_tryConnect', 'connection once connected');
-
+                // Seems that typings are not up to date at the moment
+                this._connection['then'](() => {
                     observer.next();
                     observer.complete();
-                });
-
-                this._connection.once('error', err => {
-                    __debugger.debug('_tryConnect', `connection once error ${JSON.stringify(err, null, 2)}`);
-
-                    observer.error(err);
-                });
+                })
+                .catch(err => observer.error(err));
             });
     }
 
@@ -100,6 +84,6 @@ export class MongooseAdapter extends HapinessMongoAdapter {
     }
 
     public close(): Observable<void> {
-        return Observable.fromPromise(this._db.close());
+        return Observable.fromPromise(mongoose.disconnect());
     }
 }

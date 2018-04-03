@@ -79,7 +79,8 @@ export class MongoManager {
 
         return this
             ._adaptersInstances[key]
-            .whenReady()
+            .connect()
+            .flatMap(() => this._adaptersInstances[key].whenReady())
             .map(_ => this._adaptersInstances[key]);
     }
 

@@ -30,20 +30,18 @@ export class MongooseGridFsAdapter extends HapinessMongoAdapter {
                 }
 
                 const connectOptions = {
-                    server: {
-                        reconnectTries: Number.MAX_VALUE,
-                        reconnectInterval: 5000,
-                    },
+                    reconnectTries: Number.MAX_VALUE,
+                    reconnectInterval: 5000,
                 };
 
                 this._connection = mongoose.createConnection(this._uri, connectOptions);
 
-                this._connection.once('connected', () => {
+                // Seems that typings are not up to date at the moment
+                this._connection['then'](connection => {
                     observer.next();
                     observer.complete();
-                });
-
-                this._connection.once('error', err => {
+                })
+                .catch(err => {
                     observer.error(err);
                 });
             });

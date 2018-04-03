@@ -40,20 +40,10 @@ export class HapinessMongoAdapter extends EventEmitter {
         }
 
         this._modelManager = new ModelManager();
-
-        this
-            .connect()
-            .subscribe(_ => {
-                __debugger.debug('constructor', 'OK');
-            }, (err) => {
-                __debugger.debug('constructor', `Err catched :: ${err.message}`);
-                __debugger.debug('constructor', `Err catched :: ${JSON.stringify(err, null, 2)}`);
-            });
     }
 
     public connect(): Observable<void> {
         this._connection = null;
-
         const db = this._config.db || this._config.database;
 
         if (this._config.url) {
@@ -64,7 +54,13 @@ export class HapinessMongoAdapter extends EventEmitter {
             return Observable.throw(new Error('No db name nor url provided'));
         }
 
-        return this.tryConnect();
+        return this.tryConnect()
+            .do(() => __debugger.debug('connect', 'OK'))
+            .catch(err => {
+                __debugger.debug('connect', `Err catched :: ${err.message}`);
+                __debugger.debug('connect', `Err catched :: ${JSON.stringify(err, null, 2)}`);
+                return Observable.throw(err);
+            });
     }
 
     public tryConnect(): Observable<void> {

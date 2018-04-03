@@ -31,10 +31,10 @@ export class MongoClientService {
         return adapter ? adapter.getModelManager() : undefined;
     }
 
-    getModel(connectionOptions: ConnectionOptions, token: Type<any>): any {
+    getModel<T = any>(connectionOptions: ConnectionOptions, token: Type<any>): T {
         connectionOptions = Object.assign({}, connectionOptions);
         const adapter = this._mongoManager
             .getAdapter(connectionOptions.adapter, connectionOptions.options);
-        return adapter ? adapter.getModelManager().get(token) : undefined;
+        return adapter ? adapter.getModelManager().get<T>(token) : undefined;
     }
 }
