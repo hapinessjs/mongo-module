@@ -21,13 +21,13 @@ export class MongooseGridFsAdapter extends HapinessMongoAdapter {
             .create(observer => {
                 this._isReady = false;
 
-                if (this._db && !this._db.close) {
-                    return observer.error(new Error('_db needs a close function.'));
-                }
+                // if (this._db && !this._db.close) {
+                //     return observer.error(new Error('_db needs a close function.'));
+                // }
 
-                if (this._db) {
-                    this._db.close();
-                }
+                // if (this._db) {
+                //     this._db.close();
+                // }
 
                 const connectOptions = {
                     reconnectTries: Number.MAX_VALUE,
@@ -85,6 +85,6 @@ export class MongooseGridFsAdapter extends HapinessMongoAdapter {
     }
 
     public close(): Observable<void> {
-        return Observable.fromPromise(this._db.close());
+        return Observable.fromPromise(mongoose.disconnect());
     }
 }

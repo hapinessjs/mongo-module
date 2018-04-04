@@ -7,6 +7,7 @@ import { test, suite } from 'mocha-typescript';
  * @see http://unitjs.com/
  */
 import * as unit from 'unit.js';
+import * as mongoose from 'mongoose';
 
 import { Observable } from 'rxjs/Observable';
 
@@ -76,42 +77,13 @@ export class MongooseAdapterTest {
     }
 
     /**
-     *  If db already exists it should call `close()` function on it
-     */
-    @test('- If db already exists it should call `close()` function on it')
-    testIfDbAlreadyExistsItShouldCloseIt(done) {
-        const spy = unit.spy();
-
-        class ExtendMongooseAdapter extends MongooseAdapter {
-            constructor(opts) {
-                super(opts);
-                this._db = { close: spy };
-            }
-
-            publicTryConnect() {
-                return this._tryConnect();
-            }
-        }
-
-        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
-        this._mockConnection.emitAfter('connected', 400);
-
-        _tmpObject
-            .publicTryConnect()
-            .subscribe(_ => {
-                unit.assert(spy.callCount === 1, `Incorrect call count on spy, expected 1 but it was ${spy.callCount}`);
-                done();
-            }, (err) => {
-                unit.assert(false);
-                done(err);
-            });
-    }
-
-    /**
      * If connection got an error the observer should failed and return the error
      */
     @test('- If connection got an error the observer should failed and return the error')
     testConnectionGotErrorObserverShouldFail(done) {
+        MongooseMockInstance.restore();
+        this._mockConnection = MongooseMockInstance.mockThrowCreateConnection(new Error('Custom error, connection failed'));
+
         class ExtendMongooseAdapter extends MongooseAdapter {
             constructor(opts) {
                 super(opts);
@@ -123,7 +95,6 @@ export class MongooseAdapterTest {
         }
 
         const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
-        this._mockConnection.emitAfter('error', 400, new Error('Custom error, connection failed'));
 
         _tmpObject
             .publicTryConnect()
@@ -135,7 +106,6 @@ export class MongooseAdapterTest {
                 done();
             });
     }
-
 
     @test('- registerValue')
     testRegisterValue() {
@@ -192,7 +162,6 @@ export class MongooseAdapterTest {
      */
     @test('- When afterConnect got an error after calling the onConnected function, it should pass in the error block')
     testAfterConnectOnConnectedFailShouldGoInErrorBlock(done) {
-        this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
 
         class ExtendMongooseAdapter extends MongooseAdapter {
@@ -210,10 +179,16 @@ export class MongooseAdapterTest {
                     observer => {
                         observer.error(new Error('test error'));
                         observer.complete();
-
-                        done();
                     }
                 );
+            }
+
+            onError() {
+                return Observable.create(o => {
+                    o.next();
+                    o.complete();
+                    done();
+                });
             }
         }
 
@@ -234,7 +209,6 @@ export class MongooseAdapterTest {
      */
     @test('- When afterConnect got error, the onError function should be called')
     testAfterConnectGotConnectionError(done) {
-        this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
 
         class ExtendMongooseAdapter extends MongooseAdapter {
@@ -288,6 +262,14 @@ export class MongooseAdapterTest {
                 this._connection = mockConnection;
                 return this._afterConnect();
             }
+
+            // protected onConnected() {
+            //     return Observable.create(o => {
+            //         console.log(`ANOTHER ONCONNECTED`);
+            //         o.next();
+            //         o.complete();
+            //     })
+            // }
 
             protected onError() {
                 return Observable.create(
@@ -402,11 +384,8 @@ export class MongooseAdapterTest {
      */
     @test('- Close')
     testClose(done) {
-        this._mockConnection.db = {
-            close: unit.stub()
-        };
-
-        this._mockConnection.db.close.returns(Promise.resolve(null))
+        const mongooseDisconnectStub = unit.stub(mongoose, 'disconnect');
+        mongooseDisconnectStub.returns(Promise.resolve(null));
 
         const mockConnection = this._mockConnection;
 
@@ -421,13 +400,14 @@ export class MongooseAdapterTest {
             }
         }
 
-        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', skip_connect: true });
 
         _tmpObject
             .publicAfterConnect()
             .flatMap(() => _tmpObject.close())
+            .finally(() => mongooseDisconnectStub.restore())
             .subscribe(_ => {
-                unit.bool(this._mockConnection.db.close.calledOnce).isTrue();
+                unit.bool(mongooseDisconnectStub.calledOnce).isTrue();
                 done();
             }, (err) => {
                 unit.assert(false);

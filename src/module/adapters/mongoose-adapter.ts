@@ -43,7 +43,6 @@ export class MongooseAdapter extends HapinessMongoAdapter {
     protected _afterConnect(): Observable<void> {
         return Observable
             .create(observer => {
-                this._db = this._connection.db;
 
                 this.onConnected().subscribe(_ => {
                     __debugger.debug('_afterConnect', '(subscribe) On connected success');
