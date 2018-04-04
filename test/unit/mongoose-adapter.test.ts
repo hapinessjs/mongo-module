@@ -263,14 +263,6 @@ export class MongooseAdapterTest {
                 return this._afterConnect();
             }
 
-            // protected onConnected() {
-            //     return Observable.create(o => {
-            //         console.log(`ANOTHER ONCONNECTED`);
-            //         o.next();
-            //         o.complete();
-            //     })
-            // }
-
             protected onError() {
                 return Observable.create(
                     observer => {
