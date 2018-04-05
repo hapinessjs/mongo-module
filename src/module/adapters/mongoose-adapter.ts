@@ -98,4 +98,8 @@ export class MongooseAdapter extends HapinessMongoAdapter {
         }
         return this._connection.model(collection, schema);
     }
+
+    public close(): Observable<void> {
+        return Observable.fromPromise(this._db.close());
+    }
 }

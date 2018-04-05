@@ -7,6 +7,9 @@ import {
     extractMetadataByDecorator,
     OnExtensionLoad,
     OnModuleInstantiated,
+    OnShutdown,
+    ExtensionShutdown,
+    ExtensionShutdownPriority,
 } from '@hapiness/core';
 
 import { Observable } from 'rxjs';
@@ -17,7 +20,7 @@ import { Debugger } from './shared/index';
 
 const __debugger = new Debugger('MongoClientExtension');
 
-export class MongoClientExt implements OnExtensionLoad, OnModuleInstantiated {
+export class MongoClientExt implements OnExtensionLoad, OnModuleInstantiated, OnShutdown {
 
     private _mongoManager: MongoManager;
 
@@ -94,7 +97,6 @@ export class MongoClientExt implements OnExtensionLoad, OnModuleInstantiated {
             );
     }
 
-
     private storeDocuments(module: CoreModule): Observable<any> {
         return Observable
             .from([].concat(module.declarations))
@@ -160,5 +162,24 @@ export class MongoClientExt implements OnExtensionLoad, OnModuleInstantiated {
             .storeDocuments(module)
             .ignoreElements()
             .defaultIfEmpty(null);
+    }
+
+    onShutdown(): ExtensionShutdown {
+        __debugger.debug('kill received, starting shutdown procedure', '');
+
+        const adapters = Object.values(this._mongoManager['_adaptersInstances']);
+
+        const exitObservable = Observable
+            .from(adapters)
+            .flatMap(adapter => adapter.close())
+            .do(() => {
+                __debugger.debug('bye', '');
+            })
+            .toArray();
+
+        return {
+            priority: ExtensionShutdownPriority.NORMAL,
+            resolver: exitObservable
+        };
     }
 }

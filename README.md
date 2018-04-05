@@ -33,14 +33,14 @@
 
 # Mongo Module
 
-```Mongo``` module for the Hapiness framework including a ```mongoose``` adapter and a ```mongoose-gridfs``` one.
+`Mongo` module for the Hapiness framework including a `mongoose` adapter and a `mongoose-gridfs` one.
 
 ## Table of contents
 
 * [Using your module inside Hapiness application](#using-your-module-inside-hapiness-application)
     * [`yarn` or `npm` it in your `package.json`](#yarn-or-npm-it-in-your-package)
     * [Importing `MongoModule` from the library](#importing-mongomodule-from-the-library)
-* [Creating ```Adapters```](#creating-adapters)
+* [Creating `Adapters`](#creating-adapters)
     * [Step 1](step-1)
     * [Step 2](step-2)
     * [Step 3](step-3)
@@ -67,7 +67,7 @@ or
 $ yarn add @hapiness/core @hapiness/mongo rxjs
 ```
 
-```javascript
+```json5
 "dependencies": {
     "@hapiness/core": "^1.3.0",
     "@hapiness/mongo": "^1.1.3",
@@ -79,9 +79,9 @@ $ yarn add @hapiness/core @hapiness/mongo rxjs
 
 ### Importing `MongoModule` from the library
 
-This module provide an Hapiness extension for Mongo. To use it, simply register it during the ```bootstrap``` step of your project like that:
-```javascript
+This module provide an Hapiness extension for Mongo. To use it, simply register it during the `bootstrap` step of your project like that:
 
+```typescript
 import { MongoModule, MongoClientExt } from '@hapiness/mongo';
 
 @HapinessModule({
@@ -100,25 +100,25 @@ Hapiness.bootstrap(MyModule, [ MongoClientExt.setConfig(/* ... */) ]);
 
 [Back to top](#table-of-contents)
 
-## Creating ```Adapters```
+## Creating `Adapters`
 
-The ```Mongo``` module is based on adapters. Included to the module, there is an adapter using mongoose and one using mongoose to manage gridfs.
+The `Mongo` module is based on adapters. Included to the module, there is an adapter using mongoose and one using mongoose to manage gridfs.
 
-But you can create your own adapters if you want by following some required steps describe belows.
+But you can create your own adapters if you want by following some required steps described belows.
 
 ### Step 1
 
-Your adapter should be a class which inherits from ```AbstractHapinessMongoAdapter```.
+Your adapter should be a class which inherits from `AbstractHapinessMongoAdapter`.
 
 ### Step 2
 
-You absolutely needs to implement a static function ```getInterfaceName```, which will return a uniq string identifier for your adapter (**NOTE** ```mongoose``` and ```mongoose-gridfs``` are already use for included adapters of this module).
+You absolutely need to implement a static function `getInterfaceName`, which will return a uniq string identifier for your adapter (**NOTE** `mongoose` and `mongoose-gridfs` are already used by adapters provided by this module).
 
 ### Step 3
 
 You need to override 4 functions
 
-```javascript
+```typescript
     _tryConnect(): Observable<void> { /* ... */ }
 
     _afterConnect(): Observable<void> { /* ... */ }
@@ -132,7 +132,7 @@ You need to override 4 functions
 
 Example for mongoose
 
-```javascript
+```typescript
 protected _tryConnect(): Observable<void> {
         return Observable
             .create(observer => {
@@ -163,11 +163,11 @@ protected _tryConnect(): Observable<void> {
     }
 ```
 
-*_afterConnect:* this function will be called just after ```_tryConnect``` if you want to manage some stuff once your connection is fine.
+*_afterConnect:* this function will be called just after `_tryConnect` if you want to manage some stuff once your connection is fine.
 
 Example for mongoose:
 
-```javascript
+```typescript
 protected _afterConnect(): Observable<void> {
         return Observable
             .create(observer => {
@@ -205,32 +205,37 @@ protected _afterConnect(): Observable<void> {
 
 Example for mongoose:
 
-```javascript
+```typescript
 public getLibrary(): any {
     return mongoose;
 }
-````
+```
 
 *registerValue:* this will register your document and return a model value to get through the DI.
 
 Example for mongoose:
 
-```javascript
+```typescript
 public registerValue(document, collection): any {
     return this._connection.model(collection, document);
 }
-````
+```
 
-**NOTE**  DONT FORGET TO SET ```_isReady = true``` once you are done, else your adapter will never be ready.
+**NOTE** DONT FORGET TO SET `_isReady = true` once you are done, else your adapter will never be ready.
+
+You should also override:
+
+```typescript
+    close(): Observalbe<void> { /*  */ }
+```
 
 [Back to top](#table-of-contents)
 
 ## Registering adapters
 
-When you want created your own adapters, you first need to tell the Mongo extension to register it. The Mongo extension will add your class and map it with the uniq identifier you put inside the static ```ddd```.
+When you want to create your own adapters, first you need to tell the Mongo extension to register it. The Mongo extension will add your classes and map it with the uniq identifier you put inside the static `ddd`.
 
-```javascript
-
+```typescript
 class MyCustomAdapter extends AbstractHapinessMongoAdapter {
     public static getInterfaceName(): string {
         return 'custom-identifier-for-my-adapter';
@@ -252,12 +257,11 @@ Hapiness.bootstrap(
             )
     ]
 );
-
 ```
 
-Now, the mongo extension know that an Adapter with identifier ```custom-identifier-for-my-adapte``` exists.
+Now, the mongo extension knows that an Adapter with the identifier `custom-identifier-for-my-adapter` exists.
 
-The two provided adapters dont needs to be registered as it is already done.
+The two provided adapters don't need to be registered as it is already done.
 
 ## Using a registered adapter
 
@@ -265,8 +269,7 @@ It will work the same for both custom adapters you made and provided adapters.
 
 Just load them with the config you want to use:
 
-```javascript
-
+```typescript
 class MyCustomAdapter extends AbstractHapinessMongoAdapter {
     public static getInterfaceName(): string {
         return 'custom-identifier-for-my-adapter';
@@ -304,21 +307,19 @@ Hapiness.bootstrap(
             )
     ]
 );
-
 ```
 
-So you can load as much connection as you want and provide custom config for each adapter you load.
+So you can load as many connections as you want and provide custom configs for each adapter you load.
 
 [Back to top](#table-of-contents)
 
 ## Configuration
 
-When you load adapter (see previous section), you can provide config, but you have the possibility to not provide one every time.
+When you load adapters (see previous section), you can provide a config, but you have the possibility to not provide one every time.
 
-Lets say you want two adapters pointing to the same database, you can for that use the ```common``` option.
+Lets say you want two adapters pointing to the same database, you can for that use the `common` option.
 
-```javascript
-
+```typescript
 class MyCustomAdapter extends AbstractHapinessMongoAdapter {
     public static getInterfaceName(): string {
         return 'custom-identifier-for-my-adapter';
@@ -351,21 +352,19 @@ Hapiness.bootstrap(
             )
     ]
 );
-
 ```
 
 [Back to top](#table-of-contents)
 
 ## Get your adapter anywhere
 
-To get your adapter and play with it, you need to inject the MongoClientService in your class and call the ```get()`` function to get an instance of the adapter manager.
+To get your adapter and play with it, you need to inject the MongoClientService in your class and call the `get()` function to get an instance of the adapter manager.
 
-Once you did it, you'll able to get your adapter with it's name only or with its name and options (if you have the same adapter in different db or host ...) calling the function ```getAdapter(...)```.
+Once you did it, you'll be able to get your adapter with its name only or with its name and options (if you have the same adapter in different DBs or host ...) calling the function `getAdapter(...)`.
 
-Example showing how to get mongoose adapter for ```my_database```:
+Example showing how to get mongoose adapter for `my_database`:
 
-```javascript
-
+```typescript
 @Injectable()
 class MyModelDocument {
     private _myModelConnection: any;
@@ -404,7 +403,7 @@ You can implement and register models in the adapter
 
 Example:
 
-```javascript
+```typescript
 @MongoModel({
     adapter: 'mongoose',
     collection: 'collection', // The name of the collection, will be pluralize using mongoose if no collectionName is explicitly given
@@ -452,23 +451,23 @@ class MyModule {}
 
 ## Helpers functions
 
-The module gives you an helpers to perform some basic mongo-related operation.
+The module gives you an helpers to perform some basic mongo-related operations.
 
 Just import the class from the module
 
-```
+```typescript
 import { MongoUtils } from '@hapiness/mongo'
 ```
 
 There is 4 static functions (for now)
 
-```public static prepareUpdateObject(dto: any): any```: You give to this function an object like ```{ "meta": { "key": "value" } }``` and it returns you the object ```{ "meta.key": "value" }```. Very usefull if you perform update operations!
+`public static prepareUpdateObject(dto: any): any`: Give to this function an object like `{ "meta": { "key": "value" } }` and it returns you the object `{ "meta.key": "value" }`. Very usefull to perform update operations!
 
-```public static toObjectId(id: string)```: it returns an ObjectID type from the given string (```null``` if the string is not a valid ObjectID)
+`public static toObjectId(id: string)`: Returns an ObjectID type from the given string (`null` if the string is not a valid ObjectID)
 
-```public static fieldsStringFromArray(fields: string[]): string```: If you want to select only some fields and you need for that to compute a string from an array of string, use this function
+`public static fieldsStringFromArray(fields: string[]): string`: If you want to select only some fields and you need for that to compute a string from an array of string, use this function
 
-```public static filterFindCondition(condition: any): any```: If you have a query object for mongo, this function will parse your condition, convert the field ```id``` into ```_id``` and then convert ```_id``` to an ```ObjectID``` before giving back the query object
+`public static filterFindCondition(condition: any): any`: If you have a query object for mongo, this function will parse your condition, convert the field `id` into `_id` and then convert `_id` to an `ObjectID` before giving back the query object
 
 [Back to top](#table-of-contents)
 
@@ -487,6 +486,11 @@ To set up your development environment:
 
 ## Change History
 
+* v1.2.0 (2018-04-05)
+    * Updated packages' versions.
+    * added support of `OnShutdown` of `hapiness Core`
+    * added `close` functions to adapters.
+    * Fix typos in documentation.
 * v1.1.3 (2018-01-16)
     * Fix get adapter using adapter name
 * v1.1.2 (2018-01-09)
@@ -523,12 +527,14 @@ To set up your development environment:
         <td align="center"><a href="https://github.com/antoinegomez"><img src="https://avatars3.githubusercontent.com/u/997028?v=3&s=117" width="117"/></a></td>
         <td align="center"><a href="https://github.com/reptilbud"><img src="https://avatars3.githubusercontent.com/u/6841511?v=3&s=117" width="117"/></a></td>
         <td align="center"><a href="https://github.com/njl07"><img src="https://avatars3.githubusercontent.com/u/1673977?v=3&s=117" width="117"/></a></td>
+        <td align="center"><a href="https://github.com/xmaIIoc"><img src="https://avatars2.githubusercontent.com/u/1898461?s=117&v=4" width="117"/></a></td>
     </tr>
     <tr>
         <td align="center"><a href="https://github.com/Juneil">Julien Fauville</a></td>
         <td align="center"><a href="https://github.com/antoinegomez">Antoine Gomez</a></td>
         <td align="center"><a href="https://github.com/reptilbud">Sébastien Ritz</a></td>
         <td align="center"><a href="https://github.com/njl07">Nicolas Jessel</a></td>
+        <td align="center"><a href="https://github.com/xmaIIoc">Florent Bennani</a></td>
     </tr>
 </table>
 
