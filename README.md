@@ -486,7 +486,7 @@ To set up your development environment:
 
 ## Change History
 
-* next
+* v1.1.6 (2018-04-05)
     * Updated packages' versions.
     * added support of `OnShutdown` of `hapiness Core`
     * added `close` functions to adapters.
