@@ -33,7 +33,7 @@
 
 # Mongo Module
 
-`Mongo` module for the Hapiness framework including a `mongoose` adapter and a `mongoose-gridfs` one.
+`Mongo` module for the Hapiness framework including `mongoose`, `mongoose-gridfs` (deprecated) and `mongoose-gridfs-bucket` adapter one.
 
 ## Table of contents
 
@@ -112,7 +112,7 @@ Your adapter should be a class which inherits from `AbstractHapinessMongoAdapter
 
 ### Step 2
 
-You absolutely need to implement a static function `getInterfaceName`, which will return a uniq string identifier for your adapter (**NOTE** `mongoose` and `mongoose-gridfs` are already used by adapters provided by this module).
+You absolutely need to implement a static function `getInterfaceName`, which will return a uniq string identifier for your adapter (**NOTE** `mongoose`, `mongoose-gridfs` and `mongoose-gridfs-bucket` are already used by adapters provided by this module).
 
 ### Step 3
 
