@@ -443,10 +443,10 @@ export class MongooseGridFsBucketAdapterTest {
     testClose(done) {
         const mockConnection = this._mockConnection;
         mockConnection.db = new mongoose.mongo.Db('dbname', new mongoose.mongo.Server('fake.host.in.tdw', 4242));
+        const stub = unit.stub().returns(Promise.resolve(null));
         (<any>mockConnection).client = {
-            close: unit.stub()
+            close: stub
         };
-        (<any>mockConnection).client.close.returns(Promise.resolve(null));
 
         class ExtendMongooseGridfsBucketAdapter extends MongooseGridFsBucketAdapter {
             constructor(opts) {
@@ -465,10 +465,9 @@ export class MongooseGridFsBucketAdapterTest {
             .publicAfterConnect()
             .flatMap(() => _tmpObject.close())
             .subscribe(_ => {
-                unit.bool((<any>mockConnection).client.close.calledOnce).isTrue();
+                unit.bool(stub.calledOnce).isTrue();
                 done();
             }, (err) => {
-                unit.assert(false);
                 done(err);
             });
     }

@@ -25,7 +25,7 @@ export class MongooseGridFsBucketAdapter extends HapinessMongoAdapter {
             .create(observer => {
                 this._isReady = false;
 
-                const connectOptions = {
+                const connectOptions: mongoose.ConnectionOptions = {
                     reconnectTries: Number.MAX_VALUE,
                     reconnectInterval: 5000,
                 };
@@ -86,7 +86,8 @@ export class MongooseGridFsBucketAdapter extends HapinessMongoAdapter {
         return this._gridfsBucket;
     }
 
+    // It seems that there is a bug here and it never really close the connection it always try to reconnect afterwards.
     public close(): Observable<void> {
-        return Observable.fromPromise(this._connection.client.close());
+        return Observable.fromPromise(this._connection.client.close(true));
     }
 }

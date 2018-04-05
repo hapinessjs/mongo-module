@@ -7,7 +7,6 @@ import { test, suite } from 'mocha-typescript';
  * @see http://unitjs.com/
  */
 import * as unit from 'unit.js';
-import * as mongoose from 'mongoose';
 
 import { Observable } from 'rxjs/Observable';
 
@@ -376,10 +375,12 @@ export class MongooseAdapterTest {
      */
     @test('- Close')
     testClose(done) {
-        const mongooseDisconnectStub = unit.stub(mongoose, 'disconnect');
-        mongooseDisconnectStub.returns(Promise.resolve(null));
+        const stub = unit.stub().returns(Promise.resolve(null));
 
         const mockConnection = this._mockConnection;
+        (<any>mockConnection).client = {
+            close: stub
+        }
 
         class ExtendMongooseAdapter extends MongooseAdapter {
             constructor(opts) {
@@ -397,9 +398,8 @@ export class MongooseAdapterTest {
         _tmpObject
             .publicAfterConnect()
             .flatMap(() => _tmpObject.close())
-            .finally(() => mongooseDisconnectStub.restore())
             .subscribe(_ => {
-                unit.bool(mongooseDisconnectStub.calledOnce).isTrue();
+                unit.bool(stub.calledOnce).isTrue();
                 done();
             }, (err) => {
                 unit.assert(false);
