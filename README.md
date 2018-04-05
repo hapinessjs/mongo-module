@@ -486,6 +486,10 @@ To set up your development environment:
 
 ## Change History
 
+* v2.0.0
+    * Updated mongoose to latest version
+    * Removed the call to createConnection from the constructor of mongo adapter.
+    * Now catch connection errors and pipe them out to be catch by user later on. No more waiting for timeout to realize there is a connection error.
 * v1.2.0 (2018-04-05)
     * Updated packages' versions.
     * added support of `OnShutdown` of `hapiness Core`
