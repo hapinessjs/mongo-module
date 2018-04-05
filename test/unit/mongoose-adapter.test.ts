@@ -65,10 +65,10 @@ export class MongooseAdapterTest {
     }
 
     /**
-     * Get librairy should return mongoose instance
+     * Get library should return mongoose instance
      */
-    @test('- Get librairy should return mongoose instance')
-    testGetLibrairyShouldReturnInstance() {
+    @test('- Get library should return mongoose instance')
+    testGetLibraryShouldReturnInstance() {
         const _mongoose = this._mongooseAdapter.getLibrary();
         const _test = _mongoose.createConnection();
 
@@ -397,4 +397,41 @@ export class MongooseAdapterTest {
             });
     }
 
+    /**
+     *  Close
+     */
+    @test('- Close')
+    testClose(done) {
+        this._mockConnection.db = {
+            close: unit.stub()
+        };
+
+        this._mockConnection.db.close.returns(Promise.resolve(null))
+
+        const mockConnection = this._mockConnection;
+
+        class ExtendMongooseAdapter extends MongooseAdapter {
+            constructor(opts) {
+                super(opts);
+            }
+
+            publicAfterConnect() {
+                this._connection = mockConnection;
+                return this._afterConnect();
+            }
+        }
+
+        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+
+        _tmpObject
+            .publicAfterConnect()
+            .flatMap(() => _tmpObject.close())
+            .subscribe(_ => {
+                unit.bool(this._mockConnection.db.close.calledOnce).isTrue();
+                done();
+            }, (err) => {
+                unit.assert(false);
+                done(err);
+            });
+    }
 }

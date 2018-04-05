@@ -472,4 +472,39 @@ export class MongooseGridFsAdapterTest {
                 done(err);
             });
     }
+
+    @test('- close')
+    testClose(done) {
+        this._mockConnection.db = {
+            close: unit.stub()
+        };
+
+        this._mockConnection.db.close.returns(Promise.resolve(null))
+
+        const mockConnection = this._mockConnection;
+
+        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
+            constructor(opts) {
+                super(opts);
+            }
+
+            publicAfterConnect() {
+                this._connection = mockConnection;
+                return this._afterConnect();
+            }
+        }
+
+        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+
+        _tmpObject
+            .publicAfterConnect()
+            .flatMap(() => _tmpObject.close())
+            .subscribe(_ => {
+                unit.bool(this._mockConnection.db.close.calledOnce).isTrue();
+                done();
+            }, (err) => {
+                unit.assert(false);
+                done(err);
+            });
+    }
 }

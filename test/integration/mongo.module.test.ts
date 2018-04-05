@@ -440,14 +440,15 @@ export class MongoModuleTest {
         .catch(err => {
             unit
                 .string(err.message)
-                .is('Unknown adapter custom, please register it before using it.');
+                .is('[MongoClientExt] Unknown adapter custom, please register it before using it.');
 
-            if (Hapiness['extensions']) { Hapiness['extensions']
-                .find(ext => ext.token === HttpServerExt)
-                .value
-                .stop()
-                .then(__ => done())
-                .catch(e => done(e));
+            if (Hapiness['extensions']) {
+                Hapiness['extensions']
+                    .find(ext => ext.token === HttpServerExt)
+                    .value
+                    .stop()
+                    .then(__ => done())
+                    .catch(e => done(e));
             } else {
                 done()
             }
@@ -571,6 +572,116 @@ export class MongoModuleTest {
                     {
                         name: 'mongoose',
                         config: { database: 'test_2', host: 'host_2' }
+                    }
+                ],
+            })
+        ])
+        .catch(err => {
+           done(err);
+        });
+    }
+
+    @test('- When OnShutdown is called it should call the close method of every adapter')
+    testOnShutdown(done) {
+        this._mockConnection.emitAfter('connected', 400);
+
+        this._mockConnection.db = {
+            close: unit.stub()
+        };
+
+        this._mockConnection.db.close.returns(Promise.resolve(null))
+
+        const mockConnection = this._mockConnection;
+
+        class MockAdapter extends HapinessMongoAdapter {
+            public static getInterfaceName(): string {
+                return 'mock-adapter';
+            }
+
+            constructor(opts) {
+                super(opts);
+            }
+
+            public _tryConnect() {
+                this._isReady = true;
+                return Observable.of(null);
+            }
+
+            public _afterConnect() {
+                return Observable.of(null);
+            }
+
+            public getLibrary(): any {
+                return 'plop';
+            }
+
+            public registerValue(document, collection): any {
+                return null;
+            }
+
+            publicAfterConnect() {
+                this._connection = mockConnection;
+                return this._afterConnect();
+            }
+        }
+
+        class MockAdapter2 extends MockAdapter {
+            public static getInterfaceName(): string {
+                return 'mock-adapter2';
+            }
+
+            constructor(opts) {
+                super(opts);
+            }
+        }
+
+        class MockAdapter3 extends MockAdapter {
+            public static getInterfaceName(): string {
+                return 'mock-adapter3';
+            }
+
+            constructor(opts) {
+                super(opts);
+            }
+        }
+        @HapinessModule({
+            version: '1.0.0',
+            declarations: [ ],
+            imports: [ MongoModule ]
+        })
+        class MMTest implements OnStart {
+
+            onStart(): void {
+                const mongoExt: MongoClientExt = Hapiness['extensions'].find(ext => ext.token === MongoClientExt);
+                const adapterCloseSpies = Object.values(mongoExt['value']['_adaptersInstances'])
+                    .map(adapter => unit.spy(adapter, 'close'));
+
+                mongoExt['instance']
+                    .onShutdown()
+                    .resolver
+                    .subscribe(null, err => done(err), () => {
+                        unit.number(adapterCloseSpies.length).is(3);
+                        adapterCloseSpies.forEach(spy => unit.bool(spy.calledOnce).isTrue());
+                        done();
+                    });
+            }
+        }
+
+        Hapiness.bootstrap(MMTest, [
+            MongoClientExt.setConfig({
+                register: [ MockAdapter, MockAdapter2, MockAdapter3 ],
+                load: [
+                    {
+                        name: 'mock-adapter',
+                        config: { url: 'mongodb://127.0.0.1:27017' }
+                    },
+                    {
+                        name: 'mock-adapter2',
+                        config: { url: 'mongodb://127.0.0.1:27017' }
+                    },
+                    {
+                        name: 'mock-adapter3',
+                        config: { url: 'mongodb://127.0.0.1:27017' }
                     }
                 ],
             })
