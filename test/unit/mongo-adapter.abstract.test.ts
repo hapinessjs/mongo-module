@@ -381,6 +381,80 @@ export class AbstractMongoAdapterTest {
     }
 
     /**
+     * Calling whenReady and not having ready bool set to true yet so emiting "ready" event
+     */
+    @test('- Calling whenReady and not having ready set to true yet so emiting "ready" event')
+    testWhenReadyDelayed(done) {
+        class TestAdapter extends HapinessMongoAdapter {
+            constructor(options) {
+                super(options);
+            }
+
+            _tryConnect() {
+                return Observable.create(observer => {
+                    observer.next();
+                    observer.complete();
+                });
+            }
+
+            _afterConnect() {
+                return Observable.create(observer => {
+                    observer.next();
+                    observer.complete();
+                });
+            }
+        }
+
+        const adapter = new TestAdapter({ skip_connect: true, url: 'this.is.a.fake.uri' });
+        setTimeout(() => adapter.emit('ready'), 1000);
+
+        adapter
+            .connect()
+            .flatMap(() => adapter.whenReady())
+            .subscribe(_ => {
+                unit.bool(adapter.isReady()).isTrue();
+                done();
+            }, (err) => {
+                done(err);
+            });
+    }
+
+    /**
+     * Calling when ready and not having ready set to true yet so emiting "ready" event
+     */
+    @test('- Calling _tryConnect and failing to connect should pass in the error cb of subscribe')
+    testThrowOnTryConnect(done) {
+        class TestAdapter extends HapinessMongoAdapter {
+            constructor(options) {
+                super(options);
+            }
+
+            _tryConnect() {
+                return Observable.create(observer => {
+                    observer.error(new Error('Try connect errored'));
+                    observer.complete();
+                });
+            }
+        }
+
+        const adapter = new TestAdapter({ skip_connect: true, url: 'this.is.a.fake.uri' });
+
+        adapter
+            .connect()
+            .flatMap(() => adapter.whenReady())
+            .subscribe(_ => {
+                unit.assert(false);
+                done(new Error('should not pass here'));
+            }, (err) => {
+                unit
+                    .string(err.message)
+                    .is('Try connect errored');
+
+                done();
+            });
+    }
+
+    /**
      *  Close
      */
     @test('- Close')

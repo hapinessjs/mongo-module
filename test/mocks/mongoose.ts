@@ -6,6 +6,15 @@ import { EventEmitter } from 'events';
 export class ConnectionMock extends EventEmitter {
     private _db: any;
 
+    private then: any;
+    private catch: any;
+
+    constructor() {
+        super();
+
+        this.then = this.then;
+        this.catch = this.catch;
+    }
     emitAfter(evt: string, delay?: number, objectToSend?: any) {
         setTimeout(() => {
             if (!!objectToSend) {
@@ -24,6 +33,26 @@ export class ConnectionMock extends EventEmitter {
         this._db = theDb;
     }
 
+    openUri(fail?: boolean, error?: Error) {
+        const promise =  new Promise((resolve, reject) => {
+            if (fail) {
+                return reject(error);
+            }
+
+            resolve();
+        });
+
+        this.then = function(resolve, reject) {
+            return promise.then(resolve, reject);
+        };
+
+        this.catch = function(reject) {
+            return promise.catch(reject);
+        };
+
+        return this;
+    }
+
     model(collection: string, schema: any) {
         return schema;
     }
@@ -37,7 +66,19 @@ export class MongooseMock {
     }
 
     mockCreateConnection() {
-        const mockConnection = new ConnectionMock();
+        const mockConnection = new ConnectionMock().openUri();
+
+        const mock = unit
+            .stub(mongoose, 'createConnection')
+            .returns(mockConnection);
+
+        this._mocks = this._mocks.concat(mock);
+
+        return mockConnection;
+    }
+
+    mockThrowCreateConnection(error: Error) {
+        const mockConnection = new ConnectionMock().openUri(true, error);
 
         const mock = unit
             .stub(mongoose, 'createConnection')

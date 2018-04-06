@@ -33,7 +33,7 @@
 
 # Mongo Module
 
-`Mongo` module for the Hapiness framework including a `mongoose` adapter and a `mongoose-gridfs` one.
+`Mongo` module for the Hapiness framework including `mongoose`, `mongoose-gridfs` (deprecated) and `mongoose-gridfs-bucket` adapter one.
 
 ## Table of contents
 
@@ -112,7 +112,7 @@ Your adapter should be a class which inherits from `AbstractHapinessMongoAdapter
 
 ### Step 2
 
-You absolutely need to implement a static function `getInterfaceName`, which will return a uniq string identifier for your adapter (**NOTE** `mongoose` and `mongoose-gridfs` are already used by adapters provided by this module).
+You absolutely need to implement a static function `getInterfaceName`, which will return a uniq string identifier for your adapter (**NOTE** `mongoose`, `mongoose-gridfs` and `mongoose-gridfs-bucket` are already used by adapters provided by this module).
 
 ### Step 3
 
@@ -486,6 +486,11 @@ To set up your development environment:
 
 ## Change History
 
+* v2.0.0
+    * Updated mongoose to latest version
+    * Removed the call to createConnection from the constructor of mongo adapter.
+    * Now catch connection errors and pipe them out to be catch by user later on. No more waiting for timeout to realize there is a connection error.
+    * MongooseGridfsAdapter is now deprecated. Use MongooseGridfsBucketAdapter
 * v1.2.0 (2018-04-05)
     * Updated packages' versions.
     * added support of `OnShutdown` of `hapiness Core`
@@ -520,7 +525,7 @@ To set up your development environment:
 
 <table>
     <tr>
-        <td colspan="4" align="center"><a href="https://www.tadaweb.com"><img src="http://bit.ly/2xHQkTi" width="117" alt="tadaweb" /></a></td>
+        <td colspan="5" align="center"><a href="https://www.tadaweb.com"><img src="http://bit.ly/2xHQkTi" width="117" alt="tadaweb" /></a></td>
     </tr>
     <tr>
         <td align="center"><a href="https://github.com/Juneil"><img src="https://avatars3.githubusercontent.com/u/6546204?v=3&s=117" width="117"/></a></td>
