@@ -2,7 +2,8 @@ import {
     HapinessMongoAdapter,
     HapinessMongoAdapterConstructorArgs,
     MongooseAdapter,
-    MongooseGridFsAdapter
+    MongooseGridFsAdapter,
+    MongooseGridFsBucketAdapter
 } from '../adapters';
 
 import { StringMap, Debugger } from '../shared';
@@ -21,7 +22,8 @@ export class MongoManager {
         this._adaptersInstances = {};
         this._adapters = {
             [MongooseAdapter.getInterfaceName()]: MongooseAdapter,
-            [MongooseGridFsAdapter.getInterfaceName()]: MongooseGridFsAdapter
+            [MongooseGridFsAdapter.getInterfaceName()]: MongooseGridFsAdapter,
+            [MongooseGridFsBucketAdapter.getInterfaceName()]: MongooseGridFsBucketAdapter
         };
     }
 
@@ -79,7 +81,8 @@ export class MongoManager {
 
         return this
             ._adaptersInstances[key]
-            .whenReady()
+            .connect()
+            .flatMap(() => this._adaptersInstances[key].whenReady())
             .map(_ => this._adaptersInstances[key]);
     }
 

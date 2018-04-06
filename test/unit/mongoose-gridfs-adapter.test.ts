@@ -7,6 +7,7 @@ import { test, suite } from 'mocha-typescript';
  * @see http://unitjs.com/
  */
 import * as unit from 'unit.js';
+
 import { Observable } from 'rxjs/Observable';
 
 import { MongooseMockInstance, GridFsMockInstance, ConnectionMock } from '../mocks';
@@ -90,8 +91,68 @@ export class MongooseGridFsAdapterTest {
                 unit.assert(spy.callCount === 1, `Incorrect call count on spy, expected 1 but it was ${spy.callCount}`);
                 done();
             }, (err) => {
-                unit.assert(false);
                 done(err);
+            });
+    }
+
+    /**
+     *  If client already exists it should call `close()` function on it
+     */
+    @test('- If client already exists it should call `close()` function on it')
+    testIfClientAlreadyExistsItShouldCloseIt(done) {
+        const spy = unit.spy();
+
+        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
+            constructor(opts) {
+                super(opts);
+                this._client = { close: spy };
+            }
+
+            publicTryConnect() {
+                return this._tryConnect();
+            }
+        }
+
+        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        this._mockConnection.emitAfter('connected', 400);
+
+        _tmpObject
+            .publicTryConnect()
+            .subscribe(_ => {
+                unit.assert(spy.callCount === 1, `Incorrect call count on spy, expected 1 but it was ${spy.callCount}`);
+                done();
+            }, (err) => {
+                done(err);
+            });
+    }
+
+    /**
+     *  If db or client already exists and doesn't have a `close()` function it should throw
+     */
+    @test('- If db or client already exists and doesn\'t have a `close()` function it should throw')
+    testIfDbOrClientAlreadyExistsButHaveNoCloseFunctionShouldThrow(done) {
+        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
+            constructor(opts) {
+                super(opts);
+                this._db = {};
+            }
+
+            publicTryConnect() {
+                return this._tryConnect();
+            }
+        }
+
+        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        this._mockConnection.emitAfter('connected', 400);
+
+        _tmpObject
+            .publicTryConnect()
+            .subscribe(_ => {
+                unit.assert(false);
+                done();
+            }, (err) => {
+                unit.string(err.message).is('_db or _client needs a close function.');
+                done();
             });
     }
 
@@ -100,6 +161,9 @@ export class MongooseGridFsAdapterTest {
      */
     @test('- If connection got an error the observer should failed and return the error')
     testConnectionGotErrorObserverShouldFail(done) {
+        MongooseMockInstance.restore();
+        this._mockConnection = MongooseMockInstance.mockThrowCreateConnection(new Error('Custom error, connection failed'));
+
         class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
             constructor(opts) {
                 super(opts);
@@ -111,7 +175,6 @@ export class MongooseGridFsAdapterTest {
         }
 
         const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
-        this._mockConnection.emitAfter('error', 400, new Error('Custom error, connection failed'));
 
         _tmpObject
             .publicTryConnect()
@@ -201,7 +264,6 @@ export class MongooseGridFsAdapterTest {
     testAfterConnectOnConnectedFailShouldGoInErrorBlock(done) {
         const gridfsMock = this._gridfsMock;
 
-        this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
 
         class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
@@ -218,11 +280,17 @@ export class MongooseGridFsAdapterTest {
                 return Observable.create(
                     observer => {
                         observer.error(new Error('test error'));
-                        observer.complete();
-                        unit.assert(gridfsMock.callCount === 1, `Incorrect call count, expected 1 but it was ${gridfsMock.callCount}`)
-                        done();
+                        unit.assert(gridfsMock.callCount === 1, `Incorrect call count, expected 1 but it was ${gridfsMock.callCount}`);
                     }
                 );
+            }
+
+            onError() {
+                return Observable.create(observer => {
+                    observer.next();
+                    observer.complete();
+                    done();
+                })
             }
         }
 
@@ -475,13 +543,13 @@ export class MongooseGridFsAdapterTest {
 
     @test('- close')
     testClose(done) {
-        this._mockConnection.db = {
-            close: unit.stub()
-        };
-
-        this._mockConnection.db.close.returns(Promise.resolve(null))
+        const stub = unit.stub().returns(Promise.resolve(null));
 
         const mockConnection = this._mockConnection;
+        (<any>mockConnection).client = {
+            close: stub
+        }
+
 
         class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
             constructor(opts) {
@@ -494,16 +562,15 @@ export class MongooseGridFsAdapterTest {
             }
         }
 
-        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', skip_connect: true });
 
         _tmpObject
             .publicAfterConnect()
             .flatMap(() => _tmpObject.close())
             .subscribe(_ => {
-                unit.bool(this._mockConnection.db.close.calledOnce).isTrue();
+                unit.bool(stub.calledOnce).isTrue();
                 done();
             }, (err) => {
-                unit.assert(false);
                 done(err);
             });
     }

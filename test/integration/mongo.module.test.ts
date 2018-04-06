@@ -88,7 +88,6 @@ export class MongoModuleTest {
                     unit
                         .string(mongooseAdapter.getUri())
                         .is('mongodb://my.hostname.com:27017/unit_test');
-
                     this._httpServer.stop().then(__ => done()).catch(err => done(err));
                 } catch (err) {
                     this._httpServer.stop().then(__ => done(err)).catch(e => done(e));
