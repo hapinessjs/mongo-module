@@ -486,6 +486,8 @@ To set up your development environment:
 
 ## Change History
 
+* v2.0.1
+    * Fix Mongo Utils - prepareUpdateObject
 * v2.0.0
     * Updated mongoose to latest version
     * Removed the call to createConnection from the constructor of mongo adapter.
