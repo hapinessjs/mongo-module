@@ -134,6 +134,7 @@ export class MongoUtilTest {
      */
     @test('- `MongoUtils` function `prepareUpdateObject` should return an unfold object (3)')
     testMongoUtilPrepareUpdateObjecUnfoldObject3() {
+        const dateObject = new Date();
         unit
             .object(
                 MongoUtils
@@ -157,7 +158,9 @@ export class MongoUtilTest {
                                 key7: {
                                     key8: 'value4'
                                 },
-                                key8: 'value5'
+                                key8: 'value5',
+                                key9: dateObject,
+                                key10: [1, 2, 3, 4, 5, 6]
                             }
                         }
                     )
@@ -168,7 +171,9 @@ export class MongoUtilTest {
                'test3.key1.key2.key3.key4.key5': 'value2',
                'test3.key1.key2.key6': 'value3',
                'test3.key7.key8': 'value4',
-               'test3.key8': 'value5'
+               'test3.key8': 'value5',
+               'test3.key9': dateObject,
+               'test3.key10': [1, 2, 3, 4, 5, 6]
               });
     }
 

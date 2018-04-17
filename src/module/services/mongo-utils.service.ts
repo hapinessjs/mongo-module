@@ -13,7 +13,7 @@ export class MongoUtils {
     public static prepareUpdateObject(dto: any, prefix?: string): any {
         return Object.entries(dto || {}).reduce((acc, [key, value]) => {
             const _key = [prefix, key].filter(item => item).join('.');
-            return value && typeof value === 'object' ?
+            return !Array.isArray(value) && value && typeof value === 'object' && Object.keys(value).length ?
                 Object.assign(MongoUtils.prepareUpdateObject(value, _key), acc) :
                 Object.assign({ [_key]: value }, acc);
         }, {});
