@@ -130,6 +130,54 @@ export class MongoUtilTest {
     }
 
     /**
+     * `MongoUtils` function `prepareUpdateObject` should return an unfold object (3)
+     */
+    @test('- `MongoUtils` function `prepareUpdateObject` should return an unfold object (3)')
+    testMongoUtilPrepareUpdateObjecUnfoldObject3() {
+        const dateObject = new Date();
+        unit
+            .object(
+                MongoUtils
+                    .prepareUpdateObject(
+                        {
+                            test1: 'value',
+                            test2: {
+                                key1: 'value1'
+                            },
+                            test3: {
+                                key1: {
+                                    key2: {
+                                        key3: {
+                                            key4: {
+                                                key5: 'value2'
+                                            }
+                                        },
+                                        key6: 'value3'
+                                    }
+                                },
+                                key7: {
+                                    key8: 'value4'
+                                },
+                                key8: 'value5',
+                                key9: dateObject,
+                                key10: [1, 2, 3, 4, 5, 6]
+                            }
+                        }
+                    )
+            )
+            .is({
+               test1: 'value',
+               'test2.key1': 'value1',
+               'test3.key1.key2.key3.key4.key5': 'value2',
+               'test3.key1.key2.key6': 'value3',
+               'test3.key7.key8': 'value4',
+               'test3.key8': 'value5',
+               'test3.key9': dateObject,
+               'test3.key10': [1, 2, 3, 4, 5, 6]
+              });
+    }
+
+    /**
      * `MongoUtils` function `filterFindCondition` without id or _id should return the object
      */
     @test('- `MongoUtils` function `filterFindCondition` without id or _id should return the object')

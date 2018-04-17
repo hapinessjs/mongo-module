@@ -10,30 +10,13 @@ export class MongoUtils {
         }
     }
 
-    public static prepareUpdateObject(dto: any): any {
-        if (!dto || !Object.keys(dto).length) {
-            return {};
-        }
-
-        const preparedObject: any = {};
-
-        Object
-            .keys(dto)
-            .forEach(rootKey => {
-                if (!!dto[rootKey] && typeof dto[rootKey] === 'object') {
-                    Object
-                        .keys(dto[rootKey])
-                        .forEach(
-                            childKey => {
-                                preparedObject[`${rootKey}.${childKey}`] = dto[rootKey][childKey];
-                            }
-                        );
-                } else {
-                    preparedObject[rootKey] = dto[rootKey];
-                }
-            });
-
-        return preparedObject;
+    public static prepareUpdateObject(dto: any, prefix?: string): any {
+        return Object.entries(dto || {}).reduce((acc, [key, value]) => {
+            const _key = [prefix, key].filter(item => item).join('.');
+            return !Array.isArray(value) && value && typeof value === 'object' && Object.keys(value).length ?
+                Object.assign(MongoUtils.prepareUpdateObject(value, _key), acc) :
+                Object.assign({ [_key]: value }, acc);
+        }, {});
     }
 
     static filterFindCondition(condition: any): any {
