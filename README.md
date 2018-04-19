@@ -486,6 +486,8 @@ To set up your development environment:
 
 ## Change History
 
+* v2.0.2
+    * More debug and events for mongoose adapter
 * v2.0.1
     * Fix Mongo Utils - prepareUpdateObject
 * v2.0.0

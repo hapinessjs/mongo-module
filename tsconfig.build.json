@@ -4,6 +4,7 @@
         "outDir": "./dist/commonjs",
         "rootDir": "./src",
         "declarationDir": "./dist",
+        "noUnusedLocals": true,
         "types": [
             "node",
             "mongoose",

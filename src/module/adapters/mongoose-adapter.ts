@@ -39,11 +39,6 @@ export class MongooseAdapter extends HapinessMongoAdapter {
                     this.emit('connected', { uri: this._uri });
                 });
 
-                this._connection.on('connecting', () => {
-                    __debugger.debug('on#connecting', `connecting to ${this._uri}`);
-                    this.emit('connecting', { uri: this._uri });
-                });
-
                 this._connection.on('reconnectFailed', () => {
                     __debugger.debug('on#reconnectFailed', `reconnectFailed on ${this._uri}`);
                     this.emit('reconnectFailed', { uri: this._uri });
@@ -65,6 +60,7 @@ export class MongooseAdapter extends HapinessMongoAdapter {
                     __debugger.debug('_afterConnect', '(subscribe) On connected success');
                 }, (e) => {
                     __debugger.debug('_afterConnect', `(subscribe) On connected failed ${JSON.stringify(e, null, 2)}`);
+                    this.emit('error', e);
                 });
 
                 this._connection.on('error', (...args) => this.emit('error', ...args));
@@ -78,11 +74,11 @@ export class MongooseAdapter extends HapinessMongoAdapter {
             });
     }
 
-    public getLibrary(): Mongoose {
-        return mongoose;
+    public getLibrary<T = Mongoose>(): T {
+        return <any>mongoose;
     }
 
-    public getConnection(): Connection {
+    public getConnection<T = Connection>(): T {
         return this._connection;
     }
 

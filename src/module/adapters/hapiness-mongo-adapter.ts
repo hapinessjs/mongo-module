@@ -96,7 +96,7 @@ export class HapinessMongoAdapter extends EventEmitter {
      *  This function should be overriden by all inherited classes.
      *
      */
-    public getLibrary(): any {
+    public getLibrary<T = any>(): T {
         throw new Error('`getLibrary` is not implemented');
     }
 
@@ -179,7 +179,7 @@ export class HapinessMongoAdapter extends EventEmitter {
         return this._uri;
     }
 
-    public getConnection(): any {
+    public getConnection<T = any>(): T {
         return this._connection;
     }
 
