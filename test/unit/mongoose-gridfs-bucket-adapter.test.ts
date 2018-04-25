@@ -163,10 +163,7 @@ export class MongooseGridFsBucketAdapterTest {
             });
     }
 
-    /**
-     *  When afterConnect got an error after calling the onConnected function, it should pass in the error block
-     */
-    @test('- When afterConnect got an error after calling the onConnected function, it should pass in the error block')
+    @test('- When afterConnect got an error after calling the onConnected function, it should pass in the error to on error event')
     testAfterConnectOnConnectedFailShouldGoInErrorBlock(done) {
         const mockConnection = this._mockConnection;
         mockConnection.db = new mongoose.mongo.Db('dbname', new mongoose.mongo.Server('fake.host.in.tdw', 4242));
@@ -192,18 +189,17 @@ export class MongooseGridFsBucketAdapterTest {
 
         const _tmpObject = new ExtendMongooseGridfsBucketAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
 
-        _tmpObject.once('error', err => done());
+        _tmpObject.once('error', err => {
+            unit.object(err).isInstanceOf(Error).hasProperty('message', 'test error');
+            done();
+        });
         _tmpObject
             .publicAfterConnect()
             .subscribe(_ => {
-                // this._mockConnection.emitAfter('error', 400);
             }, (err) => done(err));
     }
 
-    /**
-     * When afterConnect got error, the onError function should be called
-     */
-    @test('- When afterConnect got error, the onError function should be called')
+    @test('- When afterConnect got error, the on error event should be called')
     testAfterConnectGotConnectionError(done) {
         const mockConnection = this._mockConnection;
         mockConnection.db = new mongoose.mongo.Db('dbname', new mongoose.mongo.Server('fake.host.in.tdw', 4242));
@@ -229,11 +225,8 @@ export class MongooseGridFsBucketAdapterTest {
             }, (err) => done(err));
     }
 
-    /**
-     * When afterConnect got error, the onError function should be called and go to the error block of observer if there was an error
-     */
     @test
-    ('- When afterConnect got error, the onError function should be called and go to the error block of observer if there is an error')
+    ('- When afterConnect got error, the on error event should be called')
     testAfterConnectGotConnectionErrorGoToObservableErrBlock(done) {
         const mockConnection = this._mockConnection;
         mockConnection.db = new mongoose.mongo.Db('dbname', new mongoose.mongo.Server('fake.host.in.tdw', 4242));
@@ -262,10 +255,7 @@ export class MongooseGridFsBucketAdapterTest {
             });
     }
 
-    /**
-     * When afterConnect got disconnected, the onDisconnected function should be called
-     */
-    @test('- When afterConnect got disconnected, the onDisconnected function should be called')
+    @test('- When afterConnect got disconnected, the on disconnected event should be called')
     testAfterConnectGotConnectionDisconnected(done) {
         const mockConnection = this._mockConnection;
         mockConnection.db = new mongoose.mongo.Db('dbname', new mongoose.mongo.Server('fake.host.in.tdw', 4242));
@@ -293,38 +283,6 @@ export class MongooseGridFsBucketAdapterTest {
                 done(err);
             });
     }
-
-// /**
-//  * If afterConnect got disconnected, onDisconnected
-// function should be called and go to the error block of observer if there is an err
-//  */
-// @test('- If afterConnect got disconnected, onDisconnected func should be called and go to the err block of observer if there is an err')
-// testAfterConnectGotConnectionDisconnectedGoToObservableErrBlock(done) {
-//     const mockConnection = this._mockConnection;
-//     mockConnection.db = new mongoose.mongo.Db('dbname', new mongoose.mongo.Server('fake.host.in.tdw', 4242));
-
-//     class ExtendMongooseGridfsBucketAdapter extends MongooseGridFsBucketAdapter {
-//         constructor(opts) {
-//             super(opts);
-//         }
-
-//         publicAfterConnect() {
-//             this._connection = mockConnection;
-//             return this._afterConnect();
-//         }
-//     }
-
-//     const _tmpObject = new ExtendMongooseGridfsBucketAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
-
-//     _tmpObject
-//         .publicAfterConnect()
-//         .subscribe(_ => {
-//             this._mockConnection.emitAfter('disconnected', 400);
-//         }, (err) => {
-//             unit.assert(false);
-//             done(err);
-//         });
-// }
 
     @test('- registerValue')
     testRegisterValue() {

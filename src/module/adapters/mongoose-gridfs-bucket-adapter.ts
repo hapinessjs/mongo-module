@@ -6,7 +6,7 @@ import { MongooseAdapter } from './mongoose-adapter';
 (<any>mongoose).Promise = global.Promise;
 
 export class MongooseGridFsBucketAdapter extends MongooseAdapter {
-    private _gridfsBucket: mongo.GridFSBucket;
+    private _gridfsBucket;
 
     public static getInterfaceName(): string {
         return 'mongoose-gridfs-bucket';
