@@ -1,7 +1,7 @@
 /**
  * @see https://github.com/pana-cc/mocha-typescript
  */
-import { test, suite } from 'mocha-typescript';
+import { test, suite, only } from 'mocha-typescript';
 
 /**
  * @see http://unitjs.com/
@@ -65,98 +65,6 @@ export class MongooseGridFsAdapterTest {
     }
 
     /**
-     *  If db already exists it should call `close()` function on it
-     */
-    @test('- If db already exists it should call `close()` function on it')
-    testIfDbAlreadyExistsItShouldCloseIt(done) {
-        const spy = unit.spy();
-
-        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
-            constructor(opts) {
-                super(opts);
-                this._db = { close: spy };
-            }
-
-            publicTryConnect() {
-                return this._tryConnect();
-            }
-        }
-
-        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
-        this._mockConnection.emitAfter('connected', 400);
-
-        _tmpObject
-            .publicTryConnect()
-            .subscribe(_ => {
-                unit.assert(spy.callCount === 1, `Incorrect call count on spy, expected 1 but it was ${spy.callCount}`);
-                done();
-            }, (err) => {
-                done(err);
-            });
-    }
-
-    /**
-     *  If client already exists it should call `close()` function on it
-     */
-    @test('- If client already exists it should call `close()` function on it')
-    testIfClientAlreadyExistsItShouldCloseIt(done) {
-        const spy = unit.spy();
-
-        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
-            constructor(opts) {
-                super(opts);
-                this._client = { close: spy };
-            }
-
-            publicTryConnect() {
-                return this._tryConnect();
-            }
-        }
-
-        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
-        this._mockConnection.emitAfter('connected', 400);
-
-        _tmpObject
-            .publicTryConnect()
-            .subscribe(_ => {
-                unit.assert(spy.callCount === 1, `Incorrect call count on spy, expected 1 but it was ${spy.callCount}`);
-                done();
-            }, (err) => {
-                done(err);
-            });
-    }
-
-    /**
-     *  If db or client already exists and doesn't have a `close()` function it should throw
-     */
-    @test('- If db or client already exists and doesn\'t have a `close()` function it should throw')
-    testIfDbOrClientAlreadyExistsButHaveNoCloseFunctionShouldThrow(done) {
-        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
-            constructor(opts) {
-                super(opts);
-                this._db = {};
-            }
-
-            publicTryConnect() {
-                return this._tryConnect();
-            }
-        }
-
-        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
-        this._mockConnection.emitAfter('connected', 400);
-
-        _tmpObject
-            .publicTryConnect()
-            .subscribe(_ => {
-                unit.assert(false);
-                done();
-            }, (err) => {
-                unit.string(err.message).is('_db or _client needs a close function.');
-                done();
-            });
-    }
-
-    /**
      * If connection got an error the observer should failed and return the error
      */
     @test('- If connection got an error the observer should failed and return the error')
@@ -210,7 +118,6 @@ export class MongooseGridFsAdapterTest {
             .subscribe(_ => {
                 done();
             }, (err) => {
-                unit.assert(false);
                 done(err);
             });
     }
@@ -252,15 +159,11 @@ export class MongooseGridFsAdapterTest {
             .subscribe(_ => {
                 this._mockConnection.emitAfter('connected', 400);
             }, (err) => {
-                unit.assert(false);
                 done(err);
             });
     }
 
-    /**
-     *  When afterConnect got an error after calling the onConnected function, it should pass in the error block
-     */
-    @test('- When afterConnect got an error after calling the onConnected function, it should pass in the error block')
+    @test('- When afterConnect got an error after calling the onConnected function, it should pass in the error block to error event')
     testAfterConnectOnConnectedFailShouldGoInErrorBlock(done) {
         const gridfsMock = this._gridfsMock;
 
@@ -277,6 +180,7 @@ export class MongooseGridFsAdapterTest {
             }
 
             onConnected() {
+                this.emit('connected');
                 return Observable.create(
                     observer => {
                         observer.error(new Error('test error'));
@@ -284,74 +188,20 @@ export class MongooseGridFsAdapterTest {
                     }
                 );
             }
-
-            onError() {
-                return Observable.create(observer => {
-                    observer.next();
-                    observer.complete();
-                    done();
-                })
-            }
         }
 
         const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
 
+        _tmpObject.on('error', err => {
+            unit.object(err).isInstanceOf(Error).hasProperty('message', 'test error');
+            done()
+        });
         _tmpObject
             .publicAfterConnect()
-            .subscribe(_ => {
-                this._mockConnection.emitAfter('error', 400);
-            }, (err) => {
-                unit.assert(false);
-                done(err);
-            });
+            .subscribe(_ => {}, (err) => done(err));
     }
 
-    /**
-     * When afterConnect got error, the onError function should be called
-     */
-    @test('- When afterConnect got error, the onError function should be called')
-    testAfterConnectGotConnectionError(done) {
-        this._mockConnection.db = 'toto';
-        const mockConnection = this._mockConnection;
-
-        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
-            constructor(opts) {
-                super(opts);
-            }
-
-            publicAfterConnect() {
-                this._connection = mockConnection;
-                return this._afterConnect();
-            }
-
-            protected onError() {
-                return Observable.create(
-                    observer => {
-                        observer.next();
-                        observer.complete();
-
-                        done();
-                    }
-                )
-            }
-        }
-
-        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
-
-        _tmpObject
-            .publicAfterConnect()
-            .subscribe(_ => {
-                this._mockConnection.emitAfter('error', 400);
-            }, (err) => {
-                unit.assert(false);
-                done(err);
-            });
-    }
-
-    /**
-     * When afterConnect got error, the onError function should be called and go to the error block of observer if there was an error
-     */
-    @test('- When afterConnect got error, the onError function should be called and go to the error block of observer if there is an error')
+    @test('- When afterConnect got error, the on error event should be called')
     testAfterConnectGotConnectionErrorGoToObservableErrBlock(done) {
         this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
@@ -365,21 +215,11 @@ export class MongooseGridFsAdapterTest {
                 this._connection = mockConnection;
                 return this._afterConnect();
             }
-
-            protected onError() {
-                return Observable.create(
-                    observer => {
-                        observer.error(new Error('test error'));
-                        observer.complete();
-
-                        done();
-                    }
-                )
-            }
         }
 
         const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
 
+        _tmpObject.on('error', () => done());
         _tmpObject
             .publicAfterConnect()
             .subscribe(_ => {
@@ -390,10 +230,7 @@ export class MongooseGridFsAdapterTest {
             });
     }
 
-    /**
-     * When afterConnect got disconnected, the onDisconnected function should be called
-     */
-    @test('- When afterConnect got disconnected, the onDisconnected function should be called')
+    @test('- When afterConnect got disconnected, the on disconnected event should be called')
     testAfterConnectGotConnectionDisconnected(done) {
         this._mockConnection.db = 'toto';
         const mockConnection = this._mockConnection;
@@ -407,64 +244,11 @@ export class MongooseGridFsAdapterTest {
                 this._connection = mockConnection;
                 return this._afterConnect();
             }
-
-            protected onDisconnected() {
-                return Observable.create(
-                    observer => {
-                        observer.next();
-                        observer.complete();
-
-                        done();
-                    }
-                )
-            }
         }
 
         const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
 
-        _tmpObject
-            .publicAfterConnect()
-            .subscribe(_ => {
-                this._mockConnection.emitAfter('disconnected', 400);
-            }, (err) => {
-                unit.assert(false);
-                done(err);
-            });
-    }
-
-    /**
-     * If afterConnect got disconnected, onDisconnected
-    function should be called and go to the error block of observer if there is an err
-     */
-    @test('- If afterConnect got disconnected, onDisconnected func should be called and go to the err block of observer if there is an err')
-    testAfterConnectGotConnectionDisconnectedGoToObservableErrBlock(done) {
-        this._mockConnection.db = 'toto';
-        const mockConnection = this._mockConnection;
-
-        class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
-            constructor(opts) {
-                super(opts);
-            }
-
-            publicAfterConnect() {
-                this._connection = mockConnection;
-                return this._afterConnect();
-            }
-
-            protected onDisconnected() {
-                return Observable.create(
-                    observer => {
-                        observer.error(new Error('test error'));
-                        observer.complete();
-
-                        done();
-                    }
-                )
-            }
-        }
-
-        const _tmpObject = new ExtendMongooseGridFsAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
-
+        _tmpObject.on('disconnected', () => done());
         _tmpObject
             .publicAfterConnect()
             .subscribe(_ => {

@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import { Connection, Mongoose } from 'mongoose';
 
 import { Observable } from 'rxjs/Observable';
 import { HapinessMongoAdapter } from './hapiness-mongo-adapter';
@@ -16,6 +17,8 @@ export class MongooseAdapter extends HapinessMongoAdapter {
 
     constructor(options) {
         super(options);
+
+        this.on('error', (...args) => __debugger.debug('on#error', JSON.stringify(args)));
     }
 
     protected _tryConnect(): Observable<void> {
@@ -29,7 +32,17 @@ export class MongooseAdapter extends HapinessMongoAdapter {
                     reconnectInterval: 5000,
                 };
 
-                this._connection = mongoose.createConnection(this._uri, connectOptions)
+                this._connection = mongoose.createConnection(this._uri, connectOptions);
+
+                this._connection.on('connected', () => {
+                    __debugger.debug('on#connected', `connected to ${this._uri}`);
+                    this.emit('connected', { uri: this._uri });
+                });
+
+                this._connection.on('reconnectFailed', () => {
+                    __debugger.debug('on#reconnectFailed', `reconnectFailed on ${this._uri}`);
+                    this.emit('reconnectFailed', { uri: this._uri });
+                });
 
                 // Seems that typings are not up to date at the moment
                 this._connection['then'](() => {
@@ -43,42 +56,37 @@ export class MongooseAdapter extends HapinessMongoAdapter {
     protected _afterConnect(): Observable<void> {
         return Observable
             .create(observer => {
-
                 this.onConnected().subscribe(_ => {
                     __debugger.debug('_afterConnect', '(subscribe) On connected success');
                 }, (e) => {
                     __debugger.debug('_afterConnect', `(subscribe) On connected failed ${JSON.stringify(e, null, 2)}`);
+                    this.emit('error', e);
                 });
 
-                this._connection.once('error', err =>
-                    this.onError(err).subscribe(_ => {
-                        __debugger.debug('_afterConnect', '(subscribe) On connection error #success');
-                    }, (e) => {
-                        __debugger.debug('_afterConnect', `(subscribe) On connection error #failed ${JSON.stringify(e, null, 2)}`);
-                    })
-                );
-
-                this._connection.once('disconnected', () =>
-                    this.onDisconnected().subscribe(_ => {
-                        __debugger.debug('_afterConnect', '(subscribe) On connection disconnected #success');
-                    }, (e) => {
-                        __debugger.debug('_afterConnect', `(subscribe) On connection disconnected #failed ${JSON.stringify(e, null, 2)}`);
-                    })
-                );
+                this._connection.on('error', (...args) => this.emit('error', ...args));
+                this._connection.on('disconnected', () => {
+                    __debugger.debug('on#disconnected', `disconnected from ${this._uri}`);
+                    this.emit('disconnected', { uri: this._uri });
+                });
 
                 observer.next();
                 observer.complete();
             });
     }
 
-    public getLibrary(): any {
-        return mongoose;
+    public getLibrary<T = Mongoose>(): T {
+        return <any>mongoose;
+    }
+
+    public getConnection<T = Connection>(): T {
+        return this._connection;
     }
 
     public registerValue(schema: any, collection: string, collectionName?: string) {
-        if (!!collectionName && collectionName.length) {
+        if (collectionName && collectionName.length) {
             return this._connection.model(collection, schema, collectionName);
         }
+
         return this._connection.model(collection, schema);
     }
 

@@ -156,218 +156,55 @@ export class MongooseAdapterTest {
             });
     }
 
-    /**
-     *  When afterConnect got an error after calling the onConnected function, it should pass in the error block
-     */
-    @test('- When afterConnect got an error after calling the onConnected function, it should pass in the error block')
-    testAfterConnectOnConnectedFailShouldGoInErrorBlock(done) {
+    @test('- Test getConnection method')
+    testGetConnectionMethod(done) {
         const mockConnection = this._mockConnection;
-
         class ExtendMongooseAdapter extends MongooseAdapter {
             constructor(opts) {
                 super(opts);
             }
 
-            publicAfterConnect() {
-                this._connection = mockConnection;
-                return this._afterConnect();
-            }
-
-            onConnected() {
-                return Observable.create(
-                    observer => {
-                        observer.error(new Error('test error'));
-                        observer.complete();
-                    }
-                );
-            }
-
-            onError() {
-                return Observable.create(o => {
-                    o.next();
-                    o.complete();
-                    done();
+            publicTryConnect() {
+                return this._tryConnect().do(() => {
+                    this._connection = mockConnection;
                 });
             }
         }
 
         const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
+        this._mockConnection.emitAfter('connected', 400);
 
         _tmpObject
-            .publicAfterConnect()
+            .publicTryConnect()
             .subscribe(_ => {
-                this._mockConnection.emitAfter('error', 400);
-            }, (err) => {
-                unit.assert(false);
-                done(err);
-            });
+                unit.object(_tmpObject.getConnection()).is(mockConnection);
+                done();
+            }, (err) => done(err));
     }
 
-    /**
-     * When afterConnect got error, the onError function should be called
-     */
-    @test('- When afterConnect got error, the onError function should be called')
-    testAfterConnectGotConnectionError(done) {
+    @test('- Test reconnectFailed event')
+    testReconnectFailedEvent(done) {
         const mockConnection = this._mockConnection;
-
         class ExtendMongooseAdapter extends MongooseAdapter {
             constructor(opts) {
                 super(opts);
             }
 
-            publicAfterConnect() {
-                this._connection = mockConnection;
-                return this._afterConnect();
-            }
-
-            protected onError() {
-                return Observable.create(
-                    observer => {
-                        observer.next();
-                        observer.complete();
-
-                        done();
-                    }
-                )
+            publicTryConnect() {
+                return this._tryConnect().do(() => {
+                    this._connection = mockConnection;
+                });
             }
         }
 
         const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
-
-        _tmpObject
-            .publicAfterConnect()
-            .subscribe(_ => {
-                this._mockConnection.emitAfter('error', 400);
-            }, (err) => {
-                unit.assert(false);
-                done(err);
-            });
-    }
-
-    /**
-     * When afterConnect got error, the onError function should be called and go to the error block of observer if there was an error
-     */
-    @test('- When afterConnect got error, the onError function should be called and go to the error block of observer if there is an error')
-    testAfterConnectGotConnectionErrorGoToObservableErrBlock(done) {
-        this._mockConnection.db = 'toto';
-        const mockConnection = this._mockConnection;
-
-        class ExtendMongooseAdapter extends MongooseAdapter {
-            constructor(opts) {
-                super(opts);
-            }
-
-            publicAfterConnect() {
-                this._connection = mockConnection;
-                return this._afterConnect();
-            }
-
-            protected onError() {
-                return Observable.create(
-                    observer => {
-                        observer.error(new Error('test error'));
-                        observer.complete();
-
-                        done();
-                    }
-                )
-            }
-        }
-
-        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
-
-        _tmpObject
-            .publicAfterConnect()
-            .subscribe(_ => {
-                this._mockConnection.emitAfter('error', 400);
-            }, (err) => {
-                unit.assert(false);
-                done(err);
-            });
-    }
-
-    /**
-     * When afterConnect got disconnected, the onDisconnected function should be called
-     */
-    @test('- When afterConnect got disconnected, the onDisconnected function should be called')
-    testAfterConnectGotConnectionDisconnected(done) {
-        this._mockConnection.db = 'toto';
-        const mockConnection = this._mockConnection;
-
-        class ExtendMongooseAdapter extends MongooseAdapter {
-            constructor(opts) {
-                super(opts);
-            }
-
-            publicAfterConnect() {
-                this._connection = mockConnection;
-                return this._afterConnect();
-            }
-
-            protected onDisconnected() {
-                return Observable.create(
-                    observer => {
-                        observer.next();
-                        observer.complete();
-
-                        done();
-                    }
-                )
-            }
-        }
-
-        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
-
-        _tmpObject
-            .publicAfterConnect()
-            .subscribe(_ => {
-                this._mockConnection.emitAfter('disconnected', 400);
-            }, (err) => {
-                unit.assert(false);
-                done(err);
-            });
-    }
-
-    /**
-     * If afterConnect got disconnected, onDisconnected function should be called and go to the error block of observer if there is an err
-     */
-    @test('- If afterConnect got disconnected, onDisconnected func should be called and go to the err block of observer if there is an err')
-    testAfterConnectGotConnectionDisconnectedGoToObservableErrBlock(done) {
-        this._mockConnection.db = 'toto';
-        const mockConnection = this._mockConnection;
-
-        class ExtendMongooseAdapter extends MongooseAdapter {
-            constructor(opts) {
-                super(opts);
-            }
-
-            publicAfterConnect() {
-                this._connection = mockConnection;
-                return this._afterConnect();
-            }
-
-            protected onDisconnected() {
-                return Observable.create(
-                    observer => {
-                        observer.error(new Error('test error'));
-                        observer.complete();
-
-                        done();
-                    }
-                )
-            }
-        }
-
-        const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
-
-        _tmpObject
-            .publicAfterConnect()
-            .subscribe(_ => {
-                this._mockConnection.emitAfter('disconnected', 400);
-            }, (err) => {
-                unit.assert(false);
-                done(err);
-            });
+        const spy = unit.spy(mockConnection, 'on');
+        this._mockConnection.emitAfter('reconnectFailed', 400);
+        _tmpObject.on('reconnectFailed', () => {
+            unit.number(spy.callCount).isGreaterThan(0);
+            done();
+        });
+        _tmpObject.publicTryConnect().subscribe(() => {}, err => done(err));
     }
 
     /**

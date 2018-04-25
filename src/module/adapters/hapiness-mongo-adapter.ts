@@ -64,6 +64,8 @@ export class HapinessMongoAdapter extends EventEmitter {
     }
 
     public tryConnect(): Observable<void> {
+        __debugger.debug('tryConnect', `connecting to ${this._uri}`);
+        this.emit('connecting', { uri: this._uri });
         return this
             ._tryConnect()
             .switchMap(_ => this._afterConnect());
@@ -94,7 +96,7 @@ export class HapinessMongoAdapter extends EventEmitter {
      *  This function should be overriden by all inherited classes.
      *
      */
-    public getLibrary(): any {
+    public getLibrary<T = any>(): T {
         throw new Error('`getLibrary` is not implemented');
     }
 
@@ -125,9 +127,9 @@ export class HapinessMongoAdapter extends EventEmitter {
     }
 
     protected onDisconnected(): Observable<void> {
-        __debugger.debug('onDisconnected', '');
+        __debugger.debug('onDisconnected', `disconnected from ${this._uri}`);
 
-        this.emit('disconnected');
+        this.emit('disconnected', { uri: this._uri });
 
         return this
             .tryConnect()
@@ -177,7 +179,7 @@ export class HapinessMongoAdapter extends EventEmitter {
         return this._uri;
     }
 
-    public getConnection(): any {
+    public getConnection<T = any>(): T {
         return this._connection;
     }
 

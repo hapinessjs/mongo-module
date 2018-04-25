@@ -13,7 +13,7 @@ export class MongoClientService {
         @Inject(MongoClientExt) private _mongoManager: MongoManager
     ) { }
 
-    get() {
+    get(): MongoManager {
         return this._mongoManager;
     }
 
