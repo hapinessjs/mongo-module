@@ -65,7 +65,7 @@ export class MongoClientExt implements OnExtensionLoad, OnModuleInstantiated, On
     }
 
     loadAdapters(mongoManager: MongoManager, adaptersToLoad: HapinessLoadAdapterConfig[]): Observable<void> {
-        __debugger.debug('loadAdapters', `Params => ${JSON.stringify(adaptersToLoad, null, 2)}`);
+        __debugger.debug('loadAdapters', '');
         return Observable
             .create(
                 observer => {
