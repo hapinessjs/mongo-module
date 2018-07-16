@@ -3,6 +3,10 @@ import * as Url from 'url';
 export class UtilFunctions {
 
     public static hideCredentials(uri: string): string {
+        if (!uri || !uri.length) {
+            return '';
+        }
+
         return uri.replace(/\/\/.*@/, '//***:***@');
     }
 
