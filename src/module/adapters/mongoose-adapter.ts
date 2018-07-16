@@ -3,7 +3,7 @@ import { Connection, Mongoose } from 'mongoose';
 
 import { Observable } from 'rxjs/Observable';
 import { HapinessMongoAdapter } from './hapiness-mongo-adapter';
-import { Debugger } from '../shared';
+import { Debugger, UtilFunctions } from '../shared';
 
 const __debugger = new Debugger('MongooseAdapter');
 
@@ -35,12 +35,12 @@ export class MongooseAdapter extends HapinessMongoAdapter {
                 this._connection = mongoose.createConnection(this._uri, connectOptions);
 
                 this._connection.on('connected', () => {
-                    __debugger.debug('on#connected', `connected to ${this._uri}`);
+                    __debugger.debug('on#connected', `connected to ${UtilFunctions.hideCredentials(this._uri)}`);
                     this.emit('connected', { uri: this._uri });
                 });
 
                 this._connection.on('reconnectFailed', () => {
-                    __debugger.debug('on#reconnectFailed', `reconnectFailed on ${this._uri}`);
+                    __debugger.debug('on#reconnectFailed', `reconnectFailed on ${UtilFunctions.hideCredentials(this._uri)}`);
                     this.emit('reconnectFailed', { uri: this._uri });
                 });
 
@@ -65,7 +65,7 @@ export class MongooseAdapter extends HapinessMongoAdapter {
 
                 this._connection.on('error', (...args) => this.emit('error', ...args));
                 this._connection.on('disconnected', () => {
-                    __debugger.debug('on#disconnected', `disconnected from ${this._uri}`);
+                    __debugger.debug('on#disconnected', `disconnected from ${UtilFunctions.hideCredentials(this._uri)}`);
                     this.emit('disconnected', { uri: this._uri });
                 });
 

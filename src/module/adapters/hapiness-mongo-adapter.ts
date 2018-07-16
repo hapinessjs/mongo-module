@@ -64,7 +64,7 @@ export class HapinessMongoAdapter extends EventEmitter {
     }
 
     public tryConnect(): Observable<void> {
-        __debugger.debug('tryConnect', `connecting to ${this._uri}`);
+        __debugger.debug('tryConnect', `connecting to ${UtilFunctions.hideCredentials(this._uri)}`);
         this.emit('connecting', { uri: this._uri });
         return this
             ._tryConnect()
@@ -127,7 +127,7 @@ export class HapinessMongoAdapter extends EventEmitter {
     }
 
     protected onDisconnected(): Observable<void> {
-        __debugger.debug('onDisconnected', `disconnected from ${this._uri}`);
+        __debugger.debug('onDisconnected', `disconnected from ${UtilFunctions.hideCredentials(this._uri)}`);
 
         this.emit('disconnected', { uri: this._uri });
 
