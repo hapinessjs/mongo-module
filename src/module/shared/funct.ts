@@ -1,6 +1,11 @@
 import * as Url from 'url';
 
 export class UtilFunctions {
+
+    public static hideCredentials(uri: string): string {
+        return uri.replace(/\/\/.*@/, '//***:***@');
+    }
+
     public static getMongoUri(dbUrl: string, db?: string) {
         // If no db is provided we wannot append the db in the url
         if (!db) {
@@ -19,4 +24,5 @@ export class UtilFunctions {
 
         return [dbUrl, db].join('/');
     }
+
 }
