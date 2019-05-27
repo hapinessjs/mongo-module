@@ -60,13 +60,18 @@ export class MongooseAdapter extends HapinessMongoAdapter {
                     __debugger.debug('_afterConnect', '(subscribe) On connected success');
                 }, (e) => {
                     __debugger.debug('_afterConnect', `(subscribe) On connected failed ${JSON.stringify(e, null, 2)}`);
+                    this.emit('error', e);
                     this.onError(e).subscribe();
                 });
 
-                this._connection.on('error', (e) => this.onError(e).subscribe());
+                this._connection.on('error', (e) => {
+                    this.emit('error', e);
+                    this.onError(e).subscribe();
+                });
 
                 this._connection.on('disconnected', () => {
                     __debugger.debug('on#disconnected', `disconnected from ${UtilFunctions.hideCredentials(this._uri)}`);
+                    this.emit('disconnected', { uri: this._uri });
                     this.onDisconnected().subscribe();
                 });
 
