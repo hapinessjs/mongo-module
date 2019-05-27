@@ -13,7 +13,7 @@ import { Observable } from 'rxjs/Observable';
 import { HapinessMongoAdapter } from '../../src';
 
 
-@suite('- Unit AbstractMongoAdapterTest file')
+@suite.skip('- Unit AbstractMongoAdapterTest file')
 export class AbstractMongoAdapterTest {
 
     /**

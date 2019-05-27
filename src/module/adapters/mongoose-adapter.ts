@@ -61,12 +61,18 @@ export class MongooseAdapter extends HapinessMongoAdapter {
                 }, (e) => {
                     __debugger.debug('_afterConnect', `(subscribe) On connected failed ${JSON.stringify(e, null, 2)}`);
                     this.emit('error', e);
+                    this.onError(e).subscribe();
                 });
 
-                this._connection.on('error', (...args) => this.emit('error', ...args));
+                this._connection.on('error', (e) => {
+                    this.emit('error', e);
+                    this.onError(e).subscribe();
+                });
+
                 this._connection.on('disconnected', () => {
                     __debugger.debug('on#disconnected', `disconnected from ${UtilFunctions.hideCredentials(this._uri)}`);
                     this.emit('disconnected', { uri: this._uri });
+                    this.onDisconnected().subscribe();
                 });
 
                 observer.next();
@@ -83,11 +89,14 @@ export class MongooseAdapter extends HapinessMongoAdapter {
     }
 
     public registerValue(schema: any, collection: string, collectionName?: string) {
-        if (collectionName && collectionName.length) {
-            return this._connection.model(collection, schema, collectionName);
+        try {
+            if (collectionName && collectionName.length) {
+                return this._connection.model(collection, schema, collectionName);
+            }
+            return this._connection.model(collection, schema);
+        } catch (err) {
+            return this._connection.model(collection);
         }
-
-        return this._connection.model(collection, schema);
     }
 
     public close(): Observable<void> {
