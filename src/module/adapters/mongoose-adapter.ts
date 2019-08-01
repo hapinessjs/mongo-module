@@ -100,6 +100,7 @@ export class MongooseAdapter extends HapinessMongoAdapter {
     }
 
     public close(): Observable<void> {
+        this._isClosed = true;
         return Observable.fromPromise(this._connection.client.close());
     }
 }
