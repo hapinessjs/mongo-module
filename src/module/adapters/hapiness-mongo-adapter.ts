@@ -136,7 +136,7 @@ export class HapinessMongoAdapter extends EventEmitter {
         this.emit('disconnected', { uri: this._uri });
 
         if (this._isClosed) {
-            return;
+            return Observable.of(null);
         }
 
         return this
