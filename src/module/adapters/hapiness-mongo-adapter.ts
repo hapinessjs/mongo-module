@@ -13,6 +13,7 @@ export class HapinessMongoAdapter extends EventEmitter {
     protected _config: HapinessMongoAdapterConstructorArgs;
     protected _uri: string;
     protected _isReady: boolean;
+    protected _isClosed: boolean;
 
     protected _connection: any;
     protected _db: any;
@@ -34,6 +35,7 @@ export class HapinessMongoAdapter extends EventEmitter {
         }
 
         this._isReady = false;
+        this._isClosed = true;
 
         if (options.skip_connect) {
             return;
@@ -118,6 +120,7 @@ export class HapinessMongoAdapter extends EventEmitter {
 
         return Observable
             .create(observer => {
+                this._isClosed = false;
                 this._isReady = true;
                 this.emit('ready');
 
@@ -131,6 +134,10 @@ export class HapinessMongoAdapter extends EventEmitter {
 
         this._isReady = false;
         this.emit('disconnected', { uri: this._uri });
+
+        if (this._isClosed) {
+            return;
+        }
 
         return this
             .tryConnect()
@@ -178,6 +185,10 @@ export class HapinessMongoAdapter extends EventEmitter {
         return this._isReady;
     }
 
+    public isClosed(): boolean {
+        return this._isClosed;
+    }
+
     public getUri(): string {
         return this._uri;
     }
@@ -187,6 +198,7 @@ export class HapinessMongoAdapter extends EventEmitter {
     }
 
     public close(): Observable<void> {
+        this._isClosed = true;
         return Observable.of(null);
     }
 
