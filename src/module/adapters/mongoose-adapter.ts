@@ -30,6 +30,9 @@ export class MongooseAdapter extends HapinessMongoAdapter {
                     promiseLibrary: global.Promise,
                     reconnectTries: Number.MAX_VALUE,
                     reconnectInterval: 5000,
+                    useNewUrlParser: true,
+                    useCreateIndex: true,
+                    useFindAndModify: false
                 };
 
                 this._connection = mongoose.createConnection(this._uri, connectOptions);
