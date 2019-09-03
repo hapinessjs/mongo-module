@@ -486,6 +486,8 @@ To set up your development environment:
 
 ## Change History
 
+* v2.1.0
+    * Now set by default `useNewUrlParser: true`, `useCreateIndex: true` and `useFindAndModify: false` on the connectionOptions of mongoose.
 * v2.0.2
     * More debug and events for mongoose adapter
 * v2.0.1
