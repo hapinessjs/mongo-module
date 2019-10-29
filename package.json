@@ -75,7 +75,7 @@
         "@types/mongoose": "~5.3.21",
         "debug": "^3.1.0",
         "gridfs-stream": "^1.1.1",
-        "mongoose": "~5.4.23"
+        "mongoose": "~5.7.5"
     },
     "devDependencies": {
         "@hapiness/core": "^1.6.1",
