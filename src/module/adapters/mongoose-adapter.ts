@@ -26,10 +26,12 @@ export class MongooseAdapter extends HapinessMongoAdapter {
             .create(observer => {
                 this._isReady = false;
 
-                const connectOptions: mongoose.ConnectionOptions = {
+                const connectOptions: any = {
                     promiseLibrary: global.Promise,
                     reconnectTries: Number.MAX_VALUE,
                     reconnectInterval: 5000,
+                    useUnifiedTopology: true,
+                    heartbeatFrequencyMS: 300000
                 };
 
                 this._connection = mongoose.createConnection(this._uri, connectOptions);
