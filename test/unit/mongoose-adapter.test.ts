@@ -215,9 +215,7 @@ export class MongooseAdapterTest {
         const stub = unit.stub().returns(Promise.resolve(null));
 
         const mockConnection = this._mockConnection;
-        (<any>mockConnection).client = {
-            close: stub
-        }
+        (<any>mockConnection).close = stub;
 
         class ExtendMongooseAdapter extends MongooseAdapter {
             constructor(opts) {

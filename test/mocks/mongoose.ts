@@ -39,7 +39,7 @@ export class ConnectionMock extends EventEmitter {
                 return reject(error);
             }
 
-            resolve();
+            resolve(null);
         });
 
         this.then = function(resolve, reject) {
