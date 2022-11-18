@@ -98,7 +98,7 @@ export class MongooseGridFsBucketAdapterTest {
     @test.skip('- If the connection emit the event connected, the _tryConnect function should resolve observable')
     testConnectionSucceedObserverShouldResolve(done) {
         const mockConnection = this._mockConnection;
-        mockConnection.db = new mongoose.mongo.Db('dbname', new mongoose.mongo.Server('fake.host.in.tdw', 4242));
+        mockConnection.db = new mongoose.mongo.Db('dbname', mongoose.mongo.HostAddress.fromHostPort('fake.host.in.tdw', 4242).toString());
 
         class ExtendMongooseGridfsBucketAdapter extends MongooseGridFsBucketAdapter {
             constructor(opts) {
@@ -128,7 +128,7 @@ export class MongooseGridFsBucketAdapterTest {
     @test('- If the connection emit the event connected, the onConnected function inside afterConnect should resolve observable')
     testConnectionSucceedOnConnectedInsideAfterConnect(done) {
         const mockConnection = this._mockConnection;
-        mockConnection.db = new mongoose.mongo.Db('dbname', new mongoose.mongo.Server('fake.host.in.tdw', 4242));
+        mockConnection.db = new mongoose.mongo.Db('dbname', mongoose.mongo.HostAddress.fromHostPort('fake.host.in.tdw', 4242).toString());
         class ExtendMongooseGridfsBucketAdapter extends MongooseGridFsBucketAdapter {
             constructor(opts) {
                 super(opts);
@@ -166,7 +166,7 @@ export class MongooseGridFsBucketAdapterTest {
     @test('- When afterConnect got an error after calling the onConnected function, it should pass in the error to on error event')
     testAfterConnectOnConnectedFailShouldGoInErrorBlock(done) {
         const mockConnection = this._mockConnection;
-        mockConnection.db = new mongoose.mongo.Db('dbname', new mongoose.mongo.Server('fake.host.in.tdw', 4242));
+        mockConnection.db = new mongoose.mongo.Db('dbname', mongoose.mongo.HostAddress.fromHostPort('fake.host.in.tdw', 4242).toString());
 
         let i = 0;
 
@@ -210,7 +210,7 @@ export class MongooseGridFsBucketAdapterTest {
     @test.skip('- When afterConnect got error, the on error event should be called')
     testAfterConnectGotConnectionError(done) {
         const mockConnection = this._mockConnection;
-        mockConnection.db = new mongoose.mongo.Db('dbname', new mongoose.mongo.Server('fake.host.in.tdw', 4242));
+        mockConnection.db = new mongoose.mongo.Db('dbname', mongoose.mongo.HostAddress.fromHostPort('fake.host.in.tdw', 4242).toString());
 
         class ExtendMongooseGridfsBucketAdapter extends MongooseGridFsBucketAdapter {
             constructor(opts) {
@@ -240,7 +240,7 @@ export class MongooseGridFsBucketAdapterTest {
     @test.skip('- When afterConnect got error, the on error event should be called')
     testAfterConnectGotConnectionErrorGoToObservableErrBlock(done) {
         const mockConnection = this._mockConnection;
-        mockConnection.db = new mongoose.mongo.Db('dbname', new mongoose.mongo.Server('fake.host.in.tdw', 4242));
+        mockConnection.db = new mongoose.mongo.Db('dbname', mongoose.mongo.HostAddress.fromHostPort('fake.host.in.tdw', 4242).toString());
 
         class ExtendMongooseGridfsBucketAdapter extends MongooseGridFsBucketAdapter {
             constructor(opts) {
@@ -269,7 +269,7 @@ export class MongooseGridFsBucketAdapterTest {
     @test.skip('- When afterConnect got disconnected, the on disconnected event should be called')
     testAfterConnectGotConnectionDisconnected(done) {
         const mockConnection = this._mockConnection;
-        mockConnection.db = new mongoose.mongo.Db('dbname', new mongoose.mongo.Server('fake.host.in.tdw', 4242));
+        mockConnection.db = new mongoose.mongo.Db('dbname', mongoose.mongo.HostAddress.fromHostPort('fake.host.in.tdw', 4242).toString());
 
         class ExtendMongooseGridfsBucketAdapter extends MongooseGridFsBucketAdapter {
             constructor(opts) {
@@ -323,7 +323,7 @@ export class MongooseGridFsBucketAdapterTest {
     @test('- getLibrary')
     testGetLibrary(done) {
         const mockConnection = this._mockConnection;
-        mockConnection.db = new mongoose.mongo.Db('dbname', new mongoose.mongo.Server('fake.host.in.tdw', 4242));
+        mockConnection.db = new mongoose.mongo.Db('dbname', mongoose.mongo.HostAddress.fromHostPort('fake.host.in.tdw', 4242).toString());
 
         class ExtendMongooseGridfsBucketAdapter extends MongooseGridFsBucketAdapter {
             constructor(opts) {
@@ -363,7 +363,7 @@ export class MongooseGridFsBucketAdapterTest {
     @test('- close')
     testClose(done) {
         const mockConnection = this._mockConnection;
-        mockConnection.db = new mongoose.mongo.Db('dbname', new mongoose.mongo.Server('fake.host.in.tdw', 4242));
+        mockConnection.db = new mongoose.mongo.Db('dbname', mongoose.mongo.HostAddress.fromHostPort('fake.host.in.tdw', 4242).toString());
         const stub = unit.stub().returns(Promise.resolve(null));
         (<any>mockConnection).client = {
             close: stub

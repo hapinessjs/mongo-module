@@ -26,14 +26,13 @@ export class MongooseAdapter extends HapinessMongoAdapter {
             .create(observer => {
                 this._isReady = false;
 
-                const connectOptions: mongoose.ConnectionOptions = {
-                    promiseLibrary: global.Promise,
-                    reconnectTries: Number.MAX_VALUE,
-                    reconnectInterval: 5000,
+                const connectOptions: mongoose.ConnectOptions = {
+                    useUnifiedTopology: true,
                     useNewUrlParser: true,
-                    useCreateIndex: true,
-                    useFindAndModify: false
-                };
+                    socketTimeoutMS: 60000,
+                    serverSelectionTimeoutMS: 30000,
+                    heartbeatFrequencyMS: 20000
+                } as mongoose.ConnectOptions;
 
                 this._connection = mongoose.createConnection(this._uri, connectOptions);
 
@@ -104,6 +103,6 @@ export class MongooseAdapter extends HapinessMongoAdapter {
 
     public close(): Observable<void> {
         this._isClosed = true;
-        return Observable.fromPromise(this._connection.client.close());
+        return Observable.fromPromise(this._connection.close());
     }
 }

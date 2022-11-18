@@ -72,10 +72,9 @@
     "dependencies": {
         "@types/gridfs-stream": "^0.5.30",
         "@types/mongodb": "^3.0.9",
-        "@types/mongoose": "~5.3.21",
+        "@types/mongoose": "~5.11.97",
         "debug": "^3.1.0",
-        "gridfs-stream": "^1.1.1",
-        "mongoose": "~5.4.23"
+        "gridfs-stream": "^1.1.1"
     },
     "devDependencies": {
         "@hapiness/core": "^1.6.1",
@@ -86,6 +85,7 @@
         "istanbul": "^1.1.0-alpha.1",
         "mocha": "^4.1.0",
         "mocha-typescript": "^1.1.12",
+        "mongoose": "~6.7.2",
         "rimraf": "^2.6.2",
         "rxjs": "^5.5.8",
         "ts-node": "^3.3.0",
@@ -95,7 +95,8 @@
     },
     "peerDependencies": {
         "@hapiness/core": "^1.5.0",
-        "rxjs": "^5.5.8"
+        "rxjs": "^5.5.8",
+        "mongoose": ">6.0.0"
     },
     "engines": {
         "node": ">=7.0.0"

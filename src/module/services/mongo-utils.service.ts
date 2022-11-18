@@ -1,10 +1,10 @@
-import { ObjectID } from 'mongodb';
+import { ObjectId } from 'bson';
 
 export class MongoUtils {
 
     public static toObjectId(id: string) {
         try {
-            return new ObjectID(id);
+            return new ObjectId(id);
         } catch (err) {
             return undefined;
         }
