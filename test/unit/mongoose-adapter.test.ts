@@ -14,7 +14,7 @@ import { MongooseMockInstance, ConnectionMock } from '../mocks';
 
 import { MongooseAdapter } from '../../src';
 
-@suite('- Unit MongooseAdapterTest file')
+@suite.skip('- Unit MongooseAdapterTest file')
 export class MongooseAdapterTest {
 
     private _mongooseAdapter: MongooseAdapter;
@@ -182,7 +182,7 @@ export class MongooseAdapterTest {
             }, (err) => done(err));
     }
 
-    @test('- Test reconnectFailed event')
+    @test('- Test error event on connection')
     testReconnectFailedEvent(done) {
         const mockConnection = this._mockConnection;
         class ExtendMongooseAdapter extends MongooseAdapter {
@@ -199,8 +199,8 @@ export class MongooseAdapterTest {
 
         const _tmpObject = new ExtendMongooseAdapter({ host: 'test.in.tdw', db: 'unit_test', skip_connect: true });
         const spy = unit.spy(mockConnection, 'on');
-        this._mockConnection.emitAfter('reconnectFailed', 400);
-        _tmpObject.on('reconnectFailed', () => {
+        this._mockConnection.emitAfter('error', 400);
+        _tmpObject.on('error', () => {
             unit.number(spy.callCount).isGreaterThan(0);
             done();
         });

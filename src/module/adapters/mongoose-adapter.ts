@@ -39,19 +39,14 @@ export class MongooseAdapter extends HapinessMongoAdapter {
                 this._connection.on('connected', () => {
                     __debugger.debug('on#connected', `connected to ${UtilFunctions.hideCredentials(this._uri)}`);
                     this.emit('connected', { uri: this._uri });
-                });
-
-                this._connection.on('reconnectFailed', () => {
-                    __debugger.debug('on#reconnectFailed', `reconnectFailed on ${UtilFunctions.hideCredentials(this._uri)}`);
-                    this.emit('reconnectFailed', { uri: this._uri });
-                });
-
-                // Seems that typings are not up to date at the moment
-                this._connection['then'](() => {
                     observer.next();
                     observer.complete();
-                })
-                .catch(err => observer.error(err));
+                });
+
+                this._connection.once('error', err => {
+                    __debugger.debug('on#error', `error on ${UtilFunctions.hideCredentials(this._uri)}`);
+                    observer.error(err)
+                });
             });
     }
 

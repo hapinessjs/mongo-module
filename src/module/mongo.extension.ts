@@ -143,7 +143,7 @@ export class MongoClientExt implements OnExtensionLoad, OnModuleInstantiated, On
                 this._mongoManager = new MongoManager(config.common);
                 this
                     .registerAdapters(this._mongoManager, config.register)
-                    .switchMap(_ => this.loadAdapters(this._mongoManager, config.load))
+                    .flatMap(_ => this.loadAdapters(this._mongoManager, config.load))
                     .subscribe(_ => {
                         observer.next({
                             instance: this,

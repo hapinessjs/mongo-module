@@ -70,7 +70,7 @@ export class HapinessMongoAdapter extends EventEmitter {
         this.emit('connecting', { uri: this._uri });
         return this
             ._tryConnect()
-            .switchMap(_ => this._afterConnect());
+            .flatMap(_ => this._afterConnect());
     }
 
     /*

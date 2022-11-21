@@ -14,7 +14,7 @@ import { MongooseMockInstance, ConnectionMock } from '../mocks';
 import { HapinessMongoAdapter, MongoManager, MongooseAdapter } from '../../src';
 
 
-@suite('- Unit MongoManagerTest file')
+@suite.only('- Unit MongoManagerTest file')
 export class MongoManagerTest {
 
     // private property to store service instance
@@ -289,7 +289,7 @@ export class MongoManagerTest {
         this
             ._mongoManager
             .loadAdapter('custom', { db: 'toto1' })
-            .switchMap(adap1 => {
+            .flatMap(adap1 => {
                 adapter1 = adap1;
                 return this._mongoManager.loadAdapter('custom', { db: 'toto2' });
             })
@@ -320,9 +320,9 @@ export class MongoManagerTest {
         // Get first instance
         mongoManager
             .loadAdapter('mongoose')
-            .switchMap(adap1 => {
+            .flatMap(adap1 => {
                 adapter1 = adap1;
-                return mongoManager.loadAdapter('mongoose');
+                return mongoManager.loadAdapter('mongoose')
             })
             .subscribe(adap2 => {
                 try {

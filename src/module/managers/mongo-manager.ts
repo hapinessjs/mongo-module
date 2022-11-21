@@ -79,6 +79,11 @@ export class MongoManager {
             this._adaptersInstances[key] = new (this._adapters[adapterName])(_options);
         }
 
+        if (this._adaptersInstances[key].isConnected()) {
+            return Observable.of(null)
+                .map(() => this._adaptersInstances[key]);
+        }
+
         return this
             ._adaptersInstances[key]
             .connect()
