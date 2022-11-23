@@ -13,7 +13,7 @@ import { Observable } from 'rxjs/Observable';
 import { HapinessMongoAdapter } from '../../src';
 
 
-@suite.skip('- Unit AbstractMongoAdapterTest file')
+@suite('- Unit AbstractMongoAdapterTest file')
 export class AbstractMongoAdapterTest {
 
     /**
@@ -260,6 +260,7 @@ export class AbstractMongoAdapterTest {
             }
 
             callOnDisconnected(): Observable<void> {
+                this._isClosed = false;
                 return this.onDisconnected();
             }
         }

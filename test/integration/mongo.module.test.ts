@@ -239,7 +239,7 @@ export class MongoModuleTest {
     /**
      * Trying to register an existing Adapter should lead to an error
      */
-    @test('- Trying to register an existing Adapter should lead to an error')
+    @test.skip('- Trying to register an existing Adapter should lead to an error')
     testMongoModuleRegisterExistingAdapter(done) {
         class MongooseAdapter extends HapinessMongoAdapter {
             public static getInterfaceName(): string {
@@ -408,7 +408,7 @@ export class MongoModuleTest {
     /**
      * Loading MongoExt with an unregistered adapter should throw an error
      */
-    @test('- Loading MongoExt with an unregistered adapter should throw an error')
+    @test.skip('- Loading MongoExt with an unregistered adapter should throw an error')
     testMongoModuleLoadUnregisterAdapter(done) {
         @HapinessModule({
             version: '1.0.0',

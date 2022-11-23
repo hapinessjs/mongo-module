@@ -14,7 +14,7 @@ import { MongooseMockInstance, ConnectionMock } from '../mocks';
 import { HapinessMongoAdapter, MongoManager, MongooseAdapter } from '../../src';
 
 
-@suite.only('- Unit MongoManagerTest file')
+@suite('- Unit MongoManagerTest file')
 export class MongoManagerTest {
 
     // private property to store service instance

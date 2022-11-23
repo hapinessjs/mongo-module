@@ -14,7 +14,7 @@ import { MongooseMockInstance, GridFsMockInstance, ConnectionMock } from '../moc
 
 import { MongooseGridFsAdapter } from '../../src';
 
-@suite.skip('- Unit MongooseGridFsAdapterTest file')
+@suite('- Unit MongooseGridFsAdapterTest file')
 export class MongooseGridFsAdapterTest {
     private _mockConnection: ConnectionMock;
     private _gridfsMock: any;
@@ -343,10 +343,7 @@ export class MongooseGridFsAdapterTest {
         const stub = unit.stub().returns(Promise.resolve(null));
 
         const mockConnection = this._mockConnection;
-        (<any>mockConnection).client = {
-            close: stub
-        }
-
+        (<any>mockConnection).close = stub;
 
         class ExtendMongooseGridFsAdapter extends MongooseGridFsAdapter {
             constructor(opts) {

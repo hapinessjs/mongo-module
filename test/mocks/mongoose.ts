@@ -78,7 +78,10 @@ export class MongooseMock {
     }
 
     mockThrowCreateConnection(error: Error) {
-        const mockConnection = new ConnectionMock().openUri(true, error);
+        const mockConnection = new ConnectionMock().openUri(true);
+        if (error) {
+            mockConnection.emitAfter('error', 2000, error)
+        }
 
         const mock = unit
             .stub(mongoose, 'createConnection')

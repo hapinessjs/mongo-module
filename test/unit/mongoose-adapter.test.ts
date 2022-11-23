@@ -14,7 +14,7 @@ import { MongooseMockInstance, ConnectionMock } from '../mocks';
 
 import { MongooseAdapter } from '../../src';
 
-@suite.skip('- Unit MongooseAdapterTest file')
+@suite('- Unit MongooseAdapterTest file')
 export class MongooseAdapterTest {
 
     private _mongooseAdapter: MongooseAdapter;
